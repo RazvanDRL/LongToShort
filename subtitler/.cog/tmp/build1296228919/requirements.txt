@@ -1,0 +1,7 @@
+whisper-timestamped @ git+https://github.com/linto-ai/whisper-timestamped@732865ce9c0c1027c67f964e7200c7db6542b142
+python-dotenv==1.0.0
+torch==2.0.1
+torchaudio==2.0.2
+google-api-python-client==2.97.0
+onnxruntime==1.15.1
+moviepy==1.0.3

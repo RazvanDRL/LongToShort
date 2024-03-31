@@ -1,0 +1,19 @@
+{
+  "name": "server",
+  "module": "index.js",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "dev": "bun run index.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.37.0",
+    "axios": "^1.5.1",
+    "googleapis": "^126.0.1"
+  }
+}
