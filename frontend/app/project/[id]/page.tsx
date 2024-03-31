@@ -114,13 +114,13 @@ export default function Project({ params }: { params: { id: string } }) {
                 aud: userFetch.aud,
             });
             if (userFetch.aud !== 'authenticated') {
-                router.push('/login');
+                router.replace('/login');
                 return true;
             }
             else
                 return false;
         } else {
-            router.push('/login');
+            router.replace('/login');
             return true;
         }
     }
@@ -204,7 +204,7 @@ export default function Project({ params }: { params: { id: string } }) {
                         setShouldRender(true);
                     }
                     else if (metadata.processed === false) {
-                        router.push(`/video/${params.id}`);
+                        router.replace(`/video/${params.id}`);
                     }
                 }
                 catch (error: any) {

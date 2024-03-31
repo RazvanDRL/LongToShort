@@ -21,12 +21,12 @@ import { useRouter } from 'next/navigation'
 
 
 
-export default function Header({ user_email }: { user_email: string}) {
+export default function Header({ user_email }: { user_email: string }) {
     const router = useRouter();
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
-        router.push('/login');
+        router.replace('/login');
     };
 
     return (

@@ -94,14 +94,14 @@ export default function Dashboard() {
                 email: userFetch.email || "",
             });
             if (userFetch.aud !== 'authenticated') {
-                router.push('/login');
+                router.replace('/login');
                 return true;
             }
             else
                 return false;
         }
         else {
-            router.push('/login');
+            router.replace('/login');
             return true;
         }
     }
@@ -267,7 +267,7 @@ export default function Dashboard() {
                         .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration });
 
                     const promise2 = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                        router.push(`/video/${uuid}`);
+                        router.replace(`/video/${uuid}`);
                     });
 
                     toast.promise(promise2, {

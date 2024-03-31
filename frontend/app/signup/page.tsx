@@ -32,7 +32,7 @@ export default function Home() {
     async function handleSignedIn() {
         const auth = (await supabase.auth.getUser()).data.user?.aud;
         if (auth === 'authenticated') {
-            router.push('/dashboard');
+            router.replace('/dashboard');
             return true;
         }
         else

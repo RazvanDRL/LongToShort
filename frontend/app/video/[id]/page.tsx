@@ -58,13 +58,13 @@ export default function Video({ params }: { params: { id: string } }) {
                 aud: userFetch.aud,
             });
             if (userFetch.aud !== 'authenticated') {
-                router.push('/login');
+                router.replace('/login');
                 return true;
             }
             else
                 return false;
         } else {
-            router.push('/login');
+            router.replace('/login');
             return true;
         }
     }
@@ -92,7 +92,7 @@ export default function Video({ params }: { params: { id: string } }) {
 
                 if (pN !== pO && pN === true) {
                     const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                        router.push(`/project/${params.id}`);
+                        router.replace(`/project/${params.id}`);
                     });
 
                     toast.promise(promise, {
@@ -285,7 +285,7 @@ export default function Video({ params }: { params: { id: string } }) {
                         setShouldRender(true);
                     }
                     else if (metadata.processed === true) {
-                        router.push(`/project/${params.id}`);
+                        router.replace(`/project/${params.id}`);
                     }
                 }
                 catch (error: any) {

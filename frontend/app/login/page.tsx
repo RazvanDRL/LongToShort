@@ -32,7 +32,7 @@ export default function Home() {
   async function handleSignedIn() {
     const auth = (await supabase.auth.getUser()).data.user?.aud;
     if (auth === 'authenticated') {
-      router.push('/dashboard');
+      router.replace('/dashboard');
       return true;
     }
     else
@@ -131,7 +131,7 @@ export default function Home() {
       toast.error(error.message);
       setLoading(false);
     } else if (data) {
-      router.push('/dashboard');
+      router.replace('/dashboard');
     }
   };
 
@@ -145,7 +145,7 @@ export default function Home() {
 
       <div className='flex justify-center items-center h-screen'>
         <div className="absolute top-0 left-0 m-7">
-          <Button variant="link" onClick={() => router.push("/")}>
+          <Button variant="link" onClick={() => router.replace("/")}>
             <ArrowLeft className="w-4 mr-1" aria-hidden="true" />
             Home
           </Button>
