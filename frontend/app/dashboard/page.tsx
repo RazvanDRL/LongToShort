@@ -193,7 +193,7 @@ export default function Dashboard() {
         return sanitizedString;
     }
 
-    async function getDuration(file: File) {
+    async function getDuration(file: File): Promise<{ duration: number, width: number, height: number }> {
         return new Promise(async (resolve, reject) => {
             const video = document.createElement('video');
             video.preload = 'metadata';
@@ -201,7 +201,9 @@ export default function Dashboard() {
             video.onloadedmetadata = async function () {
                 window.URL.revokeObjectURL(video.src);
                 const duration = video.duration;
-                resolve(duration);
+                const width = video.videoWidth;
+                const height = video.videoHeight;
+                resolve({ duration, width, height });
             }
             video.onerror = function (error) {
                 reject(error);
@@ -259,12 +261,11 @@ export default function Dashboard() {
 
                     setUploadState("done");
 
-                    // get the duration of the video file
-                    let duration = await getDuration(file);
-
+                    const { duration, width, height } = await getDuration(file);
+                    
                     const { error } = await supabase
                         .from('metadata')
-                        .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration });
+                        .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, width: width, height: height });
 
                     const promise2 = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
                         router.replace(`/video/${uuid}`);

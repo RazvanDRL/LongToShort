@@ -17,6 +17,8 @@ type Metadata = {
     name: string;
     duration: number;
     fps?: number;
+    width?: number;
+    height?: number;
     processed: boolean;
 };
 
@@ -76,6 +78,8 @@ export default function Project({ params }: { params: { id: string } }) {
                 name: data.name,
                 duration: data.duration,
                 fps: data.fps,
+                width: data.width,
+                height: data.height,
                 processed: data.processed,
             });
         }
@@ -246,8 +250,8 @@ export default function Project({ params }: { params: { id: string } }) {
                 <Player
                     component={MyVideo}
                     durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
-                    compositionWidth={270}
-                    compositionHeight={480}
+                    compositionWidth={metadata.width! / 4 || 270}
+                    compositionHeight={metadata.height! / 4 || 480}
                     fps={metadata.fps || 30}
                     controls
                 />
