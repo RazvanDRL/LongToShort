@@ -26,9 +26,10 @@ type Metadata = {
     name: string;
     duration: number;
     fps?: number;
+    width?: number;
+    height?: number;
     processed: boolean;
-}
-
+};
 type QueuePos = {
     position: number;
     processing_time: string;

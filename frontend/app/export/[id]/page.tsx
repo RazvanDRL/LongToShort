@@ -42,8 +42,10 @@ type Metadata = {
     name: string;
     duration: number;
     fps?: number;
+    width?: number;
+    height?: number;
     processed: boolean;
-}
+};
 
 const predefinedReasons = [
     'Rather not say',
