@@ -47,12 +47,7 @@ async function processQueueItem(row: queueItem) {
                 await abortPrediction(controller);
             }
         }, 600000); // 10 minutes
-        // const { data: update_created_at_data, error: update_created_at_error } = await supabase
-        //     .from("processing_queue")
-        //     .update([
-        //         { created_at: new Date().toISOString() },
-        //     ])
-        //     .match({ id: row.id });
+
         try {
             const output = await replicate.run(
                 `razvandrl/subtitler:${version}`,
@@ -144,8 +139,8 @@ async function processQueueItem(row: queueItem) {
                         { id: row.video_id, user_id: row.user_id, subtitles: output },
                     ])
                     .select()
-                await addSubToVideo(video_data.signedUrl.toString(), row.user_id, row.video_id);
-                await upload(row.user_id, row.video_id);
+                // await addSubToVideo(video_data.signedUrl.toString(), row.user_id, row.video_id);
+                // await upload(row.user_id, row.video_id);
             }
             await $`rm -rf ${row.user_id}`;
         } catch (error) {
@@ -205,7 +200,7 @@ async function main() {
             // await abortPrediction(controller);
         } else {
             // If no new items in the queue, wait for some time before checking again
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
 }

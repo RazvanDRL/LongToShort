@@ -198,6 +198,21 @@ export default function Project({ params }: { params: { id: string } }) {
 
         const renderedSubtitles = useMemo(() => {
             return subtitles.map((subtitle) => {
+                if (subtitle.start === 0 && subtitle.end === 0) {
+
+                    const previousSubtitle = subtitles[subtitles.indexOf(subtitle) - 1];
+
+                    if (previousSubtitle) {
+                        subtitle.start = previousSubtitle.end;
+                    };
+
+                    const nextSubtitle = subtitles[subtitles.indexOf(subtitle) + 1];
+
+                    if (nextSubtitle) {
+                        subtitle.end = nextSubtitle.start;
+                    }
+                }
+
                 const subtitleDuration = subtitle.end - subtitle.start;
                 if (subtitleDuration <= 0) {
                     // Handle invalid subtitle duration
@@ -243,20 +258,29 @@ export default function Project({ params }: { params: { id: string } }) {
             </AbsoluteFill>
         );
     }
-    
+
+    console.log(subtitles);
+
     return (
         <div>
             <Toaster />
-            {video && metadata &&
-                <Player
-                    component={MyVideo}
-                    durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
-                    compositionWidth={metadata.width! / 4 || 270}
-                    compositionHeight={metadata.height! / 4 || 480}
-                    fps={metadata.fps || 30}
-                    controls
-                />
-            }
-        </div>
+            <main className="flex justify-center items-center mt-24">
+                <div className="flex justify-center items-center flex-col">
+                    {video && metadata &&
+                        <div className="rounded-lg bg-gray-800/50 p-2">
+                            <Player
+                                className="rounded-lg"
+                                component={MyVideo}
+                                durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
+                                compositionWidth={metadata.width! / 4 > 270 ? metadata.width! / 4 : 270}
+                                compositionHeight={metadata.height! / 4 > 480 ? metadata.height! / 4 : 480}
+                                fps={metadata.fps || 30}
+                                controls
+                            />
+                        </div>
+                    }
+                </div>
+            </main>
+        </div >
     );
 };
