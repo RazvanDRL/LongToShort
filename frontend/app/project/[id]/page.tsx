@@ -266,6 +266,41 @@ export default function Project({ params }: { params: { id: string } }) {
             <Toaster />
             <main className="flex justify-center items-center mt-24">
                 <div className="flex justify-center items-center flex-col">
+                    {subtitles.length > 0 && (
+                        <div className="rounded-lg bg-gray-800/50 p-2 mr-4">
+                            <div className="flex flex-col">
+                                {subtitles.map((subtitle, index) => (
+                                    <div key={index} className="bg-white rounded-md p-2 mb-2 flex items-center">
+                                        <textarea
+                                            className="w-full resize-none focus:outline-none mr-2"
+                                            value={subtitle.text}
+                                            onChange={(e) => {
+                                                const newSubtitles = [...subtitles];
+                                                newSubtitles[index].text = e.target.value;
+                                                setSubtitles(newSubtitles);
+                                            }}
+                                        />
+                                        <div className="flex items-center">
+                                            <span className="mr-2">Duration:</span>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                value={(subtitle.end - subtitle.start) / 1000}
+                                                onChange={(e) => {
+                                                    const newSubtitles = [...subtitles];
+                                                    const duration = parseFloat(e.target.value) * 1000;
+                                                    newSubtitles[index].end = newSubtitles[index].start + duration;
+                                                    setSubtitles(newSubtitles);
+                                                }}
+                                                className="w-20 px-2 py-1 rounded-md focus:outline-none"
+                                            />
+                                            <span className="ml-2">s</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                     {video && metadata &&
                         <div className="rounded-lg bg-gray-800/50 p-2">
                             <Player
