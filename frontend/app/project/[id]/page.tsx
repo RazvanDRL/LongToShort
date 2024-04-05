@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { Toaster, toast } from 'sonner';
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 type User = {
     id: string;
@@ -267,40 +268,57 @@ export default function Project({ params }: { params: { id: string } }) {
             <main className="flex justify-center items-center mt-24">
                 <div className="flex justify-center items-center flex-col">
                     {subtitles.length > 0 && (
-                        <div className="rounded-lg bg-gray-800/50 p-2 mr-4">
-                            <div className="flex flex-col">
-                                {subtitles.map((subtitle, index) => (
-                                    <div key={index} className="bg-white rounded-md p-2 mb-2 flex items-center">
-                                        <textarea
-                                            className="w-full resize-none focus:outline-none mr-2"
-                                            value={subtitle.text}
-                                            onChange={(e) => {
-                                                const newSubtitles = [...subtitles];
-                                                newSubtitles[index].text = e.target.value;
-                                                setSubtitles(newSubtitles);
-                                            }}
-                                        />
-                                        <div className="flex items-center">
-                                            <span className="mr-2">Duration:</span>
-                                            <input
-                                                type="number"
-                                                step="0.01"
-                                                value={(subtitle.end - subtitle.start) / 1000}
+                        <div className="rounded-lg bg-gray-800/50 p-2 mr-4 w-1/2">
+                            <ScrollArea className="h-[50vh]">
+                                <div className="p-4">
+                                    {subtitles.map((subtitle, index) => (
+                                        <div key={index} className="bg-white rounded-md p-2 mb-2 flex items-center">
+                                            <div className="flex items-center mr-2">
+                                                <span className="mr-2">Start:</span>
+                                                <input
+                                                    type="number"
+                                                    step="0.001"
+                                                    value={subtitle.start}
+                                                    onChange={(e) => {
+                                                        const newSubtitles = [...subtitles];
+                                                        newSubtitles[index].start = parseFloat(e.target.value);
+                                                        setSubtitles(newSubtitles);
+                                                    }}
+                                                    className="w-20 px-2 py-1 rounded-md focus:outline-none"
+                                                />
+                                                <span className="ml-2">s</span>
+                                            </div>
+                                            <div className="flex items-center mr-2">
+                                                <span className="mr-2">End:</span>
+                                                <input
+                                                    type="number"
+                                                    step="0.001"
+                                                    value={subtitle.end}
+                                                    onChange={(e) => {
+                                                        const newSubtitles = [...subtitles];
+                                                        newSubtitles[index].end = parseFloat(e.target.value);
+                                                        setSubtitles(newSubtitles);
+                                                    }}
+                                                    className="w-20 px-2 py-1 rounded-md focus:outline-none"
+                                                />
+                                                <span className="ml-2">s</span>
+                                            </div>
+                                            <textarea
+                                                className="w-full resize-none focus:outline-none"
+                                                value={subtitle.text}
                                                 onChange={(e) => {
                                                     const newSubtitles = [...subtitles];
-                                                    const duration = parseFloat(e.target.value) * 1000;
-                                                    newSubtitles[index].end = newSubtitles[index].start + duration;
+                                                    newSubtitles[index].text = e.target.value;
                                                     setSubtitles(newSubtitles);
                                                 }}
-                                                className="w-20 px-2 py-1 rounded-md focus:outline-none"
                                             />
-                                            <span className="ml-2">s</span>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            </ScrollArea>
                         </div>
                     )}
+
                     {video && metadata &&
                         <div className="rounded-lg bg-gray-800/50 p-2">
                             <Player
