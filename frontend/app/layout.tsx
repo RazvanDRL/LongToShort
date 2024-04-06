@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@/components/theme-provider"
 import { CSPostHogProvider } from './providers'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import Crisp from './crisp'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google';
@@ -27,6 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Crisp />
+          <SpeedInsights />
           {children}
         </ThemeProvider>
       </body>
