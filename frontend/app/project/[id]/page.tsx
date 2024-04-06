@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { Toaster, toast } from 'sonner';
 import { ScrollArea } from "@/components/ui/scroll-area"
+import EmbeddedCheckoutButton from "@/components/EmbeddedCheckoutButton";
 
 type User = {
     id: string;
@@ -260,7 +261,7 @@ export default function Project({ params }: { params: { id: string } }) {
         );
     }
 
-    console.log(subtitles);
+    // console.log(subtitles);
 
     return (
         <div>

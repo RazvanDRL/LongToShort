@@ -26,10 +26,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CSPostHogProvider>
-            <Crisp />
-            {children}
-          </CSPostHogProvider>
+          <Crisp />
+          {children}
         </ThemeProvider>
       </body>
     </html >
