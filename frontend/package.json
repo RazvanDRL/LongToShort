@@ -28,6 +28,7 @@
     "@stripe/stripe-js": "^3.2.0",
     "@supabase/supabase-js": "^2.38.4",
     "@types/uuid": "^9.0.7",
+    "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.10",
     "avvvatars-react": "^0.4.2",
     "class-variance-authority": "^0.7.0",
