@@ -8,6 +8,7 @@ if (typeof window !== 'undefined') {
         api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     })
 }
+
 export function CSPostHogProvider({ children }) {
     return (
         <PostHogProvider client={posthog}>{children}</PostHogProvider>
