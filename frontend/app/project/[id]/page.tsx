@@ -1,12 +1,21 @@
 "use client";
-import { Player } from "@remotion/player";
+import { Player, PlayerRef, CallbackListener } from "@remotion/player";
 import { AbsoluteFill, Video, Sequence, useVideoConfig } from "remotion";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { Toaster, toast } from 'sonner';
 import { ScrollArea } from "@/components/ui/scroll-area"
-import EmbeddedCheckoutButton from "@/components/EmbeddedCheckoutButton";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Slider } from "@/components/ui/slider"
+
 
 type User = {
     id: string;
@@ -37,6 +46,9 @@ export default function Project({ params }: { params: { id: string } }) {
     const [video, setVideo] = useState<string | null>(null);
     const [shouldRender, setShouldRender] = useState(false);
     const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
+    const [startTimeSlider, setStartTimeSlider] = useState(0);
+    const [endTimeSlider, setEndTimeSlider] = useState(0);
+    const playerRef = useRef<PlayerRef>(null);
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
@@ -191,6 +203,88 @@ export default function Project({ params }: { params: { id: string } }) {
         runPrecheck();
     }, [user?.id]);
 
+    useEffect(() => {
+        if (!playerRef.current) {
+            return;
+        }
+        const onPlay: CallbackListener<"play"> = () => {
+            console.log("play");
+        };
+        const onRateChange: CallbackListener<"ratechange"> = (e) => {
+            console.log("ratechange", e.detail.playbackRate);
+        };
+        const onVolumeChange: CallbackListener<"volumechange"> = (e) => {
+            console.log("new volume", e.detail.volume);
+        };
+
+        const onPause: CallbackListener<"pause"> = () => {
+            console.log("pausing");
+        };
+
+        const onSeeked: CallbackListener<"seeked"> = (e) => {
+            console.log("seeked to " + e.detail.frame);
+        };
+
+        const onTimeupdate: CallbackListener<"timeupdate"> = (e) => {
+            console.log("time has updated to " + e.detail.frame);
+        };
+
+        const onEnded: CallbackListener<"ended"> = () => {
+            console.log("ended");
+        };
+
+        const onError: CallbackListener<"error"> = (e) => {
+            console.log("error", e.detail.error);
+        };
+
+        const onFullscreenChange: CallbackListener<"fullscreenchange"> = (e) => {
+            console.log("fullscreenchange", e.detail.isFullscreen);
+        };
+
+        const onScaleChange: CallbackListener<"scalechange"> = (e) => {
+            console.log("scalechange", e.detail.scale);
+        };
+
+        const onMuteChange: CallbackListener<"mutechange"> = (e) => {
+            console.log("mutechange", e.detail.isMuted);
+        };
+
+        playerRef.current.addEventListener("play", onPlay);
+        playerRef.current.addEventListener("ratechange", onRateChange);
+        playerRef.current.addEventListener("volumechange", onVolumeChange);
+        playerRef.current.addEventListener("pause", onPause);
+        playerRef.current.addEventListener("ended", onEnded);
+        playerRef.current.addEventListener("error", onError);
+        playerRef.current.addEventListener("fullscreenchange", onFullscreenChange);
+        playerRef.current.addEventListener("scalechange", onScaleChange);
+        playerRef.current.addEventListener("mutechange", onMuteChange);
+
+        // See below for difference between `seeked` and `timeupdate`
+        playerRef.current.addEventListener("seeked", onSeeked);
+        playerRef.current.addEventListener("timeupdate", onTimeupdate);
+
+        return () => {
+            // Make sure to clean up event listeners
+            if (playerRef.current) {
+                playerRef.current.removeEventListener("play", onPlay);
+                playerRef.current.removeEventListener("ratechange", onRateChange);
+                playerRef.current.removeEventListener("volumechange", onVolumeChange);
+                playerRef.current.removeEventListener("pause", onPause);
+                playerRef.current.removeEventListener("ended", onEnded);
+                playerRef.current.removeEventListener("error", onError);
+                playerRef.current.removeEventListener(
+                    "fullscreenchange",
+                    onFullscreenChange,
+                );
+                playerRef.current.removeEventListener("scalechange", onScaleChange);
+                playerRef.current.removeEventListener("mutechange", onMuteChange);
+                playerRef.current.removeEventListener("seeked", onSeeked);
+                playerRef.current.removeEventListener("timeupdate", onTimeupdate);
+            }
+        };
+    }, []);
+
+
     if (!shouldRender) {
         return <div className="bg-[#ec2626] z-50 w-screen h-screen"></div>;
     }
@@ -269,50 +363,87 @@ export default function Project({ params }: { params: { id: string } }) {
             <main className="flex justify-center items-center mt-24">
                 <div className="flex justify-center items-center flex-col">
                     {subtitles.length > 0 && (
-                        <div className="rounded-lg bg-gray-800/50 p-2 mr-4 w-1/2">
+                        <div className="rounded-lg bg-gray-800/50 p-2 mr-4 w-[500px]">
                             <ScrollArea className="h-[50vh]">
                                 <div className="p-4">
                                     {subtitles.map((subtitle, index) => (
-                                        <div key={index} className="bg-white rounded-md p-2 mb-2 flex items-center">
-                                            <div className="flex items-center mr-2">
-                                                <span className="mr-2">Start:</span>
-                                                <input
-                                                    type="number"
-                                                    step="0.001"
-                                                    value={subtitle.start}
-                                                    onChange={(e) => {
-                                                        const newSubtitles = [...subtitles];
-                                                        newSubtitles[index].start = parseFloat(e.target.value);
-                                                        setSubtitles(newSubtitles);
+                                        <div key={index} className="bg-transparent rounded-md p-2 mb-2 flex flex-col hover:bg-white/20">
+                                            <div className="flex justify-between items-center">
+                                                <Popover onOpenChange={(isOpen) => {
+                                                    if (isOpen) {
+                                                        setStartTimeSlider(subtitle.start);
+                                                        setEndTimeSlider(subtitle.end);
+                                                    }
+                                                }}>
+                                                    <PopoverTrigger asChild>
+                                                        <Button variant="outline">{subtitle.start.toFixed(2)} - {subtitle.end.toFixed(2)}</Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-80">
+                                                        <div className="grid gap-4">
+                                                            <div className="grid gap-2">
+                                                                <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                                    <Label htmlFor="width">Start &#40;min {subtitle.start}&#41;</Label>
+                                                                    <Input
+                                                                        id="width"
+                                                                        value={startTimeSlider}
+                                                                        onChange={(e) => setStartTimeSlider(parseFloat(e.target.value))}
+                                                                        className="col-span-2 h-8" />
+                                                                </div>
+                                                                <Slider
+                                                                    defaultValue={[subtitle.start]}
+                                                                    min={subtitle.start}
+                                                                    max={subtitle.end}
+                                                                    step={0.001}
+                                                                    onValueChange={(e) => setStartTimeSlider(e[0])} className="mt-2" />
+
+                                                                <div className="grid w-full max-w-sm items-center gap-1.5 mt-4">
+                                                                    <Label htmlFor="width">End &#40;max {subtitle.end}&#41;</Label>
+                                                                    <Input
+                                                                        id="width"
+                                                                        value={endTimeSlider}
+                                                                        onChange={(e) => setEndTimeSlider(parseFloat(e.target.value))}
+                                                                        className="col-span-2 h-8" />
+                                                                </div>
+                                                                <Slider
+                                                                    defaultValue={[subtitle.end]}
+                                                                    min={subtitle.start}
+                                                                    max={subtitle.end}
+                                                                    step={0.001}
+                                                                    onValueChange={(e) => setEndTimeSlider(e[0])} className="mt-2" />
+                                                                <Button
+                                                                    className="mt-8"
+                                                                    onClick={() => {
+                                                                        const updatedSubtitles = [...subtitles];
+                                                                        updatedSubtitles[subtitles.indexOf(subtitle)] = {
+                                                                            ...subtitle,
+                                                                            start: startTimeSlider,
+                                                                            end: endTimeSlider,
+                                                                        };
+                                                                        setSubtitles(updatedSubtitles);
+                                                                    }}
+                                                                >
+                                                                    Save
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <Button
+                                                    className="ml-2 text-xs px-2 py-1 rounded-full bg-red-600 hover:bg-red-700 text-white"
+                                                    onClick={() => {
+                                                        const updatedSubtitles = subtitles.filter(
+                                                            (_, i) => i !== index
+                                                        );
+                                                        setSubtitles(updatedSubtitles);
                                                     }}
-                                                    className="w-20 px-2 py-1 rounded-md focus:outline-none"
-                                                />
-                                                <span className="ml-2">s</span>
+                                                >
+                                                    Delete
+                                                </Button>
+                                                <Button>Show</Button>
                                             </div>
-                                            <div className="flex items-center mr-2">
-                                                <span className="mr-2">End:</span>
-                                                <input
-                                                    type="number"
-                                                    step="0.001"
-                                                    value={subtitle.end}
-                                                    onChange={(e) => {
-                                                        const newSubtitles = [...subtitles];
-                                                        newSubtitles[index].end = parseFloat(e.target.value);
-                                                        setSubtitles(newSubtitles);
-                                                    }}
-                                                    className="w-20 px-2 py-1 rounded-md focus:outline-none"
-                                                />
-                                                <span className="ml-2">s</span>
+                                            <div contentEditable={true} className="mt-2">
+                                                {subtitle.text}
                                             </div>
-                                            <textarea
-                                                className="w-full resize-none focus:outline-none"
-                                                value={subtitle.text}
-                                                onChange={(e) => {
-                                                    const newSubtitles = [...subtitles];
-                                                    newSubtitles[index].text = e.target.value;
-                                                    setSubtitles(newSubtitles);
-                                                }}
-                                            />
                                         </div>
                                     ))}
                                 </div>
@@ -324,6 +455,7 @@ export default function Project({ params }: { params: { id: string } }) {
                         <div className="rounded-lg bg-gray-800/50 p-2">
                             <Player
                                 className="rounded-lg"
+                                ref={playerRef}
                                 component={MyVideo}
                                 durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
                                 compositionWidth={metadata.width! / 4 > 270 ? metadata.width! / 4 : 270}

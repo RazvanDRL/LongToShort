@@ -2,6 +2,7 @@
 import React from "react";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
+import { Rating } from "flowbite-react";
 
 import Stars from "@/public/stars.svg";
 import Image from "next/image";
@@ -20,7 +21,7 @@ function GridSmallBackgroundDemo() {
 export default function Home() {
     return (
         <div className="relative w-full">
-            <GridSmallBackgroundDemo />
+            {/* <GridSmallBackgroundDemo /> */}
             <Navbar />
             <div className="flex flex-col items-center justify-start min-h-screen pt-32 z-20">
                 <p className="text-4xl sm:text-7xl font-bold relative z-20 bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500 py-8">
@@ -32,10 +33,14 @@ export default function Home() {
                 <Button className="w-48 text-xl py-6 px-2 z-20">Get statred</Button>
                 <div className="text-gray-300/50 z-20">(No credit card required)</div>
                 {/* add stars review svg */}
-                <div className="flex mt-8 z-20">
-                    <Image src={Stars} alt="Stars Review" className="w-48 h-auto" />
-                    <span className="text-gray-300/50 ml-3 text-lg flex align-center items-center z-20">4.8 out of 5</span>
-                </div>
+                <Rating>
+                    <Rating.Star />
+                    <Rating.Star />
+                    <Rating.Star />
+                    <Rating.Star />
+                    <Rating.Star />
+                    <p className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">4.8 out of 5</p>
+                </Rating>
                 <span className="text-gray-300/50 mt-2 z-20">(loved by 100+ creators)</span>
             </div>
         </div>
