@@ -30,7 +30,7 @@ export default function Navbar() {
                 </div>
                 <div>
                     <Button onClick={() => {
-                        router.replace("/dashboard");
+                        router.push("/dashboard");
                     }}>
                         Dashboard
                     </Button>
