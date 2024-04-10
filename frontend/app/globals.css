@@ -50,7 +50,9 @@
 } */
 
 [contenteditable]:focus {
-  outline: 0px solid transparent;
+  outline: 1px solid white;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 @layer base {
