@@ -17,6 +17,9 @@ import {
 import { Slider } from "@/components/ui/slider"
 import { Eye, ListPlus, Trash2 } from "lucide-react";
 import Header from "@/components/header";
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 
 
 type User = {
@@ -191,6 +194,7 @@ export default function Project({ params }: { params: { id: string } }) {
                     if (metadata.processed === true) {
                         await fetchVideo();
                         await fetchSubtitles();
+                        setFocusedSubtitleIndex(0);
                         setShouldRender(true);
                     }
                     else if (metadata.processed === false) {
@@ -282,136 +286,288 @@ export default function Project({ params }: { params: { id: string } }) {
             <Toaster />
             {user ? <Header user_email={user.email} /> : null}
             <main className="flex justify-center items-center mt-24">
-                <div className="flex justify-center items-center">
-                    {metadata && subtitles.length > 0 && (
-                        <div className="rounded-lg bg-gray-800/50 p-2 mr-4 w-[500px]">
-                            <ScrollArea className="h-[50vh]">
-                                <div className="p-4">
-                                    {subtitles.map((subtitle, index) => (
-                                        <div
-                                            key={index}
-                                            className="bg-transparent rounded-md p-4 mb-2 flex flex-col hover:bg-white/20 focus:bg-white/20"
-                                            onFocus={() => setFocusedSubtitleIndex(index)}
-                                            onBlur={() => setFocusedSubtitleIndex(null)}
-                                            tabIndex={0} // Ensure that the div can receive focus
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <Popover onOpenChange={(isOpen) => {
-                                                    if (isOpen) {
-                                                        setStartTimeSlider(subtitle.start);
-                                                        setEndTimeSlider(subtitle.end);
-                                                    }
-                                                }}>
-                                                    <PopoverTrigger asChild>
-                                                        <Button variant="outline">{subtitle.start.toFixed(2)} - {subtitle.end.toFixed(2)}</Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-80">
-                                                        <div className="grid gap-4">
-                                                            <div className="grid gap-2">
-                                                                <div className="grid w-full max-w-sm items-center gap-1.5">
-                                                                    <Label htmlFor="width">Start &#40;min {subtitle.start}&#41;</Label>
-                                                                    <Input
-                                                                        id="width"
-                                                                        value={startTimeSlider}
-                                                                        onChange={(e) => setStartTimeSlider(parseFloat(e.target.value))}
-                                                                        className="col-span-2 h-8" />
-                                                                </div>
-                                                                <Slider
-                                                                    defaultValue={[subtitle.start]}
-                                                                    min={subtitle.start}
-                                                                    max={subtitle.end}
-                                                                    step={0.001}
-                                                                    onValueChange={(e) => setStartTimeSlider(e[0])} className="mt-2" />
-
-                                                                <div className="grid w-full max-w-sm items-center gap-1.5 mt-4">
-                                                                    <Label htmlFor="width">End &#40;max {subtitle.end}&#41;</Label>
-                                                                    <Input
-                                                                        id="width"
-                                                                        value={endTimeSlider}
-                                                                        onChange={(e) => setEndTimeSlider(parseFloat(e.target.value))}
-                                                                        className="col-span-2 h-8" />
-                                                                </div>
-                                                                <Slider
-                                                                    defaultValue={[subtitle.end]}
-                                                                    min={subtitle.start}
-                                                                    max={subtitle.end}
-                                                                    step={0.001}
-                                                                    onValueChange={(e) => setEndTimeSlider(e[0])} className="mt-2" />
-                                                                <Button
-                                                                    className="mt-8"
-                                                                    onClick={() => {
-                                                                        const updatedSubtitles = [...subtitles];
-                                                                        updatedSubtitles[subtitles.indexOf(subtitle)] = {
-                                                                            ...subtitle,
-                                                                            start: startTimeSlider,
-                                                                            end: endTimeSlider,
-                                                                        };
-                                                                        setSubtitles(updatedSubtitles);
-                                                                    }}
-                                                                >
-                                                                    Save
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </PopoverContent>
-                                                </Popover>
-                                                {focusedSubtitleIndex === index && (
-                                                    <div className="flex items-center">
-                                                        <ListPlus
-                                                            className="w-8 h-8 ml-1 cursor-pointer hover:bg-gray-200/20 rounded-lg"
-                                                            onClick={() => {
-                                                                const updatedSubtitles = [...subtitles];
-                                                                updatedSubtitles.splice(index + 1, 0, {
-                                                                    start: subtitles[subtitles.indexOf(subtitle)].end,
-                                                                    end: subtitles[subtitles.indexOf(subtitle) + 1].start,
-                                                                    text: "",
-                                                                });
-                                                                setSubtitles(updatedSubtitles);
-                                                            }}
-                                                        />
-                                                        <Trash2
-                                                            className="w-8 h-8 ml-1 cursor-pointer hover:bg-gray-200/20 rounded-lg"
-                                                            onClick={() => {
-                                                                const updatedSubtitles = subtitles.filter(
-                                                                    (_, i) => i !== index
-                                                                );
-                                                                setSubtitles(updatedSubtitles);
-                                                            }}
-                                                        />
-                                                        <Eye
-                                                            className="w-8 h-8 ml-1 cursor-pointer hover:bg-gray-200/20 rounded-lg"
-                                                            onClick={() => {
-                                                                playerRef.current?.seekTo(subtitle.start * metadata.fps!);
-                                                            }}
-                                                        />
+                {video && metadata && (
+                    <div className="flex justify-center items-center">
+                        {subtitles.length > 0 && (
+                            <div className="rounded-xl bg-transparent px-2 mr-4 w-[500px] h-[640px] flex flex-col">
+                                <Tabs defaultValue="styles" className="w-full">
+                                    <TabsList>
+                                        <TabsTrigger value="styles">Styles</TabsTrigger>
+                                        <TabsTrigger value="captions">Captions</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="styles">
+                                        <ScrollArea style={{ height: '593px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                            <div className="px-4 mt-6 mx-3 mb-3 flex shrink-0 flex-col justify-center text-sm md:text-base">
+                                                <h3 className="mb-1 flex gap-1 font-bold">
+                                                    <span>LongToShort AI</span>
+                                                </h3>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm text-gray-600">Auto captions accuracy</span>
+                                                        <span className="h-fit items-center gap-1 font-semibold rounded p-1 text-xs inline-block bg-green-50 text-green-500" data-testid="flowbite-badge">
+                                                            <span>96.55%</span>
+                                                        </span>
                                                     </div>
-                                                )}
+                                                </div>
                                             </div>
-                                            <div contentEditable={true} className="mt-2 text-xl">
-                                                {subtitle.text}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </ScrollArea>
-                        </div>
-                    )}
+                                            <div className="px-6 py-4">
+                                                {subtitles.map((subtitle, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className={`rounded-xl py-2 px-2 mb-2 flex flex-col ${focusedSubtitleIndex === index ? 'bg-neutral-900' : 'bg-transparent'} hover:bg-neutral-900`} onFocus={() => setFocusedSubtitleIndex(index)}
+                                                        onBlur={() => setFocusedSubtitleIndex(null)}
+                                                        tabIndex={0} // Ensure that the div can receive focus
+                                                    >
+                                                        <div className="flex justify-between items-center">
+                                                            <Popover onOpenChange={(isOpen) => {
+                                                                if (isOpen) {
+                                                                    setStartTimeSlider(subtitle.start);
+                                                                    setEndTimeSlider(subtitle.end);
+                                                                }
+                                                            }}>
+                                                                <PopoverTrigger asChild>
+                                                                    <div>
+                                                                        <Badge className="text-sm font-normal cursor-pointer" variant="default">
+                                                                            {subtitle.start.toFixed(2)}&ensp;-&ensp;{subtitle.end.toFixed(2)}
+                                                                        </Badge>
+                                                                    </div>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-80">
+                                                                    <div className="grid gap-4">
+                                                                        <div className="grid gap-2">
+                                                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                                                <Label htmlFor="width">Start &#40;min {subtitle.start}&#41;</Label>
+                                                                                <Input
+                                                                                    id="width"
+                                                                                    value={startTimeSlider}
+                                                                                    onChange={(e) => setStartTimeSlider(parseFloat(e.target.value))}
+                                                                                    className="col-span-2 h-8" />
+                                                                            </div>
+                                                                            <Slider
+                                                                                defaultValue={[subtitle.start]}
+                                                                                min={subtitle.start}
+                                                                                max={subtitle.end}
+                                                                                step={0.001}
+                                                                                onValueChange={(e) => setStartTimeSlider(e[0])} className="mt-2" />
 
-                    {video && metadata && (
-                        <div className="rounded-lg bg-gray-800/50 p-2">
+                                                                            <div className="grid w-full max-w-sm items-center gap-1.5 mt-4">
+                                                                                <Label htmlFor="width">End &#40;max {subtitle.end}&#41;</Label>
+                                                                                <Input
+                                                                                    id="width"
+                                                                                    value={endTimeSlider}
+                                                                                    onChange={(e) => setEndTimeSlider(parseFloat(e.target.value))}
+                                                                                    className="col-span-2 h-8" />
+                                                                            </div>
+                                                                            <Slider
+                                                                                defaultValue={[subtitle.end]}
+                                                                                min={subtitle.start}
+                                                                                max={subtitle.end}
+                                                                                step={0.001}
+                                                                                onValueChange={(e) => setEndTimeSlider(e[0])} className="mt-2" />
+                                                                            <Button
+                                                                                className="mt-8"
+                                                                                onClick={() => {
+                                                                                    const updatedSubtitles = [...subtitles];
+                                                                                    updatedSubtitles[subtitles.indexOf(subtitle)] = {
+                                                                                        ...subtitle,
+                                                                                        start: startTimeSlider,
+                                                                                        end: endTimeSlider,
+                                                                                    };
+                                                                                    setSubtitles(updatedSubtitles);
+                                                                                }}
+                                                                            >
+                                                                                Save
+                                                                            </Button>
+                                                                        </div>
+                                                                    </div>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                            {focusedSubtitleIndex === index && (
+                                                                <div className="flex items-center gap-x-3 text-primary/80">
+                                                                    <ListPlus
+                                                                        className="w-5 h-5 cursor-pointer rounded-lg hover:text-primary"
+                                                                        onClick={() => {
+                                                                            const updatedSubtitles = [...subtitles];
+                                                                            updatedSubtitles.splice(index + 1, 0, {
+                                                                                start: subtitles[subtitles.indexOf(subtitle)].end,
+                                                                                end: subtitles[subtitles.indexOf(subtitle) + 1].start,
+                                                                                text: "",
+                                                                            });
+                                                                            setSubtitles(updatedSubtitles);
+                                                                        }}
+                                                                    />
+                                                                    <Trash2
+                                                                        className="w-5 h-5 cursor-pointer rounded-lg hover:text-primary"
+                                                                        onClick={() => {
+                                                                            const updatedSubtitles = subtitles.filter(
+                                                                                (_, i) => i !== index
+                                                                            );
+                                                                            setSubtitles(updatedSubtitles);
+                                                                        }}
+                                                                    />
+                                                                    {/* <Eye
+                                                                className="w-6 h-6 ml-1 cursor-pointer rounded-lg"
+                                                                onClick={() => {
+                                                                    playerRef.current?.seekTo(subtitle.start * metadata.fps!);
+                                                                }}
+                                                            /> */}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div contentEditable={true} className="mt-4 mb-2 ml-3 text-lg">
+                                                            {subtitle.text}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </ScrollArea>
+                                    </TabsContent>
+                                    <TabsContent value="styles">
+                                        <ScrollArea style={{ height: '593px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                            <div className="px-4 mt-6 mx-3 mb-3 flex shrink-0 flex-col justify-center text-sm md:text-base">
+                                                <h3 className="mb-1 flex gap-1 font-bold">
+                                                    <span>LongToShort AI</span>
+                                                </h3>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm text-gray-600">Auto captions accuracy</span>
+                                                        <span className="h-fit items-center gap-1 font-semibold rounded p-1 text-xs inline-block bg-green-50 text-green-500" data-testid="flowbite-badge">
+                                                            <span>96.55%</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="px-6 py-4">
+                                                {subtitles.map((subtitle, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className={`rounded-xl py-2 px-2 mb-2 flex flex-col ${focusedSubtitleIndex === index ? 'bg-neutral-900' : 'bg-transparent'} hover:bg-neutral-900`} onFocus={() => setFocusedSubtitleIndex(index)}
+                                                        onBlur={() => setFocusedSubtitleIndex(null)}
+                                                        tabIndex={0} // Ensure that the div can receive focus
+                                                    >
+                                                        <div className="flex justify-between items-center">
+                                                            <Popover onOpenChange={(isOpen) => {
+                                                                if (isOpen) {
+                                                                    setStartTimeSlider(subtitle.start);
+                                                                    setEndTimeSlider(subtitle.end);
+                                                                }
+                                                            }}>
+                                                                <PopoverTrigger asChild>
+                                                                    <div>
+                                                                        <Badge className="text-sm font-normal cursor-pointer" variant="default">
+                                                                            {subtitle.start.toFixed(2)}&ensp;-&ensp;{subtitle.end.toFixed(2)}
+                                                                        </Badge>
+                                                                    </div>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-80">
+                                                                    <div className="grid gap-4">
+                                                                        <div className="grid gap-2">
+                                                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                                                <Label htmlFor="width">Start &#40;min {subtitle.start}&#41;</Label>
+                                                                                <Input
+                                                                                    id="width"
+                                                                                    value={startTimeSlider}
+                                                                                    onChange={(e) => setStartTimeSlider(parseFloat(e.target.value))}
+                                                                                    className="col-span-2 h-8" />
+                                                                            </div>
+                                                                            <Slider
+                                                                                defaultValue={[subtitle.start]}
+                                                                                min={subtitle.start}
+                                                                                max={subtitle.end}
+                                                                                step={0.001}
+                                                                                onValueChange={(e) => setStartTimeSlider(e[0])} className="mt-2" />
+
+                                                                            <div className="grid w-full max-w-sm items-center gap-1.5 mt-4">
+                                                                                <Label htmlFor="width">End &#40;max {subtitle.end}&#41;</Label>
+                                                                                <Input
+                                                                                    id="width"
+                                                                                    value={endTimeSlider}
+                                                                                    onChange={(e) => setEndTimeSlider(parseFloat(e.target.value))}
+                                                                                    className="col-span-2 h-8" />
+                                                                            </div>
+                                                                            <Slider
+                                                                                defaultValue={[subtitle.end]}
+                                                                                min={subtitle.start}
+                                                                                max={subtitle.end}
+                                                                                step={0.001}
+                                                                                onValueChange={(e) => setEndTimeSlider(e[0])} className="mt-2" />
+                                                                            <Button
+                                                                                className="mt-8"
+                                                                                onClick={() => {
+                                                                                    const updatedSubtitles = [...subtitles];
+                                                                                    updatedSubtitles[subtitles.indexOf(subtitle)] = {
+                                                                                        ...subtitle,
+                                                                                        start: startTimeSlider,
+                                                                                        end: endTimeSlider,
+                                                                                    };
+                                                                                    setSubtitles(updatedSubtitles);
+                                                                                }}
+                                                                            >
+                                                                                Save
+                                                                            </Button>
+                                                                        </div>
+                                                                    </div>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                            {focusedSubtitleIndex === index && (
+                                                                <div className="flex items-center gap-x-3 text-primary/80">
+                                                                    <ListPlus
+                                                                        className="w-5 h-5 cursor-pointer rounded-lg hover:text-primary"
+                                                                        onClick={() => {
+                                                                            const updatedSubtitles = [...subtitles];
+                                                                            updatedSubtitles.splice(index + 1, 0, {
+                                                                                start: subtitles[subtitles.indexOf(subtitle)].end,
+                                                                                end: subtitles[subtitles.indexOf(subtitle) + 1].start,
+                                                                                text: "",
+                                                                            });
+                                                                            setSubtitles(updatedSubtitles);
+                                                                        }}
+                                                                    />
+                                                                    <Trash2
+                                                                        className="w-5 h-5 cursor-pointer rounded-lg hover:text-primary"
+                                                                        onClick={() => {
+                                                                            const updatedSubtitles = subtitles.filter(
+                                                                                (_, i) => i !== index
+                                                                            );
+                                                                            setSubtitles(updatedSubtitles);
+                                                                        }}
+                                                                    />
+                                                                    {/* <Eye
+                                                                className="w-6 h-6 ml-1 cursor-pointer rounded-lg"
+                                                                onClick={() => {
+                                                                    playerRef.current?.seekTo(subtitle.start * metadata.fps!);
+                                                                }}
+                                                            /> */}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div contentEditable={true} className="mt-4 mb-2 ml-3 text-lg">
+                                                            {subtitle.text}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </ScrollArea>
+                                    </TabsContent>
+
+                                </Tabs>
+                            </div>
+                        )}
+                        <div className="rounded-lg border border-neutral-800 shadow-xl shadow-neutral-800">
                             <Player
                                 className="rounded-lg"
                                 ref={playerRef}
                                 component={MyVideo}
                                 durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
-                                compositionWidth={metadata.width! / 4 > 270 ? metadata.width! / 4 : 270}
-                                compositionHeight={metadata.height! / 4 > 480 ? metadata.height! / 4 : 480}
+                                compositionWidth={metadata.width! / 3 > 360 ? metadata.width! / 3 : 360}
+                                compositionHeight={metadata.height! / 3 > 640 ? metadata.height! / 3 : 640}
                                 fps={metadata.fps || 30}
                                 controls
                             />
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+
             </main>
         </div >
     );

@@ -2,11 +2,9 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Logo from "@/public/longtoshort.svg";
 import React from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link"
 
 export default function Navbar() {
-    const router = useRouter();
-
     const navItems = [
         { name: "Home", link: "/" },
         { name: "About", link: "/about" },
@@ -29,10 +27,8 @@ export default function Navbar() {
                     </ul>
                 </div>
                 <div>
-                    <Button onClick={() => {
-                        router.push("/dashboard");
-                    }}>
-                        Dashboard
+                    <Button asChild>
+                        <Link href="/dashboard">Dashboard</Link>
                     </Button>
                 </div>
             </div>
