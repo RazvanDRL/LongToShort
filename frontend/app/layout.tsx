@@ -1,5 +1,4 @@
 import { ThemeProvider } from "@/components/theme-provider"
-import { CSPostHogProvider } from "./providers"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
 import Crisp from './crisp'
@@ -28,12 +27,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CSPostHogProvider>
-            <Crisp />
-            <SpeedInsights />
-            <Analytics />
-            {children}
-          </CSPostHogProvider>
+          <Crisp />
+          <SpeedInsights />
+          <Analytics />
+          {children}
         </ThemeProvider>
       </body>
     </html >
