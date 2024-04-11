@@ -69,8 +69,9 @@ export default function Project({ params }: { params: { id: string } }) {
     const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
     const [colorValue, setColorValue] = useState<ColorPickerProps['value']>('#ffffff');
     const [fontSizeValue, setFontSizeValue] = useState<number>(24);
-    const [fontFamilyValue, setFontFamilyValue] = useState<string>('Montserrat');
+    const [fontFamilyValue, setFontFamilyValue] = useState<string>(TheBoldFont.className);
     const [fontWeightValue, setFontWeightValue] = useState<number>(700);
+    const [verticalPositionValue, setVerticalPositionValue] = useState<number>(50);
     const playerRef = useRef<PlayerRef>(null);
 
     async function handleSignedIn() {
@@ -236,13 +237,38 @@ export default function Project({ params }: { params: { id: string } }) {
         return (
             <Space direction="vertical">
                 <ColorPicker
+                    className="bg-background border border-neutral-800"
                     value={colorValue}
                     onChangeComplete={(c) => {
                         setColorValue(c.toHexString());
                     }}
-                    showText
+                    showText={(color) => <span className="text-white/80">{color.toHexString().toUpperCase()}</span>}
                 />
             </Space>
+        );
+    }
+
+    function SubtitleRenderer({ subtitle, colorValue, fontSizeValue, fontWeightValue, fontFamilyValue, verticalPositionValue, fps }: { subtitle: Subtitle, colorValue: string, fontSizeValue: number, fontWeightValue: number, fontFamilyValue: string, verticalPositionValue: number, fps: number }) {
+        return (
+            <Sequence
+                key={subtitle.start}
+                from={subtitle.start * fps}
+                durationInFrames={subtitle.start * fps}
+                className="justify-center"
+            >
+                <div
+                    style={{
+                        color: colorValue as any,
+                        fontSize: fontSizeValue,
+                        fontWeight: fontWeightValue,
+                        textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                        transform: `translateY(${100 - verticalPositionValue}%)`,
+                    }}
+                    className={`${fontFamilyValue} antialiased`}
+                >
+                    {subtitle.text.toUpperCase()}
+                </div>
+            </Sequence>
         );
     }
 
@@ -277,17 +303,17 @@ export default function Project({ params }: { params: { id: string } }) {
                         key={subtitle.start}
                         from={subtitle.start * fps}
                         durationInFrames={subtitleDuration * fps}
-                        className="items-center justify-center"
+                        className="justify-center"
                     >
                         <div
                             style={{
                                 color: colorValue as any,
                                 fontSize: fontSizeValue,
-                                fontFamily: fontFamilyValue,
                                 fontWeight: fontWeightValue,
-                                textShadow: "0 0 4px #000, 0 0 5px #000, 0 0 6px #000, 0 0 7px #000, 0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000",
+                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                transform: `translateY(${100 - verticalPositionValue}%)`,
                             }}
-                            className="drop-shadow-lg stroke-black stroke-2"
+                            className={`${fontFamilyValue} antialiased`}
                         >
                             {subtitle.text.toUpperCase()}
                         </div>
@@ -334,42 +360,85 @@ export default function Project({ params }: { params: { id: string } }) {
                                             <div className="p-6">
                                                 <h3 className="mb-4">Themes</h3>
                                                 <div className="grid-rows-3 flex justify-evenly gap-3">
-                                                    <button className="bg-neutral-200/20 p-2 h-12 w-32 rounded-sm border border-neutral-800">
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === TheBoldFont.className ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
+                                                            setFontFamilyValue(TheBoldFont.className);
+                                                        }}
+                                                    >
                                                         <div
                                                             style={{
                                                                 color: "#fff",
                                                                 fontSize: 16,
                                                                 fontWeight: 700,
                                                                 textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                top: "2.2px", // Adjust this value according to the space below the text
+                                                                textAlign: "center",
+                                                                lineHeight: 1
                                                             }}
-                                                            className={`${TheBoldFont.className} antialiased`}                                                        >
+                                                            className={`${TheBoldFont.className} antialiased`}
+                                                        >
                                                             HORMOZI
                                                         </div>
-                                                    </button>
-                                                    <button className="bg-neutral-200/20 p-2 h-12 w-32 rounded-sm border border-neutral-800">
+                                                    </Button>
+
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === Komika.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        onClick={() => {
+                                                            setFontFamilyValue(Komika.className);
+                                                        }}
+                                                    >
                                                         <div
                                                             style={{
                                                                 color: "#fff",
                                                                 fontSize: 16,
                                                                 textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                top: "-1.3px", // Adjust this value according to the space below the text
+                                                                textAlign: "center",
+                                                                lineHeight: 1
                                                             }}
                                                             className={`${Komika.className} antialiased`}
                                                         >
                                                             BEAST
                                                         </div>
-                                                    </button>
+                                                    </Button>
 
-                                                    <button className="bg-neutral-200/20 p-2 h-12 w-32 rounded-sm border border-neutral-800">
+                                                    <Button
+                                                        className="cursor-pointer bg-neutral-200/20 p-2 h-12 w-32 rounded-sm border border-neutral-800"
+                                                        onClick={() => {
+                                                            setFontFamilyValue(Komika.className);
+                                                        }}
+                                                    >
                                                         <div
                                                             style={{
                                                                 color: "#fff",
                                                                 fontSize: 16,
                                                                 textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                textAlign: "center",
+                                                                lineHeight: 1
                                                             }}
                                                         >
                                                             TikTok
                                                         </div>
-                                                    </button>
+                                                    </Button>
+                                                </div>
+                                                <h3 className="mb-4 mt-8">Font settings</h3>
+                                                <div className="grid-rows-3 flex justify-evenly gap-3">
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Font color</Label>
+                                                        <ColorPickerComponent />
+                                                    </div>
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Font size</Label>
+                                                        <Input type="number" id="size" placeholder={fontSizeValue.toString()} onChange={(e) => setFontSizeValue(Number(e.target.value))} />
+                                                    </div>
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Vertical position</Label>
+                                                        <Slider defaultValue={[verticalPositionValue]} step={1} id="size" min={1} max={100} onValueChange={(e) => setVerticalPositionValue(e[0])} />
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </ScrollArea>
