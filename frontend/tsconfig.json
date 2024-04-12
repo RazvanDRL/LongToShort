@@ -33,7 +33,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/providers.js"
   ],
   "exclude": [
     "node_modules"
