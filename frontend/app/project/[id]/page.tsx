@@ -19,11 +19,10 @@ import { Eye, ListPlus, Trash2 } from "lucide-react";
 import Header from "@/components/header";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { ColorPicker, Space } from 'antd';
 import type { ColorPickerProps } from 'antd';
 import localFont from 'next/font/local'
-
-
 
 type User = {
     id: string;
@@ -52,8 +51,20 @@ const Komika = localFont({
     display: 'swap',
 })
 
+const Montserrat = localFont({
+    src: '../../../fonts/Montserrat.ttf',
+    weight: "900",
+    display: 'swap',
+})
+
 const TheBoldFont = localFont({
     src: '../../../fonts/TheBoldFont.ttf',
+    weight: "900",
+    display: 'swap',
+})
+
+const TikTokSans = localFont({
+    src: '../../../fonts/TikTokSans.ttf',
     display: 'swap',
 })
 
@@ -72,6 +83,8 @@ export default function Project({ params }: { params: { id: string } }) {
     const [fontFamilyValue, setFontFamilyValue] = useState<string>(TheBoldFont.className);
     const [fontWeightValue, setFontWeightValue] = useState<number>(700);
     const [verticalPositionValue, setVerticalPositionValue] = useState<number>(50);
+    const [upperCaseValue, setUpperCaseValue] = useState<boolean>(true);
+    const [punctuationValue, setPunctuationValue] = useState<boolean>(false);
     const playerRef = useRef<PlayerRef>(null);
 
     async function handleSignedIn() {
@@ -202,6 +215,10 @@ export default function Project({ params }: { params: { id: string } }) {
         }
     }
 
+    function removePunctuation(text: string) {
+        return text.replace(/[.,\/\\!?#&^*;:{}=\-_`~()"+|<>@[\]\\]/g, "");
+    }
+
     useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
@@ -248,29 +265,7 @@ export default function Project({ params }: { params: { id: string } }) {
         );
     }
 
-    function SubtitleRenderer({ subtitle, colorValue, fontSizeValue, fontWeightValue, fontFamilyValue, verticalPositionValue, fps }: { subtitle: Subtitle, colorValue: string, fontSizeValue: number, fontWeightValue: number, fontFamilyValue: string, verticalPositionValue: number, fps: number }) {
-        return (
-            <Sequence
-                key={subtitle.start}
-                from={subtitle.start * fps}
-                durationInFrames={subtitle.start * fps}
-                className="justify-center"
-            >
-                <div
-                    style={{
-                        color: colorValue as any,
-                        fontSize: fontSizeValue,
-                        fontWeight: fontWeightValue,
-                        textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
-                        transform: `translateY(${100 - verticalPositionValue}%)`,
-                    }}
-                    className={`${fontFamilyValue} antialiased`}
-                >
-                    {subtitle.text.toUpperCase()}
-                </div>
-            </Sequence>
-        );
-    }
+
 
     function MyVideo() {
         const { fps } = useVideoConfig();
@@ -305,17 +300,24 @@ export default function Project({ params }: { params: { id: string } }) {
                         durationInFrames={subtitleDuration * fps}
                         className="justify-center"
                     >
-                        <div
-                            style={{
-                                color: colorValue as any,
-                                fontSize: fontSizeValue,
-                                fontWeight: fontWeightValue,
-                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
-                                transform: `translateY(${100 - verticalPositionValue}%)`,
-                            }}
-                            className={`${fontFamilyValue} antialiased`}
-                        >
-                            {subtitle.text.toUpperCase()}
+                        <div style={{
+                            color: colorValue as any,
+                            fontSize: fontSizeValue,
+                            fontWeight: fontWeightValue,
+                            transform: `translateY(${100 - verticalPositionValue}%)`,
+                        }}
+                            className={`${fontFamilyValue} antialiased ${upperCaseValue ? 'uppercase' : ''} absolute z-40`}>
+                            {punctuationValue == false ? removePunctuation(subtitle.text) : subtitle.text}
+                        </div>
+                        <div style={{
+                            color: colorValue as any,
+                            fontSize: fontSizeValue,
+                            fontWeight: fontWeightValue,
+                            WebkitTextStroke: "0.2em #000",
+                            transform: `translateY(${100 - verticalPositionValue}%)`,
+                        }}
+                            className={`${fontFamilyValue} antialiased ${upperCaseValue ? 'uppercase' : ''} absolute z-10`}>
+                            {punctuationValue == false ? removePunctuation(subtitle.text) : subtitle.text}
                         </div>
                     </Sequence>
                 );
@@ -359,7 +361,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                             {/* Themes */}
                                             <div className="p-6">
                                                 <h3 className="mb-4">Themes</h3>
-                                                <div className="grid-rows-3 flex justify-evenly gap-3">
+                                                <div className="grid grid-cols-3 gap-3">
                                                     <Button
                                                         className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === TheBoldFont.className ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
                                                             setFontFamilyValue(TheBoldFont.className);
@@ -405,9 +407,9 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </Button>
 
                                                     <Button
-                                                        className="cursor-pointer bg-neutral-200/20 p-2 h-12 w-32 rounded-sm border border-neutral-800"
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === TikTokSans.className ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                         onClick={() => {
-                                                            setFontFamilyValue(Komika.className);
+                                                            setFontFamilyValue(TikTokSans.className);
                                                         }}
                                                     >
                                                         <div
@@ -419,8 +421,30 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 textAlign: "center",
                                                                 lineHeight: 1
                                                             }}
+                                                            className={`${TikTokSans.className} antialiased`}
                                                         >
                                                             TikTok
+                                                        </div>
+                                                    </Button>
+
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === Montserrat.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        onClick={() => {
+                                                            setFontFamilyValue(Montserrat.className);
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                color: "#fff",
+                                                                fontSize: 16,
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                textAlign: "center",
+                                                                lineHeight: 1
+                                                            }}
+                                                            className={`${Montserrat.className} antialiased`}
+                                                        >
+                                                            Montserrat
                                                         </div>
                                                     </Button>
                                                 </div>
@@ -438,7 +462,19 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         <Label htmlFor="size">Vertical position</Label>
                                                         <Slider defaultValue={[verticalPositionValue]} step={1} id="size" min={1} max={100} onValueChange={(e) => setVerticalPositionValue(e[0])} />
                                                     </div>
-
+                                                </div>
+                                                <div className="grid-rows-3 flex justify-evenly gap-3">
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Uppercase</Label>
+                                                        <Switch defaultChecked onCheckedChange={(checked) => setUpperCaseValue(checked)} />
+                                                    </div>
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Punctuation</Label>
+                                                        <Switch onCheckedChange={(checked) => setPunctuationValue(checked)} />
+                                                    </div>                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Vertical position</Label>
+                                                        <Slider defaultValue={[verticalPositionValue]} step={1} id="size" min={1} max={100} onValueChange={(e) => setVerticalPositionValue(e[0])} />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </ScrollArea>
@@ -580,12 +616,12 @@ export default function Project({ params }: { params: { id: string } }) {
                         }
                         <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                             <Player
-                                className="rounded-lg"
+                                className="rounded-xl"
                                 ref={playerRef}
                                 component={MyVideo}
                                 durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
-                                compositionWidth={metadata.width! / 3 > 360 ? metadata.width! / 3 : 360}
-                                compositionHeight={metadata.height! / 3 > 640 ? metadata.height! / 3 : 640}
+                                compositionWidth={metadata.width!}
+                                compositionHeight={metadata.height!}
                                 fps={metadata.fps || 30}
                                 controls
                             />
