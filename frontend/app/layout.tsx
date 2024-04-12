@@ -1,6 +1,4 @@
 import { ThemeProvider } from "@/components/theme-provider"
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/react"
 import Crisp from './crisp'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google';
@@ -24,7 +22,7 @@ export default function RootLayout({
       <head>
         <PlausibleProvider
           domain="j8s84oo.64.23.249.87.sslip.io"
-          customDomain="http://plausible-f48o844.64.23.249.87.sslip.io"
+          customDomain="http://plausible-f48o844.64.23.249.87.sslip.io:8000"
           selfHosted={true}
           trackLocalhost={true}
         />
@@ -37,8 +35,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Crisp />
-          <SpeedInsights />
-          <Analytics />
           {children}
         </ThemeProvider>
       </body>
