@@ -21,6 +21,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <PlausibleProvider
+          domain="j8s84oo.64.23.249.87.sslip.io"
+          customDomain="http://plausible-f48o844.64.23.249.87.sslip.io"
+          selfHosted={true}
+          trackLocalhost={true}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
@@ -28,12 +36,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <PlausibleProvider
-            domain="j8s84oo.64.23.249.87.sslip.io"
-            customDomain="http://plausible-f48o844.64.23.249.87.sslip.io"
-            selfHosted={true}
-            trackLocalhost={true}
-          />
           <Crisp />
           <SpeedInsights />
           <Analytics />
