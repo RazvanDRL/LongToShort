@@ -5,6 +5,7 @@ import Crisp from './crisp'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google';
 import './globals.css'
+import PlausibleProvider from 'next-plausible'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,10 +28,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Crisp />
-          <SpeedInsights />
-          <Analytics />
-          {children}
+          <PlausibleProvider domain="https://j8s84oo.64.23.249.87.sslip.io/">
+            <Crisp />
+            <SpeedInsights />
+            <Analytics />
+            {children}
+          </PlausibleProvider>
         </ThemeProvider>
       </body>
     </html >
