@@ -31,6 +31,7 @@ export default function RootLayout({
           <PlausibleProvider
             domain="https://j8s84oo.64.23.249.87.sslip.io"
             customDomain="http://plausible-f48o844.64.23.249.87.sslip.io"
+            selfHosted={true}
           >
             <Crisp />
             <SpeedInsights />
