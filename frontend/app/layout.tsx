@@ -33,12 +33,11 @@ export default function RootLayout({
             customDomain="http://plausible-f48o844.64.23.249.87.sslip.io"
             selfHosted={true}
             trackLocalhost={true}
-          >
-            <Crisp />
-            <SpeedInsights />
-            <Analytics />
-            {children}
-          </PlausibleProvider>
+          />
+          <Crisp />
+          <SpeedInsights />
+          <Analytics />
+          {children}
         </ThemeProvider>
       </body>
     </html >
