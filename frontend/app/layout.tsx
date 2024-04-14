@@ -19,27 +19,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <PlausibleProvider
-          domain="j8s84oo.64.23.249.87.sslip.io"
-          customDomain="https://plausible-f48o844.64.23.249.87.sslip.io"
-          trackFileDownloads={true}
-          trackOutboundLinks={true}
-          selfHosted={true}
-          enabled={true}
-        />
-      </head>
-      <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Crisp />
-          {children}
-        </ThemeProvider>
-      </body>
+      <PlausibleProvider
+        domain="j8s84oo.64.23.249.87.sslip.io"
+        customDomain="https://plausible-f48o844.64.23.249.87.sslip.io"
+        trackFileDownloads={true}
+        trackOutboundLinks={true}
+        selfHosted={true}
+        enabled={true}>
+        <body className={inter.className}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Crisp />
+            {children}
+          </ThemeProvider>
+        </body>
+      </PlausibleProvider>
     </html >
   )
 }
