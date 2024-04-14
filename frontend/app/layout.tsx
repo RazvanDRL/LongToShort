@@ -23,6 +23,8 @@ export default function RootLayout({
         <PlausibleProvider
           domain="j8s84oo.64.23.249.87.sslip.io"
           customDomain="https://plausible-f48o844.64.23.249.87.sslip.io"
+          trackFileDownloads={true}
+          trackOutboundLinks={true}
           selfHosted={true}
           enabled={true}
         />
