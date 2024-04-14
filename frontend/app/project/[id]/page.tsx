@@ -68,6 +68,20 @@ const TikTokSans = localFont({
     display: 'swap',
 })
 
+type Font = {
+    textColor: string;
+    fontSize: number;
+    fontFamily: string;
+    fontWeight: number;
+    verticalPosition: number;
+    uppercase: boolean;
+    punctuation: boolean;
+    stroke: {
+        strokeWidth: number,
+        strokeColor: string,
+    };
+}
+
 export default function Project({ params }: { params: { id: string } }) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
@@ -78,14 +92,19 @@ export default function Project({ params }: { params: { id: string } }) {
     const [startTimeSlider, setStartTimeSlider] = useState(0);
     const [endTimeSlider, setEndTimeSlider] = useState(0);
     const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
-    const [colorValue, setColorValue] = useState<ColorPickerProps['value']>('#ffffff');
-    const [fontSizeValue, setFontSizeValue] = useState<number>(24);
-    const [fontFamilyValue, setFontFamilyValue] = useState<string>(TheBoldFont.className);
-    const [fontWeightValue, setFontWeightValue] = useState<number>(700);
-    const [verticalPositionValue, setVerticalPositionValue] = useState<number>(50);
-    const [upperCaseValue, setUpperCaseValue] = useState<boolean>(true);
-    const [punctuationValue, setPunctuationValue] = useState<boolean>(false);
-    const [stroke, setStroke] = useState<string>(".25em #000");
+    const [font, setFont] = useState<Font>({
+        textColor: "#ffffff",
+        fontSize: 30,
+        fontFamily: Montserrat.className,
+        fontWeight: 700,
+        verticalPosition: 50,
+        uppercase: true,
+        punctuation: false,
+        stroke: {
+            strokeWidth: 0,
+            strokeColor: "",
+        }
+    });
     const playerRef = useRef<PlayerRef>(null);
 
     async function handleSignedIn() {
@@ -256,9 +275,12 @@ export default function Project({ params }: { params: { id: string } }) {
             <Space direction="vertical">
                 <ColorPicker
                     className="bg-background border border-neutral-800"
-                    value={colorValue}
+                    value={font.textColor}
                     onChangeComplete={(c) => {
-                        setColorValue(c.toHexString());
+                        setFont((prevFont) => ({
+                            ...prevFont,
+                            textColor: c.toHexString(),
+                        }))
                     }}
                     showText={(color) => <span className="text-white/80">{color.toHexString().toUpperCase()}</span>}
                 />
@@ -300,17 +322,17 @@ export default function Project({ params }: { params: { id: string } }) {
                         className="justify-center"
                     >
                         <div style={{
-                            color: colorValue as any,
-                            fontSize: fontSizeValue,
-                            fontWeight: fontWeightValue,
-                            transform: `translateY(${100 - verticalPositionValue}%)`,
+                            color: font.textColor,
+                            fontSize: font.fontSize,
+                            fontWeight: font.fontWeight,
+                            transform: `translateY(${100 - font.verticalPosition}%)`,
                         }}
-                            className={`${fontFamilyValue} antialiased ${upperCaseValue ? 'uppercase' : ''}`}>
-                            <span className={`${stroke?.length > 0 ? "absolute" : ""}`}>
-                                {punctuationValue == false ? removePunctuation(subtitle.text) : subtitle.text}
+                            className={`${font.fontFamily} antialiased ${font.uppercase ? 'uppercase' : ''}`}>
+                            <span className={`${font.stroke?.strokeWidth > 0 ? "absolute" : ""}`}>
+                                {font.punctuation == false ? removePunctuation(subtitle.text) : subtitle.text}
                             </span>
-                            {stroke?.length > 0 && <span style={{ WebkitTextStroke: stroke }}>
-                                {punctuationValue == false ? removePunctuation(subtitle.text) : subtitle.text}
+                            {font.stroke?.strokeWidth > 0 && <span style={{ WebkitTextStroke: font.stroke.strokeWidth + font.stroke.strokeColor }}>
+                                {font.punctuation == false ? removePunctuation(subtitle.text) : subtitle.text}
                             </span>}
                         </div>
                     </Sequence>
@@ -334,10 +356,6 @@ export default function Project({ params }: { params: { id: string } }) {
 
     return (
         <div>
-            {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
-            <link rel="preconnect" href="https://fonts.gstatic.com" />
-            <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" /> */}
-
             <Toaster />
             {user ? <Header user_email={user.email} /> : null}
             <main className="flex justify-center items-center mt-24">
@@ -357,8 +375,11 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 <h3 className="mb-4">Themes</h3>
                                                 <div className="grid grid-cols-3 gap-3">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === TheBoldFont.className ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
-                                                            setFontFamilyValue(TheBoldFont.className);
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TheBoldFont.className ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: TheBoldFont.className,
+                                                            }))
                                                         }}
                                                     >
                                                         <div
@@ -379,9 +400,12 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </Button>
 
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === Komika.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Komika.className ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                         onClick={() => {
-                                                            setFontFamilyValue(Komika.className);
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: Komika.className,
+                                                            }))
                                                         }}
                                                     >
                                                         <div
@@ -401,9 +425,12 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </Button>
 
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === TikTokSans.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TikTokSans.className ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                         onClick={() => {
-                                                            setFontFamilyValue(TikTokSans.className);
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: TikTokSans.className,
+                                                            }))
                                                         }}
                                                     >
                                                         <div
@@ -422,9 +449,12 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </Button>
 
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${fontFamilyValue === Montserrat.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Montserrat.className ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                         onClick={() => {
-                                                            setFontFamilyValue(Montserrat.className);
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: Montserrat.className,
+                                                            }))
                                                         }}
                                                     >
                                                         <div
@@ -450,24 +480,49 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </div>
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="size">Font size</Label>
-                                                        <Input type="number" id="size" placeholder={fontSizeValue.toString()} onChange={(e) => setFontSizeValue(Number(e.target.value))} />
+                                                        <Input type="number" id="size" placeholder={font.fontSize.toString()} onChange={(e) => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontSize: parseInt(e.target.value),
+                                                            }))
+                                                        }} />
                                                     </div>
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="size">Vertical position</Label>
-                                                        <Slider defaultValue={[verticalPositionValue]} step={1} id="size" min={1} max={100} onValueChange={(e) => setVerticalPositionValue(e[0])} />
+                                                        <Slider defaultValue={[font.verticalPosition]} step={1} id="size" min={1} max={100} onValueChange={(e) => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                verticalPosition: e[0],
+                                                            }))
+                                                        }} />
                                                     </div>
                                                 </div>
                                                 <div className="grid-rows-3 flex justify-evenly gap-3">
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="size">Uppercase</Label>
-                                                        <Switch defaultChecked onCheckedChange={(checked) => setUpperCaseValue(checked)} />
+                                                        <Switch defaultChecked onCheckedChange={(checked) => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                uppercase: checked,
+                                                            }))
+                                                        }} />
                                                     </div>
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="size">Punctuation</Label>
-                                                        <Switch onCheckedChange={(checked) => setPunctuationValue(checked)} />
+                                                        <Switch onCheckedChange={(checked) => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                punctuation: checked,
+                                                            }))
+                                                        }} />
                                                     </div>                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="size">Vertical position</Label>
-                                                        <Slider defaultValue={[verticalPositionValue]} step={1} id="size" min={1} max={100} onValueChange={(e) => setVerticalPositionValue(e[0])} />
+                                                        <Slider defaultValue={[font.verticalPosition]} step={1} id="size" min={1} max={100} onValueChange={(e) => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                verticalPosition: e[0],
+                                                            }))
+                                                        }} />
                                                     </div>
                                                 </div>
                                             </div>
