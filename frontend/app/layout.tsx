@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/theme-provider"
+import Head from "next/head";
 import Crisp from './crisp'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google';
@@ -19,25 +20,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <PlausibleProvider
-        domain="j8s84oo.64.23.249.87.sslip.io"
-        customDomain="https://plausible-f48o844.64.23.249.87.sslip.io"
-        trackFileDownloads={true}
-        trackOutboundLinks={true}
-        selfHosted={true}
-        enabled={true}>
-        <body className={inter.className}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Crisp />
-            {children}
-          </ThemeProvider>
-        </body>
-      </PlausibleProvider>
+      <Head>
+        <PlausibleProvider
+          domain="j8s84oo.64.23.249.87.sslip.io"
+          customDomain="https://plausible-f48o844.64.23.249.87.sslip.io"
+          trackFileDownloads={false}
+          trackOutboundLinks={false}
+          selfHosted={true}
+          enabled={true} />
+      </Head>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Crisp />
+          {children}
+        </ThemeProvider>
+      </body>
     </html >
   )
 }
