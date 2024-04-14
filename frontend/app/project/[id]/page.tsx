@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { Toaster, toast } from 'sonner';
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Toggle } from "@/components/ui/toggle"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,6 +17,15 @@ import {
 } from "@/components/ui/popover"
 import { Slider } from "@/components/ui/slider"
 import { Eye, ListPlus, Trash2 } from "lucide-react";
+import {
+    Menubar,
+    MenubarContent,
+    MenubarItem,
+    MenubarMenu,
+    MenubarSeparator,
+    MenubarShortcut,
+    MenubarTrigger,
+} from "@/components/ui/menubar"
 import Header from "@/components/header";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -77,10 +87,27 @@ type Font = {
     uppercase: boolean;
     punctuation: boolean;
     stroke: {
-        strokeWidth: number,
+        strokeWidth: string,
         strokeColor: string,
     };
+    shadow?: {
+        shadowColor: string,
+        shadowBlur: string,
+        shadowOffsetX: string,
+        shadowOffsetY: string,
+    };
 }
+
+type StrokeSize = 'None' | 'S' | 'M' | 'L' | 'XL';
+
+const strokeSizes: Record<StrokeSize, string> = {
+    None: '',
+    S: '0.1em',
+    M: '0.15em',
+    L: '0.2em',
+    XL: '0.25em',
+};
+
 
 export default function Project({ params }: { params: { id: string } }) {
     const router = useRouter();
@@ -93,7 +120,7 @@ export default function Project({ params }: { params: { id: string } }) {
     const [endTimeSlider, setEndTimeSlider] = useState(0);
     const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
     const [font, setFont] = useState<Font>({
-        textColor: "#ffffff",
+        textColor: "#fff",
         fontSize: 30,
         fontFamily: Montserrat.className,
         fontWeight: 700,
@@ -101,8 +128,8 @@ export default function Project({ params }: { params: { id: string } }) {
         uppercase: true,
         punctuation: false,
         stroke: {
-            strokeWidth: 0,
-            strokeColor: "",
+            strokeWidth: strokeSizes.M,
+            strokeColor: "#000",
         }
     });
     const playerRef = useRef<PlayerRef>(null);
@@ -239,6 +266,16 @@ export default function Project({ params }: { params: { id: string } }) {
         return text.replace(/[.,\/\\!?#&^*;:{}=\-_`~()"+|<>@[\]\\]/g, "");
     }
 
+    const handleSetStrokeSize = (size: StrokeSize) => {
+        setFont((prevFont) => ({
+            ...prevFont,
+            stroke: {
+                ...prevFont.stroke,
+                strokeWidth: strokeSizes[size],
+            },
+        }));
+    };
+
     useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
@@ -270,16 +307,37 @@ export default function Project({ params }: { params: { id: string } }) {
         return <div className="bg-[#ec2626] z-50 w-screen h-screen"></div>;
     }
 
-    function ColorPickerComponent() {
+    function TextColorPickerComponent() {
         return (
             <Space direction="vertical">
                 <ColorPicker
-                    className="bg-background border border-neutral-800"
+                    className="bg-background border border-neutral-800 h-10"
                     value={font.textColor}
                     onChangeComplete={(c) => {
                         setFont((prevFont) => ({
                             ...prevFont,
                             textColor: c.toHexString(),
+                        }))
+                    }}
+                    showText={(color) => <span className="text-white/80">{color.toHexString().toUpperCase()}</span>}
+                />
+            </Space>
+        );
+    }
+
+    function StrokeColorPickerComponent() {
+        return (
+            <Space direction="vertical">
+                <ColorPicker
+                    className="bg-background border border-neutral-800 h-10"
+                    value={font.stroke.strokeColor}
+                    onChangeComplete={(c) => {
+                        setFont((prevFont) => ({
+                            ...prevFont,
+                            stroke: {
+                                ...prevFont.stroke,
+                                strokeColor: c.toHexString(),
+                            }
                         }))
                     }}
                     showText={(color) => <span className="text-white/80">{color.toHexString().toUpperCase()}</span>}
@@ -328,10 +386,10 @@ export default function Project({ params }: { params: { id: string } }) {
                             transform: `translateY(${100 - font.verticalPosition}%)`,
                         }}
                             className={`${font.fontFamily} antialiased ${font.uppercase ? 'uppercase' : ''}`}>
-                            <span className={`${font.stroke?.strokeWidth > 0 ? "absolute" : ""}`}>
+                            <span className={`${font.stroke?.strokeWidth.length > 0 ? "absolute" : ""}`}>
                                 {font.punctuation == false ? removePunctuation(subtitle.text) : subtitle.text}
                             </span>
-                            {font.stroke?.strokeWidth > 0 && <span style={{ WebkitTextStroke: font.stroke.strokeWidth + font.stroke.strokeColor }}>
+                            {font.stroke?.strokeWidth.length > 0 && <span style={{ WebkitTextStroke: font.stroke.strokeWidth + font.stroke.strokeColor }}>
                                 {font.punctuation == false ? removePunctuation(subtitle.text) : subtitle.text}
                             </span>}
                         </div>
@@ -476,25 +534,55 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 <div className="grid-rows-3 flex justify-evenly gap-3">
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="size">Font color</Label>
-                                                        <ColorPickerComponent />
+                                                        <TextColorPickerComponent />
                                                     </div>
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="size">Font size</Label>
-                                                        <Input type="number" id="size" placeholder={font.fontSize.toString()} onChange={(e) => {
-                                                            setFont((prevFont) => ({
-                                                                ...prevFont,
-                                                                fontSize: parseInt(e.target.value),
-                                                            }))
-                                                        }} />
+                                                        <Input
+                                                            className="w-36 h-10"
+                                                            type="number"
+                                                            id="size"
+                                                            min={0}
+                                                            max={100}
+                                                            placeholder={font.fontSize.toString() + "px"}
+                                                            onChange={(e) =>
+                                                                setFont((prevFont) => ({
+                                                                    ...prevFont,
+                                                                    fontSize: e.target.value === '' ? 0 : Number(e.target.value),
+                                                                }))
+                                                            }
+                                                        />
                                                     </div>
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
-                                                        <Label htmlFor="size">Vertical position</Label>
-                                                        <Slider defaultValue={[font.verticalPosition]} step={1} id="size" min={1} max={100} onValueChange={(e) => {
-                                                            setFont((prevFont) => ({
-                                                                ...prevFont,
-                                                                verticalPosition: e[0],
-                                                            }))
-                                                        }} />
+                                                        <Label htmlFor="size">Vertical position %</Label>
+                                                        <Input
+                                                            id="size"
+                                                            type="number"
+                                                            value={font.verticalPosition}
+                                                            min={0}
+                                                            max={100}
+                                                            onChangeCapture={(e: any) =>
+                                                                setFont((prevFont) => ({
+                                                                    ...prevFont,
+                                                                    verticalPosition: e.target.value === '' ? 0 : Number(e.target.value),
+                                                                }))
+                                                            }
+                                                            className="h-8"
+                                                        />
+                                                        <Slider
+                                                            className="w-full"
+                                                            value={[font.verticalPosition]}
+                                                            step={1}
+                                                            id="size"
+                                                            min={0}
+                                                            max={100}
+                                                            onValueChange={(e) =>
+                                                                setFont((prevFont) => ({
+                                                                    ...prevFont,
+                                                                    verticalPosition: e[0],
+                                                                }))
+                                                            }
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="grid-rows-3 flex justify-evenly gap-3">
@@ -515,14 +603,63 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 punctuation: checked,
                                                             }))
                                                         }} />
-                                                    </div>                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
-                                                        <Label htmlFor="size">Vertical position</Label>
-                                                        <Slider defaultValue={[font.verticalPosition]} step={1} id="size" min={1} max={100} onValueChange={(e) => {
-                                                            setFont((prevFont) => ({
-                                                                ...prevFont,
-                                                                verticalPosition: e[0],
-                                                            }))
-                                                        }} />
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-evenly gap-3">
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label>Stroke color</Label>
+                                                        <StrokeColorPickerComponent />
+                                                    </div>
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="stroke">Stroke</Label>
+                                                        <Menubar id="stroke">
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.stroke.strokeWidth === strokeSizes.None ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetStrokeSize('None')}
+                                                                >
+                                                                    None
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.stroke.strokeWidth === strokeSizes.S ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetStrokeSize('S')}
+                                                                >
+                                                                    S
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.stroke.strokeWidth === strokeSizes.M ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetStrokeSize('M')}
+                                                                >
+                                                                    M
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.stroke.strokeWidth === strokeSizes.L ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetStrokeSize('L')}
+                                                                >
+                                                                    L
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.stroke.strokeWidth === strokeSizes.XL ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetStrokeSize('XL')}
+                                                                >
+                                                                    XL
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                        </Menubar>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -581,7 +718,8 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                                 min={subtitle.start}
                                                                                 max={subtitle.end}
                                                                                 step={0.001}
-                                                                                onValueChange={(e) => setStartTimeSlider(e[0])} className="mt-2" />
+                                                                                onValueChange={(e) => setStartTimeSlider(e[0])} className="mt-2"
+                                                                            />
 
                                                                             <div className="grid w-full max-w-sm items-center gap-1.5 mt-4">
                                                                                 <Label htmlFor="width">End &#40;max {subtitle.end}&#41;</Label>
@@ -596,7 +734,8 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                                 min={subtitle.start}
                                                                                 max={subtitle.end}
                                                                                 step={0.001}
-                                                                                onValueChange={(e) => setEndTimeSlider(e[0])} className="mt-2" />
+                                                                                onValueChange={(e) => setEndTimeSlider(e[0])} className="mt-2"
+                                                                            />
                                                                             <Button
                                                                                 className="mt-8"
                                                                                 onClick={() => {
@@ -678,7 +817,6 @@ export default function Project({ params }: { params: { id: string } }) {
                     </div >
                 )
                 }
-
             </main >
         </div >
     );
