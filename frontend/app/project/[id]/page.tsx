@@ -85,6 +85,7 @@ export default function Project({ params }: { params: { id: string } }) {
     const [verticalPositionValue, setVerticalPositionValue] = useState<number>(50);
     const [upperCaseValue, setUpperCaseValue] = useState<boolean>(true);
     const [punctuationValue, setPunctuationValue] = useState<boolean>(false);
+    const [stroke, setStroke] = useState<string>(".25em #000");
     const playerRef = useRef<PlayerRef>(null);
 
     async function handleSignedIn() {
@@ -265,8 +266,6 @@ export default function Project({ params }: { params: { id: string } }) {
         );
     }
 
-
-
     function MyVideo() {
         const { fps } = useVideoConfig();
 
@@ -306,18 +305,13 @@ export default function Project({ params }: { params: { id: string } }) {
                             fontWeight: fontWeightValue,
                             transform: `translateY(${100 - verticalPositionValue}%)`,
                         }}
-                            className={`${fontFamilyValue} antialiased ${upperCaseValue ? 'uppercase' : ''} absolute z-40`}>
-                            {punctuationValue == false ? removePunctuation(subtitle.text) : subtitle.text}
-                        </div>
-                        <div style={{
-                            color: colorValue as any,
-                            fontSize: fontSizeValue,
-                            fontWeight: fontWeightValue,
-                            WebkitTextStroke: "0.2em #000",
-                            transform: `translateY(${100 - verticalPositionValue}%)`,
-                        }}
-                            className={`${fontFamilyValue} antialiased ${upperCaseValue ? 'uppercase' : ''} absolute z-10`}>
-                            {punctuationValue == false ? removePunctuation(subtitle.text) : subtitle.text}
+                            className={`${fontFamilyValue} antialiased ${upperCaseValue ? 'uppercase' : ''}`}>
+                            <span className={`${stroke?.length > 0 ? "absolute" : ""}`}>
+                                {punctuationValue == false ? removePunctuation(subtitle.text) : subtitle.text}
+                            </span>
+                            {stroke?.length > 0 && <span style={{ WebkitTextStroke: stroke }}>
+                                {punctuationValue == false ? removePunctuation(subtitle.text) : subtitle.text}
+                            </span>}
                         </div>
                     </Sequence>
                 );
