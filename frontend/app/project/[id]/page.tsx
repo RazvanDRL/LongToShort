@@ -90,24 +90,27 @@ type Font = {
         strokeWidth: string,
         strokeColor: string,
     };
-    shadow?: {
-        shadowColor: string,
-        shadowBlur: string,
-        shadowOffsetX: string,
-        shadowOffsetY: string,
-    };
+    shadow: string;
 }
 
 type StrokeSize = 'None' | 'S' | 'M' | 'L' | 'XL';
+type ShadowSize = 'None' | 'S' | 'M' | 'L' | 'XL';
 
 const strokeSizes: Record<StrokeSize, string> = {
-    None: '',
-    S: '0.1em',
-    M: '0.15em',
-    L: '0.2em',
-    XL: '0.25em',
+    None: "",
+    S: "0.1em",
+    M: "0.15em",
+    L: "0.2em",
+    XL: "0.25em",
 };
 
+const shadowSizes: Record<ShadowSize, string> = {
+    None: "",
+    S: "0 0 2px #000, 0 0 3px #000, 0 0 4px #000, 0 0 5px #000, 0 0 6px #000, 0 0 7px #000, 0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000",
+    M: "0 0 4px #000, 0 0 5px #000, 0 0 6px #000, 0 0 7px #000, 0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000",
+    L: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+    XL: "0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000, 0 0 18px #000, 0 0 19px #000, 0 0 20px #000, 0 0 21px #000",
+};
 
 export default function Project({ params }: { params: { id: string } }) {
     const router = useRouter();
@@ -128,9 +131,10 @@ export default function Project({ params }: { params: { id: string } }) {
         uppercase: true,
         punctuation: false,
         stroke: {
-            strokeWidth: strokeSizes.M,
+            strokeWidth: strokeSizes.None,
             strokeColor: "#000",
-        }
+        },
+        shadow: shadowSizes.None,
     });
     const playerRef = useRef<PlayerRef>(null);
 
@@ -276,6 +280,13 @@ export default function Project({ params }: { params: { id: string } }) {
         }));
     };
 
+    const handleSetShadowSize = (size: ShadowSize) => {
+        setFont((prevFont) => ({
+            ...prevFont,
+            shadow: shadowSizes[size],
+        }));
+    }
+
     useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
@@ -345,6 +356,7 @@ export default function Project({ params }: { params: { id: string } }) {
             </Space>
         );
     }
+    // console.log(font.shadow);
 
     function MyVideo() {
         const { fps } = useVideoConfig();
@@ -383,6 +395,7 @@ export default function Project({ params }: { params: { id: string } }) {
                             color: font.textColor,
                             fontSize: font.fontSize,
                             fontWeight: font.fontWeight,
+                            textShadow: font.shadow,
                             transform: `translateY(${100 - font.verticalPosition}%)`,
                         }}
                             className={`${font.fontFamily} antialiased ${font.uppercase ? 'uppercase' : ''}`}>
@@ -659,7 +672,58 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 </MenubarTrigger>
                                                             </MenubarMenu>
                                                         </Menubar>
-
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-evenly gap-3">
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="shadow">Shadow</Label>
+                                                        <Menubar id="shadow">
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.shadow === shadowSizes.None ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetShadowSize('None')}
+                                                                >
+                                                                    None
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.shadow === shadowSizes.S ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetShadowSize('S')}
+                                                                >
+                                                                    S
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.shadow === shadowSizes.M ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetShadowSize('M')}
+                                                                >
+                                                                    M
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.shadow === shadowSizes.L ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetShadowSize('L')}
+                                                                >
+                                                                    L
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                            <MenubarMenu>
+                                                                <MenubarTrigger
+                                                                    className="cursor-pointer"
+                                                                    data-state={font.shadow === shadowSizes.XL ? 'open' : 'closed'}
+                                                                    onClick={() => handleSetShadowSize('XL')}
+                                                                >
+                                                                    XL
+                                                                </MenubarTrigger>
+                                                            </MenubarMenu>
+                                                        </Menubar>
                                                     </div>
                                                 </div>
                                             </div>
