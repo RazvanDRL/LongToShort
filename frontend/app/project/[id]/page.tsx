@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { Toaster, toast } from 'sonner';
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Toggle } from "@/components/ui/toggle"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,14 +15,10 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Slider } from "@/components/ui/slider"
-import { Eye, ListPlus, Trash2 } from "lucide-react";
+import { ListPlus, Trash2 } from "lucide-react";
 import {
     Menubar,
-    MenubarContent,
-    MenubarItem,
     MenubarMenu,
-    MenubarSeparator,
-    MenubarShortcut,
     MenubarTrigger,
 } from "@/components/ui/menubar"
 import Header from "@/components/header";
@@ -31,7 +26,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { ColorPicker, Space } from 'antd';
-import type { ColorPickerProps } from 'antd';
 import localFont from 'next/font/local'
 
 type User = {
@@ -63,13 +57,11 @@ const Komika = localFont({
 
 const Montserrat = localFont({
     src: '../../../fonts/Montserrat.ttf',
-    weight: "900",
     display: 'swap',
 })
 
 const TheBoldFont = localFont({
     src: '../../../fonts/TheBoldFont.ttf',
-    weight: "900",
     display: 'swap',
 })
 
@@ -322,7 +314,7 @@ export default function Project({ params }: { params: { id: string } }) {
         return (
             <Space direction="vertical">
                 <ColorPicker
-                    className="bg-background border border-neutral-800 h-10"
+                    className="bg-background border border-neutral-800 h-10 px-2"
                     value={font.textColor}
                     onChangeComplete={(c) => {
                         setFont((prevFont) => ({
@@ -340,7 +332,7 @@ export default function Project({ params }: { params: { id: string } }) {
         return (
             <Space direction="vertical">
                 <ColorPicker
-                    className="bg-background border border-neutral-800 h-10"
+                    className="bg-background border border-neutral-800 h-10 px-2"
                     value={font.stroke.strokeColor}
                     onChangeComplete={(c) => {
                         setFont((prevFont) => ({
@@ -356,7 +348,6 @@ export default function Project({ params }: { params: { id: string } }) {
             </Space>
         );
     }
-    // console.log(font.shadow);
 
     function MyVideo() {
         const { fps } = useVideoConfig();
@@ -443,7 +434,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                         <ScrollArea style={{ height: '593px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                             {/* Themes */}
                                             <div className="p-6">
-                                                <h3 className="mb-4">Themes</h3>
+                                                <h3 className="mb-4">Fonts</h3>
                                                 <div className="grid grid-cols-3 gap-3">
                                                     <Button
                                                         className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TheBoldFont.className ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
@@ -483,6 +474,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             style={{
                                                                 color: "#fff",
                                                                 fontSize: 16,
+                                                                fontWeight: 700,
                                                                 textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
                                                                 position: "relative",
                                                                 top: "-1.3px", // Adjust this value according to the space below the text
@@ -508,6 +500,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             style={{
                                                                 color: "#fff",
                                                                 fontSize: 16,
+                                                                fontWeight: 700,
                                                                 textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
                                                                 position: "relative",
                                                                 textAlign: "center",
@@ -532,6 +525,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             style={{
                                                                 color: "#fff",
                                                                 fontSize: 16,
+                                                                fontWeight: 700,
                                                                 textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
                                                                 position: "relative",
                                                                 textAlign: "center",
@@ -544,13 +538,13 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </Button>
                                                 </div>
                                                 <h3 className="mb-4 mt-8">Font settings</h3>
-                                                <div className="grid-rows-3 flex justify-evenly gap-3">
+                                                <div className="grid grid-cols-3 gap-3">
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="size">Font color</Label>
                                                         <TextColorPickerComponent />
                                                     </div>
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
-                                                        <Label htmlFor="size">Font size</Label>
+                                                        <Label htmlFor="size">Font size (px)</Label>
                                                         <Input
                                                             className="w-36 h-10"
                                                             type="number"
@@ -558,72 +552,51 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             min={0}
                                                             max={100}
                                                             placeholder={font.fontSize.toString() + "px"}
-                                                            onChange={(e) =>
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    fontSize: e.target.value === '' ? 0 : Number(e.target.value),
-                                                                }))
-                                                            }
+                                                            value={font.fontSize}
+                                                            onChange={(e) => {
+                                                                const newValue = e.target.value === '' ? 0 : Number(e.target.value);
+                                                                setFont((prevFont) => ({ ...prevFont, fontSize: newValue }));
+                                                            }}
                                                         />
                                                     </div>
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
-                                                        <Label htmlFor="size">Vertical position %</Label>
+                                                        <Label htmlFor="weight">Font weight</Label>
                                                         <Input
-                                                            id="size"
+                                                            className="w-36 h-10"
                                                             type="number"
-                                                            value={font.verticalPosition}
-                                                            min={0}
-                                                            max={100}
-                                                            onChangeCapture={(e: any) =>
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    verticalPosition: e.target.value === '' ? 0 : Number(e.target.value),
-                                                                }))
-                                                            }
-                                                            className="h-8"
+                                                            id="weight"
+                                                            min={100}
+                                                            step={100}
+                                                            max={900}
+                                                            placeholder={font.fontWeight.toString()}
+                                                            value={font.fontWeight}
+                                                            onChange={(e) => {
+                                                                const newValue = e.target.value === '' ? 0 : Number(e.target.value);
+                                                                setFont((prevFont) => ({ ...prevFont, fontWeight: newValue }));
+                                                            }}
                                                         />
                                                         <Slider
                                                             className="w-full"
-                                                            value={[font.verticalPosition]}
-                                                            step={1}
+                                                            value={[font.fontWeight]}
                                                             id="size"
-                                                            min={0}
-                                                            max={100}
+                                                            min={100}
+                                                            step={100}
+                                                            max={900}
                                                             onValueChange={(e) =>
                                                                 setFont((prevFont) => ({
                                                                     ...prevFont,
-                                                                    verticalPosition: e[0],
+                                                                    fontWeight: e[0],
                                                                 }))
                                                             }
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="grid-rows-3 flex justify-evenly gap-3">
-                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
-                                                        <Label htmlFor="size">Uppercase</Label>
-                                                        <Switch defaultChecked onCheckedChange={(checked) => {
-                                                            setFont((prevFont) => ({
-                                                                ...prevFont,
-                                                                uppercase: checked,
-                                                            }))
-                                                        }} />
-                                                    </div>
-                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
-                                                        <Label htmlFor="size">Punctuation</Label>
-                                                        <Switch onCheckedChange={(checked) => {
-                                                            setFont((prevFont) => ({
-                                                                ...prevFont,
-                                                                punctuation: checked,
-                                                            }))
-                                                        }} />
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-evenly gap-3">
-                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                <div className="grid grid-cols-3 justify-center items-center">
+                                                    <div className="flex flex-col">
                                                         <Label>Stroke color</Label>
                                                         <StrokeColorPickerComponent />
                                                     </div>
-                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                    <div className="col-span-2">
                                                         <Label htmlFor="stroke">Stroke</Label>
                                                         <Menubar id="stroke">
                                                             <MenubarMenu>
@@ -674,7 +647,38 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         </Menubar>
                                                     </div>
                                                 </div>
-                                                <div className="flex justify-evenly gap-3">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Vertical position (%)</Label>
+                                                        <Input
+                                                            id="size"
+                                                            type="number"
+                                                            value={font.verticalPosition}
+                                                            min={0}
+                                                            max={100}
+                                                            onChangeCapture={(e: any) =>
+                                                                setFont((prevFont) => ({
+                                                                    ...prevFont,
+                                                                    verticalPosition: e.target.value === '' ? 0 : Number(e.target.value),
+                                                                }))
+                                                            }
+                                                            className="h-8"
+                                                        />
+                                                        <Slider
+                                                            className="w-full"
+                                                            value={[font.verticalPosition]}
+                                                            step={1}
+                                                            id="size"
+                                                            min={0}
+                                                            max={100}
+                                                            onValueChange={(e) =>
+                                                                setFont((prevFont) => ({
+                                                                    ...prevFont,
+                                                                    verticalPosition: e[0],
+                                                                }))
+                                                            }
+                                                        />
+                                                    </div>
                                                     <div className="grid w-fit max-w-sm items-center gap-1.5">
                                                         <Label htmlFor="shadow">Shadow</Label>
                                                         <Menubar id="shadow">
@@ -724,6 +728,26 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 </MenubarTrigger>
                                                             </MenubarMenu>
                                                         </Menubar>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Uppercase</Label>
+                                                        <Switch defaultChecked onCheckedChange={(checked) => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                uppercase: checked,
+                                                            }))
+                                                        }} />
+                                                    </div>
+                                                    <div className="grid w-fit max-w-sm items-center gap-1.5">
+                                                        <Label htmlFor="size">Punctuation</Label>
+                                                        <Switch onCheckedChange={(checked) => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                punctuation: checked,
+                                                            }))
+                                                        }} />
                                                     </div>
                                                 </div>
                                             </div>
