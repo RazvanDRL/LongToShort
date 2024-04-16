@@ -65,6 +65,11 @@ const TheBoldFont = localFont({
     display: 'swap',
 })
 
+const Bangers = localFont({
+    src: '../../../fonts/Bangers.ttf',
+    display: 'swap',
+})
+
 const TikTokSans = localFont({
     src: '../../../fonts/TikTokSans.ttf',
     display: 'swap',
@@ -448,7 +453,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             <div
                                                                 style={{
                                                                     color: "#fff",
-                                                                    fontSize: 16,
+                                                                    fontSize: 18,
                                                                     fontWeight: 700,
                                                                     textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
                                                                     position: "relative",
@@ -475,7 +480,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             <div
                                                                 style={{
                                                                     color: "#fff",
-                                                                    fontSize: 16,
+                                                                    fontSize: 18,
                                                                     fontWeight: 700,
                                                                     textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
                                                                     position: "relative",
@@ -541,7 +546,33 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             </div>
                                                         </Button>
                                                     </div>
-
+                                                    <div className="flex flex-col items-center">
+                                                        <Button
+                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Bangers.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                            onClick={() => {
+                                                                setFont((prevFont) => ({
+                                                                    ...prevFont,
+                                                                    fontFamily: Bangers.className,
+                                                                    fontWeight: 400,
+                                                                }))
+                                                            }}
+                                                        >
+                                                            <div
+                                                                style={{
+                                                                    color: "#fff",
+                                                                    fontSize: 22,
+                                                                    fontWeight: 700,
+                                                                    textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                    position: "relative",
+                                                                    textAlign: "center",
+                                                                    lineHeight: 1
+                                                                }}
+                                                                className={`${Bangers.className} antialiased`}
+                                                            >
+                                                                Bangers
+                                                            </div>
+                                                        </Button>
+                                                    </div>
                                                 </div>
                                                 <h3 className="mb-4 mt-8">Font settings</h3>
                                                 <div className="grid grid-cols-3 gap-3">
@@ -570,6 +601,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         <Label className="mb-1.5 ml-3 w-full" htmlFor="weight">Font weight</Label>
                                                         <Input
                                                             className="w-32 h-10"
+                                                            disabled={font.fontFamily === Bangers.className}
                                                             type="number"
                                                             id="weight"
                                                             min={100}
@@ -585,6 +617,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         <Slider
                                                             className="w-32 mt-3"
                                                             value={[font.fontWeight]}
+                                                            disabled={font.fontFamily === Bangers.className}
                                                             id="size"
                                                             min={100}
                                                             step={100}
@@ -734,7 +767,9 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             </MenubarMenu>
                                                         </Menubar>
                                                     </div>
-                                                    {/* 4th row */}
+                                                </div>
+                                                {/* 4th row */}
+                                                <div className="grid grid-cols-5 gap-3">
                                                     <div className="flex flex-col items-center mt-3">
                                                         <Label className="mb-1.5 items-center" htmlFor="size">Uppercase</Label>
                                                         <Switch defaultChecked onCheckedChange={(checked) => {

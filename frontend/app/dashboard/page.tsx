@@ -35,6 +35,7 @@ type Video = {
     name: string;
     created_at: string;
     duration: number;
+    processed: boolean;
 }
 
 export default function Dashboard() {
@@ -69,12 +70,12 @@ export default function Dashboard() {
 
             for (let i = 0; i < data.length; i++) {
                 const file = data[i];
-                if (file.processed === false) continue;
                 fetchedVideos.push({
                     id: file.id,
                     name: file.name || '',
                     created_at: file.created_at,
                     duration: file.duration,
+                    processed: file.processed,
                 });
             }
 
@@ -262,7 +263,7 @@ export default function Dashboard() {
                     setUploadState("done");
 
                     const { duration, width, height } = await getDuration(file);
-                    
+
                     const { error } = await supabase
                         .from('metadata')
                         .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, width: width, height: height });
@@ -334,12 +335,12 @@ export default function Dashboard() {
 
         for (let i = 0; i < data.length; i++) {
             const file = data[i];
-            if (file.processed === false) continue;
             fetchedVideos.push({
                 id: file.id,
                 name: file.name || '',
                 created_at: file.created_at,
                 duration: file.duration,
+                processed: file.processed,
             });
         }
 
@@ -465,7 +466,7 @@ export default function Dashboard() {
                                 </a>
                                 <CollapsibleContent className="space-y-2">
                                     {videos?.slice(1, videos.length).map((video) => (
-                                        <a key={video.id} href={`/video/${video.id}`} className="hover:underline">
+                                        <a key={video.id} href={video.processed ? `/export/${video.id}` : `/video/${video.id}`} className="hover:underline">
                                             <div className="rounded-md border px-4 py-3 font-mono text-sm mt-2.5">
                                                 {shortenFileName(video.name)}
                                             </div>

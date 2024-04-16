@@ -3,9 +3,12 @@ import React from "react";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Rating } from "flowbite-react";
+import localFont from 'next/font/local'
 
-import Stars from "@/public/stars.svg";
-import Image from "next/image";
+const Satoshi = localFont({
+    src: '../fonts/Satoshi.ttf',
+    display: 'swap',
+})
 
 function GridSmallBackgroundDemo() {
     return (
@@ -20,15 +23,70 @@ function GridSmallBackgroundDemo() {
 
 export default function Home() {
     return (
-        <div className="relative w-full">
+        <div className="relative w-full bg-black">
             {/* <GridSmallBackgroundDemo /> */}
             <Navbar />
             <div className="flex flex-col items-center justify-start min-h-screen pt-32 z-20">
-                <p className="text-4xl sm:text-7xl font-bold relative z-20 bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500 py-8">
+                {/* grid */}
+                <div className="grid grid-cols-3 gap-12">
+                    {/* 1st testimonial */}
+                    <div className="col-span-1">
+                        <div className="text-center mt-4">
+                            <div className="flex justify-center">
+                                <Rating className="items-center">
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                </Rating>
+                            </div>
+                            <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
+                                "I just love how niggers touch me till i cum"
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="col-span-1">
+                        <div className="text-center mt-4">
+                            <div className="flex justify-center">
+                                <Rating className="items-center">
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                </Rating>
+                            </div>
+                            <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
+                                "I just love how niggers touch me"
+                            </p>
+                        </div>
+                    </div>
+                    <div className="col-span-1">
+                        <div className="text-center mt-4">
+                            <div className="flex justify-center">
+                                <Rating className="items-center">
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                    <Rating.Star />
+                                </Rating>
+                            </div>
+                            <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
+                                "I just love how niggers touch me"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p className={`${Satoshi.className} text-4xl sm:text-7xl font-bold relative z-20 bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500 py-8`}>
                     Create viral shorts in seconds with AI
                 </p>
-                <p className="text-lg sm:text-2xl font-semibold relative z-20 bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500 py-8">
-                    Create viral shorts in seconds with AI
+                {/* description */}
+                <p className={`${Satoshi.className} text-md font-bold relative z-20 text-neutral-400 text-center`}>
+                    Effortlessly create viral video shorts with our AI-powered platform
+                    <br />Captivate your audience and stay ahead of trends in seconds - no editing required
                 </p>
                 <Button className="w-48 text-xl py-6 px-2 z-20">Get started</Button>
                 <div className="text-gray-300/50 z-20">(No credit card required)</div>
