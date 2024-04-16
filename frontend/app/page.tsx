@@ -42,7 +42,7 @@ export default function Home() {
                                 </Rating>
                             </div>
                             <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
-                                "I just love how niggers touch me till i cum"
+                                "Review"
                             </p>
                         </div>
                     </div>
@@ -59,7 +59,7 @@ export default function Home() {
                                 </Rating>
                             </div>
                             <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
-                                "I just love how niggers touch me"
+                                "Review"
                             </p>
                         </div>
                     </div>
@@ -75,7 +75,7 @@ export default function Home() {
                                 </Rating>
                             </div>
                             <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
-                                "I just love how niggers touch me"
+                                "Review"
                             </p>
                         </div>
                     </div>
