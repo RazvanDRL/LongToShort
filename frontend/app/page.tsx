@@ -42,7 +42,7 @@ export default function Home() {
                                 </Rating>
                             </div>
                             <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
-                                "Review"
+                                {`"`}No annoying watermarks{`"`}
                             </p>
                         </div>
                     </div>
@@ -59,7 +59,7 @@ export default function Home() {
                                 </Rating>
                             </div>
                             <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
-                                "Review"
+                                {`"`}Lightning fast transcriptions{`"`}
                             </p>
                         </div>
                     </div>
@@ -75,31 +75,21 @@ export default function Home() {
                                 </Rating>
                             </div>
                             <p className="mt-2 text-md font-medium text-gray-200 dark:text-gray-300">
-                                "Review"
+                                {`"`}98{`%`} accurate transcriptions{`"`}
                             </p>
                         </div>
                     </div>
                 </div>
                 <p className={`${Satoshi.className} text-4xl sm:text-7xl font-bold relative z-20 bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500 py-8`}>
-                    Create viral shorts in seconds with AI
+                    Focus on creating, not editing
                 </p>
                 {/* description */}
-                <p className={`${Satoshi.className} text-md font-bold relative z-20 text-neutral-400 text-center`}>
+                <p className={`mb-12 text-md font-medium relative z-20 text-neutral-400 text-center`}>
                     Effortlessly create viral video shorts with our AI-powered platform
-                    <br />Captivate your audience and stay ahead of trends in seconds - no editing required
+                    <br />
+                    Captivate your audience and stay ahead of trends in seconds - no editing required
                 </p>
                 <Button className="w-48 text-xl py-6 px-2 z-20">Get started</Button>
-                <div className="text-gray-300/50 z-20">(No credit card required)</div>
-                {/* add stars review svg */}
-                <Rating>
-                    <Rating.Star />
-                    <Rating.Star />
-                    <Rating.Star />
-                    <Rating.Star />
-                    <Rating.Star />
-                    <p className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">4.8 out of 5</p>
-                </Rating>
-                <span className="text-gray-300/50 mt-2 z-20">(loved by 100+ creators)</span>
             </div>
         </div>
     );
