@@ -1,4 +1,5 @@
 {
+  "extends": "next/core-web-vitals",
   "plugins": [
     "@remotion"
   ],
@@ -8,8 +9,7 @@
         "remotion/*.{ts,tsx}"
       ],
       "extends": [
-        "plugin:@remotion/recommended",
-        "next/core-web-vitals"
+        "plugin:@remotion/recommended"
       ]
     }
   ]
