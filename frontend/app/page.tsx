@@ -81,7 +81,7 @@ export default function Home() {
                     </div>
                 </div>
                 <p className={`${Satoshi.className} text-4xl sm:text-7xl font-bold relative z-20 bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500 py-8`}>
-                    Focus on creating, not editing
+                    Focus on creating{`,`} not editing
                 </p>
                 {/* description */}
                 <p className={`mb-12 text-md font-medium relative z-20 text-neutral-400 text-center`}>

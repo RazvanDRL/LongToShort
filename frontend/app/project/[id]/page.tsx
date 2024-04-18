@@ -109,6 +109,7 @@ const shadowSizes: Record<ShadowSize, string> = {
     XL: "0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000, 0 0 18px #000, 0 0 19px #000, 0 0 20px #000, 0 0 21px #000",
 };
 
+
 export default function Project({ params }: { params: { id: string } }) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
