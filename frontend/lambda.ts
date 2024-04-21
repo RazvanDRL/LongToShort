@@ -11,51 +11,36 @@ async function comp() {
         compatibleOnly: true,
     });
 
-    const { bucketName } = await getOrCreateBucket({
+    const render = await renderMediaOnLambda({
+        functionName,
+        inputProps: {},
         region: "us-east-1",
+        serveUrl: "text-warping",
+        codec: "h264",
+        composition: "CompID",
     });
 
-    console.log("Bucket name", bucketName);
+    while (true) {
+        const progress = await getRenderProgress({
+            bucketName: render.bucketName,
+            functionName,
+            region: "us-east-1",
+            renderId: render.renderId,
+        });
 
-    const { serveUrl } = await deploySite({
-        bucketName,
-        entryPoint: path.resolve(process.cwd(), "remotion/index.ts"),
-        region: "us-east-1",
-        siteName: "my-video",
-    });
-    console.log("Site URL", serveUrl);
-    // get compositions
+        if (progress.done) {
+            console.log("Render done", progress.outputFile);
+            break;
+        }
 
-    // const render = await renderMediaOnLambda({
-    //     functionName,
-    //     inputProps: {},
-    //     region: "us-east-1",
-    //     serveUrl: "text-warping",
-    //     codec: "h264",
-    //     composition: "CompID",
-    // });
+        if (progress.fatalErrorEncountered) {
+            console.error("Fatal error encountered", progress.errors.filter((e) => e.isFatal));
+            break;
+        }
 
-    // while (true) {
-    //     const progress = await getRenderProgress({
-    //         bucketName: render.bucketName,
-    //         functionName,
-    //         region: "us-east-1",
-    //         renderId: render.renderId,
-    //     });
-
-    //     if (progress.done) {
-    //         console.log("Render done", progress.outputFile);
-    //         break;
-    //     }
-
-    //     if (progress.fatalErrorEncountered) {
-    //         console.error("Fatal error encountered", progress.errors.filter((e) => e.isFatal));
-    //         break;
-    //     }
-
-    //     console.log("Progress", progress.overallProgress);
-    //     await new Promise((r) => setTimeout(r, 1000));
-    // }
+        console.log("Progress", progress.overallProgress);
+        await new Promise((r) => setTimeout(r, 1000));
+    }
 }
 
 comp();

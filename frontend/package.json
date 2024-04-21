@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "bun run deploy.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
@@ -30,6 +31,7 @@
     "@radix-ui/react-toggle": "^1.0.3",
     "@remotion/cli": "^4.0.142",
     "@remotion/eslint-plugin": "^4.0.142",
+    "@remotion/google-fonts": "^4.0.142",
     "@remotion/lambda": "^4.0.142",
     "@remotion/layout-utils": "^4.0.133",
     "@remotion/player": "^4.0.133",
@@ -63,7 +65,8 @@
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "tus-js-client": "^4.0.1",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "zod": "^3.22.5"
   },
   "devDependencies": {
     "typescript": "^5",

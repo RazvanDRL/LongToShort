@@ -6,7 +6,7 @@ import { Rating } from "flowbite-react";
 import localFont from 'next/font/local'
 
 const Satoshi = localFont({
-    src: '../fonts/Satoshi.ttf',
+    src: '../public/Satoshi.ttf',
     display: 'swap',
 })
 

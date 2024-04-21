@@ -1,6 +1,5 @@
 "use client";
 import { Player, PlayerRef } from "@remotion/player";
-import { AbsoluteFill, Video, Sequence, useVideoConfig } from "remotion";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
@@ -28,6 +27,14 @@ import { Switch } from "@/components/ui/switch";
 import { ColorPicker, Space } from 'antd';
 import localFont from 'next/font/local'
 
+import {
+    CompositionProps,
+    defaultMyCompProps,
+} from "../../../types/constants";
+import { RenderControls } from "../../../components-remotion/RenderControls";
+import { Main } from "../../../remotion/MyComp/Main";
+import { z } from "zod";
+
 type User = {
     id: string;
     email: string;
@@ -51,27 +58,27 @@ type Subtitle = {
 };
 
 const Komika = localFont({
-    src: '../../../fonts/Komika.ttf',
+    src: '../../../public/Komika.ttf',
     display: 'swap',
 })
 
 const Montserrat = localFont({
-    src: '../../../fonts/Montserrat.ttf',
+    src: '../../../public/Montserrat.ttf',
     display: 'swap',
 })
 
 const TheBoldFont = localFont({
-    src: '../../../fonts/TheBoldFont.ttf',
+    src: '../../../public/TheBoldFont.ttf',
     display: 'swap',
 })
 
 const Bangers = localFont({
-    src: '../../../fonts/Bangers.ttf',
+    src: '../../../public/Bangers.ttf',
     display: 'swap',
 })
 
 const TikTokSans = localFont({
-    src: '../../../fonts/TikTokSans.ttf',
+    src: '../../../public/TikTokSans.ttf',
     display: 'swap',
 })
 
@@ -79,6 +86,7 @@ type Font = {
     textColor: string;
     fontSize: number;
     fontFamily: string;
+    fontName: string;
     fontWeight: number;
     verticalPosition: number;
     uppercase: boolean;
@@ -123,7 +131,8 @@ export default function Project({ params }: { params: { id: string } }) {
     const [font, setFont] = useState<Font>({
         textColor: "#fff",
         fontSize: 30,
-        fontFamily: Montserrat.className,
+        fontFamily: Montserrat.style.fontFamily,
+        fontName: "Montserrat",
         fontWeight: 700,
         verticalPosition: 50,
         uppercase: true,
@@ -135,6 +144,14 @@ export default function Project({ params }: { params: { id: string } }) {
         shadow: shadowSizes.None,
     });
     const playerRef = useRef<PlayerRef>(null);
+    const [remo, setRemo] = useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
+    const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
+        return {
+            subtitles,
+            font,
+            video: video!,
+        };
+    }, [subtitles, font, video]);
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
@@ -182,6 +199,14 @@ export default function Project({ params }: { params: { id: string } }) {
                 height: data.height,
                 processed: data.processed,
             });
+
+            // setRemo({
+            //     ...remo,
+            //     DURATION_IN_FRAMES: data.duration * data.fps,
+            //     VIDEO_WIDTH: data.width,
+            //     VIDEO_HEIGHT: data.height,
+            //     VIDEO_FPS: data.fps,
+            // });
         }
 
         return data;
@@ -222,6 +247,10 @@ export default function Project({ params }: { params: { id: string } }) {
 
         if (data && data.signedUrl) {
             setVideo(data.signedUrl);
+            setRemo({
+                ...remo,
+                video: data.signedUrl,
+            });
         }
     }
 
@@ -259,13 +288,13 @@ export default function Project({ params }: { params: { id: string } }) {
                 }
             }
             setSubtitles(newSubtitles);
+            setRemo({
+                ...remo,
+                subtitles: newSubtitles,
+            });
         } else {
             toast.error("Subtitles not found");
         }
-    }
-
-    function removePunctuation(text: string) {
-        return text.replace(/[.,\/\\!?#&^*;:{}=\-_`~()"+|<>@[\]\\]/g, "");
     }
 
     const handleSetStrokeSize = (size: StrokeSize) => {
@@ -355,72 +384,7 @@ export default function Project({ params }: { params: { id: string } }) {
         );
     }
 
-    function MyVideo() {
-        const { fps } = useVideoConfig();
-
-        const renderedSubtitles = useMemo(() => {
-            return subtitles.map((subtitle) => {
-                if (subtitle.start === 0 && subtitle.end === 0) {
-
-                    const previousSubtitle = subtitles[subtitles.indexOf(subtitle) - 1];
-
-                    if (previousSubtitle) {
-                        subtitle.start = previousSubtitle.end;
-                    };
-
-                    const nextSubtitle = subtitles[subtitles.indexOf(subtitle) + 1];
-
-                    if (nextSubtitle) {
-                        subtitle.end = nextSubtitle.start;
-                    }
-                }
-
-                const subtitleDuration = subtitle.end - subtitle.start;
-                if (subtitleDuration <= 0) {
-                    // Handle invalid subtitle duration
-                    return null;
-                }
-
-                return (
-                    <Sequence
-                        key={subtitle.start}
-                        from={subtitle.start * fps}
-                        durationInFrames={subtitleDuration * fps}
-                        className="justify-center"
-                    >
-                        <div style={{
-                            color: font.textColor,
-                            fontSize: font.fontSize,
-                            fontWeight: font.fontWeight,
-                            textShadow: font.shadow,
-                            transform: `translateY(${100 - font.verticalPosition}%)`,
-                        }}
-                            className={`${font.fontFamily} antialiased ${font.uppercase ? 'uppercase' : ''}`}>
-                            <span className={`${font.stroke?.strokeWidth.length > 0 ? "absolute" : ""}`}>
-                                {font.punctuation == false ? removePunctuation(subtitle.text) : subtitle.text}
-                            </span>
-                            {font.stroke?.strokeWidth.length > 0 && <span style={{ WebkitTextStroke: font.stroke.strokeWidth + font.stroke.strokeColor }}>
-                                {font.punctuation == false ? removePunctuation(subtitle.text) : subtitle.text}
-                            </span>}
-                        </div>
-                    </Sequence>
-                );
-            });
-        }, [subtitles, fps]);
-
-        return (
-            <AbsoluteFill>
-                <Video
-                    src={video!}
-                    volume={1}
-                    startFrom={0}
-                    onError={(e) => console.error(e)}
-                />
-
-                {renderedSubtitles}
-            </AbsoluteFill>
-        );
-    }
+    console.log(Komika);
 
     return (
         <div>
@@ -444,10 +408,11 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 <div className="grid grid-cols-3 gap-3">
                                                     <div className="flex flex-col items-center">
                                                         <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TheBoldFont.className ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
+                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TheBoldFont.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
                                                                 setFont((prevFont) => ({
                                                                     ...prevFont,
-                                                                    fontFamily: TheBoldFont.className,
+                                                                    fontFamily: TheBoldFont.style.fontFamily,
+                                                                    fontName: "TheBoldFont",
                                                                 }))
                                                             }}
                                                         >
@@ -470,11 +435,12 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </div>
                                                     <div className="flex flex-col items-center">
                                                         <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Komika.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Komika.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                             onClick={() => {
                                                                 setFont((prevFont) => ({
                                                                     ...prevFont,
-                                                                    fontFamily: Komika.className,
+                                                                    fontFamily: Komika.style.fontFamily,
+                                                                    fontName: "Komika",
                                                                 }))
                                                             }}
                                                         >
@@ -497,11 +463,12 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </div>
                                                     <div className="flex flex-col items-center">
                                                         <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TikTokSans.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TikTokSans.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                             onClick={() => {
                                                                 setFont((prevFont) => ({
                                                                     ...prevFont,
-                                                                    fontFamily: TikTokSans.className,
+                                                                    fontFamily: TikTokSans.style.fontFamily,
+                                                                    fontName: "TikTokSans",
                                                                 }))
                                                             }}
                                                         >
@@ -523,11 +490,12 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </div>
                                                     <div className="flex flex-col items-center">
                                                         <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Montserrat.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Montserrat.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                             onClick={() => {
                                                                 setFont((prevFont) => ({
                                                                     ...prevFont,
-                                                                    fontFamily: Montserrat.className,
+                                                                    fontFamily: Montserrat.style.fontFamily,
+                                                                    fontName: "Montserrat",
                                                                 }))
                                                             }}
                                                         >
@@ -549,11 +517,12 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </div>
                                                     <div className="flex flex-col items-center">
                                                         <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Bangers.className ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Bangers.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                             onClick={() => {
                                                                 setFont((prevFont) => ({
                                                                     ...prevFont,
-                                                                    fontFamily: Bangers.className,
+                                                                    fontFamily: Bangers.style.fontFamily,
+                                                                    fontName: "Bangers",
                                                                     fontWeight: 400,
                                                                 }))
                                                             }}
@@ -602,7 +571,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         <Label className="mb-1.5 ml-3 w-full" htmlFor="weight">Font weight</Label>
                                                         <Input
                                                             className="w-32 h-10"
-                                                            disabled={font.fontFamily === Bangers.className}
+                                                            disabled={font.fontFamily === Bangers.style.fontFamily}
                                                             type="number"
                                                             id="weight"
                                                             min={100}
@@ -618,7 +587,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         <Slider
                                                             className="w-32 mt-3"
                                                             value={[font.fontWeight]}
-                                                            disabled={font.fontFamily === Bangers.className}
+                                                            disabled={font.fontFamily === Bangers.style.fontFamily}
                                                             id="size"
                                                             min={100}
                                                             step={100}
@@ -928,23 +897,33 @@ export default function Project({ params }: { params: { id: string } }) {
 
                                 </Tabs>
                             </div>
-                        )
-                        }
+                        )}
                         <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                             <Player
                                 className="rounded-xl"
                                 ref={playerRef}
-                                component={MyVideo}
+                                component={Main}
+                                inputProps={{
+                                    subtitles: subtitles,
+                                    font: font,
+                                    video: video,
+                                }}
                                 durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
                                 compositionWidth={metadata.width!}
                                 compositionHeight={metadata.height!}
                                 fps={metadata.fps || 30}
                                 controls
                             />
+
                         </div>
+                        <RenderControls
+                            inputProps={inputProps}
+                            font={font}
+                            setFont={setFont}
+                        >
+                        </RenderControls>
                     </div >
-                )
-                }
+                )}
             </main >
         </div >
     );
