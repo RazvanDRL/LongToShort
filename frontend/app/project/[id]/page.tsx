@@ -384,8 +384,6 @@ export default function Project({ params }: { params: { id: string } }) {
         );
     }
 
-    console.log(Komika);
-
     return (
         <div>
             <Toaster />
@@ -918,8 +916,6 @@ export default function Project({ params }: { params: { id: string } }) {
                         </div>
                         <RenderControls
                             inputProps={inputProps}
-                            font={font}
-                            setFont={setFont}
                         >
                         </RenderControls>
                     </div >

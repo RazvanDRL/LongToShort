@@ -32,7 +32,7 @@
     "@remotion/cli": "^4.0.142",
     "@remotion/eslint-plugin": "^4.0.142",
     "@remotion/google-fonts": "^4.0.142",
-    "@remotion/lambda": "^4.0.142",
+    "@remotion/lambda": "^4.0.143",
     "@remotion/layout-utils": "^4.0.133",
     "@remotion/player": "^4.0.133",
     "@remotion/preload": "^4.0.141",

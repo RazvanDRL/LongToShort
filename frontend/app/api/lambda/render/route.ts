@@ -43,6 +43,7 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
         type: "download",
         fileName: "video.mp4",
       },
+      privacy: "public",
     });
 
     return result;
