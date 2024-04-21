@@ -34,6 +34,14 @@ function removePunctuation(text: string) {
   return text.replace(/[.,\/\\!?#&^*;:{}=\-_`~()"+|<>@[\]\\]/g, "");
 }
 
+const fontList = [
+  "Bangers",
+  "Montserrat",
+  "Komika",
+  "TheBoldFont",
+  "TikTokSans",
+]
+
 function localFont(fontName: string) {
   const waitForFont = delayRender();
   const font = new FontFace(
@@ -57,7 +65,9 @@ export const Main: React.FC<{
 }> = ({ subtitles, font, video }) => {
   const { fps } = useVideoConfig();
 
-  localFont(font.fontName);
+  fontList.forEach(() => {
+    localFont(font.fontName);
+  });
 
   const sequenceStyle: React.CSSProperties = useMemo(() => {
     return {
