@@ -2,6 +2,7 @@ import { AwsRegion, RenderMediaOnLambdaOutput } from "@remotion/lambda/client";
 import {
   renderMediaOnLambda,
   speculateFunctionName,
+  presignUrl,
 } from "@remotion/lambda/client";
 import { DISK, RAM, REGION, SITE_NAME, TIMEOUT } from "../../../../config.mjs";
 import { executeApi } from "../../../../helpers/api-response";
@@ -27,6 +28,7 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       );
     }
 
+    // force width, force height from input props
     const result = await renderMediaOnLambda({
       codec: "h264",
       functionName: speculateFunctionName({
@@ -44,7 +46,19 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
         fileName: "video.mp4",
       },
       privacy: "public",
+      deleteAfter: "1-day",
+      scale: 1,
     });
+
+    // const url = await presignUrl({
+    //   region: REGION as AwsRegion,
+    //   bucketName: result.bucketName,
+    //   objectKey: "renders" + result.renderId + "/out.mp4",
+    //   expiresInSeconds: 900,
+    //   checkIfObjectExists: true,
+    // });
+
+    // console.log("Rendered video URL:", url);
 
     return result;
   }

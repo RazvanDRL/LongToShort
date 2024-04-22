@@ -13,6 +13,7 @@ export const RenderControls: React.FC<{
 
   if (state.status === "error") {
     toast.error(state.error.message);
+    console.error(state.error.message);
   }
 
   return (
