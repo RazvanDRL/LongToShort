@@ -2,10 +2,8 @@ import Replicate, { Prediction } from "replicate";
 import { $ } from "bun";
 
 import { supabase } from "./scripts/supabaseClient";
-import { upload } from "./scripts/upload";
-import { addSubToVideo } from "./scripts/addSubToVideo";
 
-const version = "410415fa53d2d3cfb180c2bbbf4a4a8bdb13f794e1bac515244741ef8685e4b3";
+const version = "3cafb09bd68dc82d1c09f7f91d5f67451d61242b8acf83e9ad4e27422dc51b28";
 
 const replicate = new Replicate({
     auth: process.env.REPLICATE_API_TOKEN,

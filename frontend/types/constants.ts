@@ -28,6 +28,13 @@ export const CompositionProps = z.object({
   subtitles: z.array(Subtitle), // Use z.array to specify an array of Subtitle schema
   font: Font, // Use the previously defined Font schema
   video: z.string(),
+  user_id: z.string(),
+  video_id: z.string(),
+  video_height: z.number(),
+  video_width: z.number(),
+  video_duration: z.number(),
+  video_fps: z.number(),
+  aws_url: z.string(),
 });
 
 export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
@@ -54,4 +61,11 @@ export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
     shadow: "",
   },
   video: "",
+  user_id: "",
+  video_id: "",
+  video_height: 0,
+  video_width: 0,
+  video_duration: 0,
+  video_fps: 0,
+  aws_url: " ",
 };

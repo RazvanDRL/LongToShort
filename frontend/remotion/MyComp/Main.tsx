@@ -5,7 +5,6 @@ import {
   Video,
 } from "remotion";
 import React, { useMemo } from "react";
-import { continueRender, delayRender, staticFile } from "remotion";
 
 type Subtitle = {
   start: number;
@@ -29,33 +28,8 @@ type Font = {
   shadow: string;
 }
 
-
 function removePunctuation(text: string) {
   return text.replace(/[.,\/\\!?#&^*;:{}=\-_`~()"+|<>@[\]\\]/g, "");
-}
-
-const fontList = [
-  "Bangers",
-  "Montserrat",
-  "Komika",
-  "TheBoldFont",
-  "TikTokSans",
-]
-
-function localFont(fontName: string) {
-  const waitForFont = delayRender();
-  const font = new FontFace(
-    `${fontName}`,
-    `url('${staticFile(`${fontName}.ttf`)}') format('truetype')`,
-  );
-
-  font
-    .load()
-    .then(() => {
-      document.fonts.add(font);
-      continueRender(waitForFont);
-    })
-    .catch((err) => console.log("Error loading font", err));
 }
 
 export const Main: React.FC<{
@@ -65,14 +39,11 @@ export const Main: React.FC<{
 }> = ({ subtitles, font, video }) => {
   const { fps } = useVideoConfig();
 
-  fontList.forEach(() => {
-    localFont(font.fontName);
-  });
-
   const sequenceStyle: React.CSSProperties = useMemo(() => {
+    console.log(font.fontWeight);
     return {
       color: font.textColor,
-      fontFamily: font.fontName,
+      fontFamily: "Arial",
       justifyContent: "center",
       fontWeight: font.fontWeight,
       verticalPosition: font.verticalPosition,

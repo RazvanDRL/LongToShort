@@ -76,8 +76,11 @@ export default function Video({ params }: { params: { id: string } }) {
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'processing_queue' },
             async (payload) => {
-                const s = payload.new.status;
-                setStatus(s);
+                if (payload.new.video_id !== params.id) return;
+                else {
+                    const s = payload.new.status;
+                    setStatus(s);
+                }
             }
         )
         .subscribe();
@@ -88,17 +91,20 @@ export default function Video({ params }: { params: { id: string } }) {
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'metadata' },
             async (payload) => {
-                const pN = payload.new.processed;
-                const pO = payload.old.processed;
+                if (payload.new.video_id !== params.id) return;
+                else {
+                    const pN = payload.new.processed;
+                    const pO = payload.old.processed;
 
-                if (pN !== pO && pN === true) {
-                    const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                        router.replace(`/project/${params.id}`);
-                    });
+                    if (pN !== pO && pN === true) {
+                        const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+                            router.replace(`/project/${params.id}`);
+                        });
 
-                    toast.promise(promise, {
-                        loading: 'File processed successfully. Redirecting...',
-                    })
+                        toast.promise(promise, {
+                            loading: 'File processed successfully. Redirecting...',
+                        })
+                    }
                 }
             }
         )

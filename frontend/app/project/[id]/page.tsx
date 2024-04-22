@@ -26,7 +26,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { ColorPicker, Space } from 'antd';
 import localFont from 'next/font/local'
-
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import {
     CompositionProps,
     defaultMyCompProps,
@@ -150,8 +158,15 @@ export default function Project({ params }: { params: { id: string } }) {
             subtitles,
             font,
             video: video!,
+            video_id: params.id,
+            user_id: user?.id!,
+            video_height: metadata?.height!,
+            video_width: metadata?.width!,
+            video_duration: metadata?.duration!,
+            video_fps: metadata?.fps!,
+            aws_url: "",
         };
-    }, [subtitles, font, video]);
+    }, [subtitles, font, video, metadata, user]);
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
@@ -896,6 +911,31 @@ export default function Project({ params }: { params: { id: string } }) {
                                 </Tabs>
                             </div>
                         )}
+                        <Dialog
+                        >
+                            <DialogTrigger asChild>
+                                <Button className="inline-block" variant="outline">Export video</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Render video</DialogTitle>
+                                    <DialogDescription>
+                                        Make changes to your profile here. Click save when you're done.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <RenderControls
+                                        inputProps={inputProps}
+                                    >
+                                    </RenderControls>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                         <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                             <Player
                                 className="rounded-xl"
@@ -912,12 +952,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                 fps={metadata.fps || 30}
                                 controls
                             />
-
                         </div>
-                        <RenderControls
-                            inputProps={inputProps}
-                        >
-                        </RenderControls>
                     </div >
                 )}
             </main >

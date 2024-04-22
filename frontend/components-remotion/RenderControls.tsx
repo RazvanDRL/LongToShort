@@ -48,11 +48,14 @@ export const RenderControls: React.FC<{
           </Button>
         ) : null
       }
-      {state.status === "done" ? (
-        <>
-          <DownloadButton undo={undo} state={state}></DownloadButton>
-        </>
-      ) : null}
+      {
+        state.status === "done" ? (
+          <DownloadButton
+            state={state}
+            undo={undo}
+          />
+        ) : null
+      }
     </div>
   );
 };
