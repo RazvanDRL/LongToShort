@@ -947,8 +947,8 @@ export default function Project({ params }: { params: { id: string } }) {
                                     video: video,
                                 }}
                                 durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
-                                compositionWidth={metadata.width!}
-                                compositionHeight={metadata.height!}
+                                compositionWidth={metadata.width! / 4}
+                                compositionHeight={metadata.height! / 4}
                                 fps={metadata.fps || 30}
                                 controls
                             />
