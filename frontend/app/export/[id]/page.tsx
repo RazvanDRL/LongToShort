@@ -136,60 +136,38 @@ export default function Export({ params }: { params: { id: string } }) {
     }
 
     async function fetchVideo() {
-        const { data, error } = await supabase
-            .storage
-            .from('processed_videos')
-            .createSignedUrl(`${user?.id}/${params.id}.mp4`, 86400);
-
-        if (error) {
-            toast.error(error.message);
-            return;
-        }
-        if (!data) {
-            toast.error("Video not found");
-            return;
-        }
-
         try {
-            const videoElement = document.createElement('video');
-            videoElement.src = data.signedUrl;
-            videoElement.onloadedmetadata = () => {
-                const resolution = {
-                    width: videoElement.videoWidth,
-                    height: videoElement.videoHeight
-                };
-                // Assuming you need to store the resolution, you can set it in state or use it as needed
-                // setStateForVideoResolution(resolution);
-            };
-            videoElement.onerror = () => {
-                console.error('Error loading video');
-            };
-        } catch (error) {
-            console.error('Error fetching video resolution:', error);
-        }
+            const response = await fetch(`/api/generate-signed-url?key=${user?.id}/${params.id}.mp4?bucket=output-bucket`, {
+                method: 'POST'
+            });
 
-        if (data && data.signedUrl) {
-            setVideo(data.signedUrl);
+            if (!response.ok) {
+                throw new Error('Failed to fetch signed URL');
+            }
+
+            const data = await response.json();
+            console.log(data.url);
+            setVideo(data.url);
+        } catch (error) {
+            console.error('Error fetching video:', error);
         }
     }
 
     async function fetchSubtitles() {
-        const { data, error } = await supabase
-            .storage
-            .from('processed_videos')
-            .createSignedUrl(`${user?.id}/${params.id}.srt`, 86400);
+        try {
+            const response = await fetch(`/api/generate-signed-url?key=${user?.id}/${params.id}.srt?bucket=subtitles`, {
+                method: 'POST'
+            });
 
-        if (error) {
-            toast.error(error.message);
-            return;
-        }
-        if (!data) {
-            toast.error("Subtitles not found");
-            return;
-        }
+            if (!response.ok) {
+                throw new Error('Failed to fetch signed URL');
+            }
 
-        if (data && data.signedUrl) {
-            setSubtitles(data.signedUrl);
+            const data = await response.json();
+            console.log(data.url);
+            setSubtitles(data.url);
+        } catch (error) {
+            console.error('Error fetching video:', error);
         }
     }
 
@@ -218,7 +196,6 @@ export default function Export({ params }: { params: { id: string } }) {
             }
         }
     }
-
 
     async function addRating(rating: string, reason?: string) {
         if (rating === 'positive' || rating === 'negative') {
@@ -291,7 +268,7 @@ export default function Export({ params }: { params: { id: string } }) {
             {user ? <Header user_email={user.email} /> : null}
             <main className="flex justify-center items-center mt-24">
                 <div className="flex justify-center items-center flex-col">
-                    {shouldRender && video && subtitles && (
+                    {shouldRender && video && (
                         <div>
                             <div>
                                 <div className="flex justify-between">
@@ -333,6 +310,7 @@ export default function Export({ params }: { params: { id: string } }) {
                                             <Download className="mr-2 h-4 w-4" /> Download Video
                                         </Button>
                                         <div className="mt-4 w-full flex justify-between">
+                                            {/*
                                             <Button
                                                 onClick={() => {
                                                     // Create a Blob from the video URL
@@ -363,6 +341,7 @@ export default function Export({ params }: { params: { id: string } }) {
                                             >
                                                 <Captions className="mr-2 h-4 w-4" /> Subtitles
                                             </Button>
+                                            */}
                                             <div className="w-4" /> {/* Spacer */}
                                             <Button
                                                 onClick={() => {

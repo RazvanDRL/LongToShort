@@ -1,7 +1,6 @@
 import S3 from 'aws-sdk/clients/s3.js';
 import { NextResponse } from 'next/server'
 
-
 const s3 = new S3({
     endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID!}.r2.cloudflarestorage.com`,
     accessKeyId: process.env.CLOUDFLARE_AWS_ACCESS_KEY_ID!,
@@ -10,7 +9,9 @@ const s3 = new S3({
 });
 
 export async function POST(req: Request) {
-    const key = req.url.split('?key=')[1];
-    const url = await s3.getSignedUrlPromise('getObject', { Bucket: 'output-bucket', Key: key, Expires: 3600 });
+    const key = req.url.split('?key=')[1].slice(0, req.url.split('?key=')[1].indexOf('?'))
+    const bucketName = req.url.split('?bucket=')[1]
+    const url = await s3.getSignedUrlPromise('getObject', { Bucket: bucketName, Key: key, Expires: 3600 });
+
     return NextResponse.json({ url })
 }
