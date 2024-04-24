@@ -46,19 +46,19 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
         fileName: "video.mp4",
       },
       privacy: "public",
-      deleteAfter: "1-day",
-      scale: 1,
+      // deleteAfter: "1-day",
+      // scale: 1,
+      outName: {
+        key: `${body.inputProps.user_id}/${body.inputProps.video_id}.mp4`,
+        bucketName: "output-bucket",
+        s3OutputProvider: {
+          endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID!}.r2.cloudflarestorage.com`,
+          accessKeyId: process.env.CLOUDFLARE_AWS_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.CLOUDFLARE_AWS_SECRET_ACCESS_KEY!,
+        }
+      }
     });
 
-    // const url = await presignUrl({
-    //   region: REGION as AwsRegion,
-    //   bucketName: result.bucketName,
-    //   objectKey: "renders" + result.renderId + "/out.mp4",
-    //   expiresInSeconds: 900,
-    //   checkIfObjectExists: true,
-    // });
-
-    // console.log("Rendered video URL:", url);
 
     return result;
   }

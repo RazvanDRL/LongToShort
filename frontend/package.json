@@ -46,6 +46,7 @@
     "@vercel/speed-insights": "^1.0.10",
     "antd": "^5.16.1",
     "avvvatars-react": "^0.4.2",
+    "aws-sdk": "^2.1605.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "flowbite-react": "^0.8.0",

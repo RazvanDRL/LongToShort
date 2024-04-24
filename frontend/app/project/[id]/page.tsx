@@ -38,10 +38,19 @@ import {
 import {
     CompositionProps,
     defaultMyCompProps,
+    COMP_NAME,
 } from "../../../types/constants";
-import { RenderControls } from "../../../components-remotion/RenderControls";
 import { Main } from "../../../remotion/MyComp/Main";
 import { z } from "zod";
+import { useRendering } from "../../../helpers/use-rendering";
+import Link from 'next/link';
+import { Undo2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { REGION } from "../../../config.mjs";
+import { AwsRegion } from "@remotion/lambda/client";
+import {
+    presignUrl,
+} from "@remotion/lambda/client";
 
 type User = {
     id: string;
@@ -106,6 +115,11 @@ type Font = {
     shadow: string;
 }
 
+type Render = {
+    renderId: string;
+    bucketName: string;
+}
+
 type StrokeSize = 'None' | 'S' | 'M' | 'L' | 'XL';
 type ShadowSize = 'None' | 'S' | 'M' | 'L' | 'XL';
 
@@ -123,6 +137,18 @@ const shadowSizes: Record<ShadowSize, string> = {
     M: "0 0 4px #000, 0 0 5px #000, 0 0 6px #000, 0 0 7px #000, 0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000",
     L: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
     XL: "0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000, 0 0 18px #000, 0 0 19px #000, 0 0 20px #000, 0 0 21px #000",
+};
+
+const Megabytes: React.FC<{
+    sizeInBytes: number;
+}> = ({ sizeInBytes }) => {
+    const megabytes = Intl.NumberFormat("en", {
+        notation: "compact",
+        style: "unit",
+        unit: "byte",
+        unitDisplay: "narrow",
+    }).format(sizeInBytes);
+    return <span>&nbsp;{megabytes}</span>;
 };
 
 
@@ -153,6 +179,7 @@ export default function Project({ params }: { params: { id: string } }) {
     });
     const playerRef = useRef<PlayerRef>(null);
     const [remo, setRemo] = useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
+    const [render, setRender] = useState<Render>({ renderId: "", bucketName: "" });
     const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
         return {
             subtitles,
@@ -167,6 +194,8 @@ export default function Project({ params }: { params: { id: string } }) {
             aws_url: "",
         };
     }, [subtitles, font, video, metadata, user]);
+
+    const { renderMedia, state, undo } = useRendering(COMP_NAME, inputProps);
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
@@ -330,6 +359,21 @@ export default function Project({ params }: { params: { id: string } }) {
     }
 
     useEffect(() => {
+        if (state.status === "rendering") {
+            setRender({
+                renderId: state.renderId,
+                bucketName: state.bucketName,
+            });
+        }
+        if (state.status === "done") {
+            uploadAWS();
+        }
+        if (state.status === "error") {
+            console.error(state.error.message);
+        }
+    }, [state.status]);
+
+    useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
             if (!result) {
@@ -397,6 +441,57 @@ export default function Project({ params }: { params: { id: string } }) {
                 />
             </Space>
         );
+    }
+
+
+    console.log(state);
+
+    async function uploadAWS() {
+        if (state.status === "done") {
+            // const url = await presignUrl({
+            //     region: REGION as AwsRegion,
+            //     bucketName: render.bucketName,
+            //     objectKey: "renders/" + render.renderId + "/out.mp4",
+            //     expiresInSeconds: 900,
+            //     checkIfObjectExists: true,
+            // });
+
+            // if (!url) {
+            //     console.error("Presigned URL is null.");
+            //     return;
+            // }
+
+            // console.log(url);
+
+            // try {
+            //     const response = await fetch(url);
+            //     const blob = await response.blob();
+
+            //     const { data, error } = await supabase.storage
+            //         .from('processed_videos')
+            //         .upload(`${user?.id}/${params.id}.mp4`, blob);
+
+            //     if (error) {
+            //         toast.error(error.message);
+            //         return;
+            //     }
+
+            //     if (data) {
+            //         const { error } = await supabase
+            //             .from('metadata')
+            //             .update({ processed: true })
+            //             .eq('id', params.id);
+
+            //         if (error) {
+            //             toast.error(error.message);
+            //             return;
+            //         }
+            //     }
+            // } catch (error) {
+            //     console.error("Error uploading to AWS:", error);
+            //     toast.error("Error uploading to AWS");
+            // }
+        }
     }
 
     return (
@@ -920,7 +1015,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                 <DialogHeader>
                                     <DialogTitle>Render video</DialogTitle>
                                     <DialogDescription>
-                                        Make changes to your profile here. Click save when you're done.
+                                        Make changes to your profile here. Click save when you&apos;re done.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
@@ -929,10 +1024,53 @@ export default function Project({ params }: { params: { id: string } }) {
                                     </div>
                                 </div>
                                 <DialogFooter>
-                                    <RenderControls
-                                        inputProps={inputProps}
-                                    >
-                                    </RenderControls>
+                                    <div>
+                                        <Toaster />
+                                        {state.status === "init" ||
+                                            state.status === "invoking" ||
+                                            state.status === "error" ? (
+                                            <>
+                                                {state.status === "invoking" ?
+                                                    (
+                                                        <Button disabled>
+                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            Please wait
+                                                        </Button>
+                                                    ) :
+                                                    (
+                                                        <Button
+                                                            onClick={renderMedia}
+                                                        >
+                                                            Render video
+                                                        </Button>
+                                                    )
+                                                }
+                                            </>
+                                        ) : null}
+                                        {
+                                            state.status === "rendering" ? (
+                                                <Button disabled>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Rendering&nbsp;{Math.ceil(state.progress * 100)}%
+                                                </Button>
+                                            ) : null
+                                        }
+                                        {
+                                            state.status === "done" ? (
+                                                <div>
+                                                    <Button variant="secondary" onClick={undo}>
+                                                        <Undo2 />
+                                                    </Button>
+                                                    <Button asChild>
+                                                        <Link href={state.url}>
+                                                            Download video
+                                                            <Megabytes sizeInBytes={state.size}></Megabytes>
+                                                        </Link>
+                                                    </Button>
+                                                </div>
+                                            ) : null
+                                        }
+                                    </div>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
