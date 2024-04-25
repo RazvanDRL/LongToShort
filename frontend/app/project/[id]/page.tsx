@@ -1,5 +1,5 @@
 "use client";
-import { Player, PlayerRef } from "@remotion/player";
+import { Player } from "@remotion/player";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
@@ -43,14 +43,7 @@ import {
 import { Main } from "../../../remotion/MyComp/Main";
 import { z } from "zod";
 import { useRendering } from "../../../helpers/use-rendering";
-import Link from 'next/link';
-import { Undo2 } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { REGION } from "../../../config.mjs";
-import { AwsRegion } from "@remotion/lambda/client";
-import {
-    presignUrl,
-} from "@remotion/lambda/client";
 
 type User = {
     id: string;
@@ -115,11 +108,6 @@ type Font = {
     shadow: string;
 }
 
-type Render = {
-    renderId: string;
-    bucketName: string;
-}
-
 type StrokeSize = 'None' | 'S' | 'M' | 'L' | 'XL';
 type ShadowSize = 'None' | 'S' | 'M' | 'L' | 'XL';
 
@@ -164,9 +152,7 @@ export default function Project({ params }: { params: { id: string } }) {
         },
         shadow: shadowSizes.None,
     });
-    const playerRef = useRef<PlayerRef>(null);
     const [remo, setRemo] = useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
-    const [render, setRender] = useState<Render>({ renderId: "", bucketName: "" });
     const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
         return {
             subtitles,
@@ -178,11 +164,10 @@ export default function Project({ params }: { params: { id: string } }) {
             video_width: metadata?.width!,
             video_duration: metadata?.duration!,
             video_fps: metadata?.fps!,
-            aws_url: "",
         };
     }, [subtitles, font, video, metadata, user]);
 
-    const { renderMedia, state, undo } = useRendering(COMP_NAME, inputProps);
+    const { renderMedia, state } = useRendering(COMP_NAME, inputProps);
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
@@ -319,14 +304,8 @@ export default function Project({ params }: { params: { id: string } }) {
             shadow: shadowSizes[size],
         }));
     }
-    
+
     useEffect(() => {
-        if (state.status === "rendering") {
-            setRender({
-                renderId: state.renderId,
-                bucketName: state.bucketName,
-            });
-        }
         if (state.status === "done") {
             const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
                 router.push(`/export/${params.id}`);
@@ -410,7 +389,7 @@ export default function Project({ params }: { params: { id: string } }) {
             </Space>
         );
     }
-    
+
     if (state.status === "rendering")
         console.log(state.status, state.progress);
 
@@ -926,77 +905,87 @@ export default function Project({ params }: { params: { id: string } }) {
                                 </Tabs>
                             </div>
                         )}
-                        <Dialog
-                        >
-                            <DialogTrigger asChild>
-                                <Button className="inline-block" variant="outline">Export video</Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Render video</DialogTitle>
-                                    <DialogDescription>
-                                        Make changes to your profile here. Click save when you&apos;re done.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
+                        <div className="flex flex-col items-end">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    {state.status !== "rendering" ?
+                                        <Button className="mb-4" variant="outline">
+                                            Export video
+                                        </Button> :
+                                        <Button className="mb-4" variant="outline">
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Rendering
+                                        </Button>}
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle >Render video</DialogTitle>
+                                        <DialogDescription>
+                                            Make changes to your profile here. Click save when you&apos;re done.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
 
+                                        </div>
                                     </div>
-                                </div>
-                                <DialogFooter>
-                                    <div>
-                                        <Toaster />
-                                        {state.status === "init" ||
-                                            state.status === "invoking" ||
-                                            state.status === "error" ? (
-                                            <>
-                                                {state.status === "invoking" ?
-                                                    (
-                                                        <Button disabled>
-                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                            Please wait
-                                                        </Button>
-                                                    ) :
-                                                    (
-                                                        <Button
-                                                            onClick={renderMedia}
-                                                        >
-                                                            Render video
-                                                        </Button>
-                                                    )
-                                                }
-                                            </>
-                                        ) : null}
-                                        {
-                                            state.status === "rendering" ? (
-                                                <Button disabled>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Rendering&nbsp;{Math.ceil(state.progress * 100)}%
-                                                </Button>
-                                            ) : null
-                                        }
-                                    </div>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                        <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
-                            <Player
-                                className="rounded-xl"
-                                ref={playerRef}
-                                component={Main}
-                                inputProps={{
-                                    subtitles: subtitles,
-                                    font: font,
-                                    video: video,
-                                }}
-                                durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
-                                compositionWidth={metadata.width! / 4}
-                                compositionHeight={metadata.height! / 4}
-                                fps={metadata.fps || 30}
-                                controls
-                            />
+                                    <DialogFooter>
+                                        <div>
+                                            <Toaster />
+                                            {state.status === "init" ||
+                                                state.status === "invoking" ||
+                                                state.status === "error" ? (
+                                                <>
+                                                    {state.status === "invoking" ?
+                                                        (
+                                                            <Button disabled>
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                Please wait
+                                                            </Button>
+
+                                                        ) :
+                                                        (
+                                                            <Button
+                                                                onClick={renderMedia}
+                                                            >
+                                                                Render video
+                                                            </Button>
+                                                        )
+                                                    }
+                                                </>
+                                            ) : null}
+                                            {
+                                                state.status === "rendering" ? (
+                                                    <Button disabled>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Rendering&nbsp;{Math.ceil(state.progress * 100)}%
+                                                    </Button>
+                                                ) : null
+                                            }
+                                        </div>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                            <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                <Player
+                                    className="rounded-xl z-50"
+                                    style={{ width: metadata.width! / 4 + "px", height: metadata.height! / 4 + "px" }}
+                                    component={Main}
+                                    inputProps={{
+                                        subtitles: subtitles,
+                                        font: font,
+                                        video: video,
+                                        video_fps: metadata.fps!,
+                                    }}
+                                    durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
+                                    compositionWidth={metadata.width!}
+                                    compositionHeight={metadata.height!}
+                                    fps={metadata.fps || 30}
+                                    controls
+                                />
+                            </div>
                         </div>
-                    </div >
+                    </div>
                 )}
             </main >
         </div >

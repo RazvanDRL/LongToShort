@@ -20,7 +20,8 @@ export const RemotionRoot: React.FC = () => {
         calculateMetadata={async ({ props }) => {
           const data = await getVideoMetadata(props.video);
           return {
-            durationInSeconds: data.durationInSeconds,
+            fps: props.video_fps,
+            durationInFrames: Math.ceil(data.durationInSeconds * props.video_fps),
             width: data.width,
             height: data.height,
           };

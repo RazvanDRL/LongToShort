@@ -36,8 +36,10 @@ export const Main: React.FC<{
   subtitles: Subtitle[];
   font: Font;
   video: string;
-}> = ({ subtitles, font, video }) => {
+  video_fps: number;
+}> = ({ subtitles, font, video, video_fps }) => {
   const { fps } = useVideoConfig();
+  video_fps = fps;
 
   const sequenceStyle: React.CSSProperties = useMemo(() => {
     console.log(font.fontWeight);
@@ -104,7 +106,6 @@ export const Main: React.FC<{
     <AbsoluteFill>
       <Video
         src={video!}
-        startFrom={0}
         volume={1}
         onError={(e) => console.error(e)}
       />

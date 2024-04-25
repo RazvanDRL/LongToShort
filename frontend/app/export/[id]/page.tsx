@@ -58,18 +58,6 @@ const predefinedReasons = [
     'Other',
 ];
 
-const Megabytes: React.FC<{
-    sizeInBytes: number;
-}> = ({ sizeInBytes }) => {
-    const megabytes = Intl.NumberFormat("en", {
-        notation: "compact",
-        style: "unit",
-        unit: "byte",
-        unitDisplay: "narrow",
-    }).format(sizeInBytes);
-    return <span>&nbsp;{megabytes}</span>;
-};
-
 export default function Export({ params }: { params: { id: string } }) {
     const router = useRouter();
 
@@ -82,7 +70,6 @@ export default function Export({ params }: { params: { id: string } }) {
     const [negativeClicked, setNegativeClicked] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedReasons, setSelectedReasons] = useState<string[] | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
 
     const handlePositiveClick = async () => {
         if (!positiveClicked) {
@@ -167,21 +154,21 @@ export default function Export({ params }: { params: { id: string } }) {
     }
 
     async function fetchSubtitles() {
-        try {
-            const response = await fetch(`/api/generate-signed-url?key=${user?.id}/${params.id}.srt?bucket=subtitles`, {
-                method: 'POST'
-            });
+        const { data, error } = await supabase
+            .from('subs')
+            .select('subtitles')
+            .eq('id', params.id);
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch signed URL');
-            }
-
-            const data = await response.json();
-            console.log(data.url);
-            setSubtitles(data.url);
-        } catch (error) {
-            console.error('Error fetching video:', error);
+        if (error) {
+            toast.error(error.message);
+            return;
         }
+        if (!data) {
+            toast.error("Subtitles not found");
+            return;
+        }
+
+        setSubtitles(data[0].subtitles);
     }
 
     async function fetchRating() {
@@ -299,38 +286,36 @@ export default function Export({ params }: { params: { id: string } }) {
                                             </Link>
                                         </Button>
                                         <div className="mt-4 w-full flex justify-between">
-                                            {/*
                                             <Button
                                                 onClick={() => {
                                                     // Create a Blob from the video URL
-                                                    fetch(subtitles)
-                                                        .then(response => response.blob())
-                                                        .then(blob => {
-                                                            // Create a temporary URL for the Blob
-                                                            const blobUrl = URL.createObjectURL(blob);
-                                                            // Create a temporary anchor element
-                                                            const link = document.createElement('a');
-                                                            link.href = blobUrl;
-                                                            // process metadata.name to remove.mp4 extenison
-                                                            const fileName = metadata?.name.replace('.mp4', '.srt');
-                                                            link.download = `${fileName}`; // Set the default download filename
-                                                            document.body.appendChild(link);
-                                                            link.click();
-                                                            // Remove the temporary URL and anchor element
-                                                            URL.revokeObjectURL(blobUrl);
-                                                            document.body.removeChild(link);
-                                                            toast.success('Subtitles downloaded');
-                                                        })
-                                                        .catch(error => {
-                                                            console.error('Error downloading subtitles:', error);
-                                                            toast.error('Error downloading subtitles');
-                                                        });
+                                                    // fetch(subtitles)
+                                                    //     .then(response => response.blob())
+                                                    //     .then(blob => {
+                                                    //         // Create a temporary URL for the Blob
+                                                    //         const blobUrl = URL.createObjectURL(blob);
+                                                    //         // Create a temporary anchor element
+                                                    //         const link = document.createElement('a');
+                                                    //         link.href = blobUrl;
+                                                    //         // process metadata.name to remove.mp4 extenison
+                                                    //         const fileName = metadata?.name.replace('.mp4', '.srt');
+                                                    //         link.download = `${fileName}`; // Set the default download filename
+                                                    //         document.body.appendChild(link);
+                                                    //         link.click();
+                                                    //         // Remove the temporary URL and anchor element
+                                                    //         URL.revokeObjectURL(blobUrl);
+                                                    //         document.body.removeChild(link);
+                                                    //         toast.success('Subtitles downloaded');
+                                                    //     })
+                                                    //     .catch(error => {
+                                                    //         console.error('Error downloading subtitles:', error);
+                                                    //         toast.error('Error downloading subtitles');
+                                                    //     });
                                                 }}
                                                 className="w-[48%]" // Adjust width to your preference
                                             >
                                                 <Captions className="mr-2 h-4 w-4" /> Subtitles
                                             </Button>
-                                            */}
                                             <div className="w-4" /> {/* Spacer */}
                                             <Button
                                                 onClick={() => {
