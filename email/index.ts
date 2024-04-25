@@ -10,8 +10,6 @@ supabase
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'metadata' },
         async (payload) => {
-            console.log('payload:', payload.new);
-
             let { data: profiles, error } = await supabase
                 .from('profiles')
                 .select('*')
