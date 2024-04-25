@@ -47,7 +47,6 @@ export default function Dashboard() {
     const [shouldRender, setShouldRender] = useState(false);
     const [files, setFiles] = useState<File>();
     const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
-    const [uploadProgress, setUploadProgress] = useState(0);
 
     const fetchAllVideos = async () => {
         if (user && user.id) {
@@ -226,78 +225,41 @@ export default function Dashboard() {
             throw new Error('user not logged in');
         }
 
-        const accessToken = session.data.session?.access_token;
+        const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.mp4`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/octet-stream',
+            },
+            body: file,
+        });
 
-        const promise = new Promise<void>((resolve, reject) => {
-            let path = `${user?.id}/${uuid}.mp4`;
+        if (response.status == 200) {
+            setUploadState("done");
+            const { duration, width, height } = await getDuration(file);
 
-            var upload = new tus.Upload(file, {
-                endpoint: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/upload/resumable`,
-                retryDelays: [0, 3000, 5000, 10000, 20000],
-                headers: {
-                    authorization: `Bearer ${accessToken}`,
-                    // 'x-upsert': 'true', // optionally set upsert to true to overwrite existing files
-                },
-                uploadDataDuringCreation: true,
-                removeFingerprintOnSuccess: false, // Important if you want to allow re-uploading the same file https://github.com/tus/tus-js-client/blob/main/docs/api.md#removefingerprintonsuccess
-                metadata: {
-                    bucketName: "videos",
-                    objectName: path,
-                    contentType: "video/mp4",
-                    cacheControl: 3600,
-                },
-                chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB (for now) do not change it
-                onError: function (error: any) {
-                    toast.error(error.message);
-                    setUploadProgress(0);
-                    setUploadState("error");
-                    reject(error)
-                },
-                onProgress: function (bytesUploaded: any, bytesTotal: any) {
-                    var percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2)
-                    setUploadProgress(Number(percentage));
-                },
-                onSuccess: async function () {
-                    resolve()
+            const { error } = await supabase
+                .from('metadata')
+                .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, width: width, height: height });
+            if (error) {
+                toast.error(error.message);
+                return;
+            }
 
-                    setUploadState("done");
+            const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+                router.replace(`/video/${uuid}`);
+            });
 
-                    const { duration, width, height } = await getDuration(file);
-
-                    const { error } = await supabase
-                        .from('metadata')
-                        .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, width: width, height: height });
-
-                    const promise2 = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                        router.replace(`/video/${uuid}`);
-                    });
-
-                    toast.promise(promise2, {
-                        loading: 'File uploaded successfully. Redirecting...',
-                    })
-                },
+            toast.promise(promise, {
+                loading: 'File uploaded successfully. Redirecting...',
             })
+        }
 
-            setUploadState("idle");
+        if (response.status != 200) {
+            toast.error(response.ok);
+            setUploadState("error");
+        }
 
-
-            // Check if there are any previous uploads to continue.
-            return upload.findPreviousUploads().then(function (previousUploads: any) {
-                // Found previous uploads so we select the first one.
-                if (previousUploads.length) {
-                    upload.resumeFromPreviousUpload(previousUploads[0])
-                }
-
-                // Start the upload
-                upload.start()
-            })
-        })
-
-        toast.promise(promise, {
-            loading: 'Uploading...',
-        })
-
-        return promise;
+        setUploadState("idle");
     }
 
     async function handleRemoveVideo(video_id: string) {
@@ -412,12 +374,6 @@ export default function Dashboard() {
                             accept="video/mp4"
                             disabled={uploadState === "uploading"}
                         />
-                        {uploadState === "uploading" ?
-                            <Progress value={uploadProgress} className="mt-8" />
-                            :
-                            null
-                        }
-
                         {uploadState === "uploading" ?
                             <div>
                                 <Button

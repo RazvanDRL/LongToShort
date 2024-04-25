@@ -23,20 +23,30 @@ let lastKnownStatus: string | null = null;
 let lastKnownLogs: string | null = null;
 let preditctionID: string | null = null;
 
+async function fetchVideo(path: string) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/generate-signed-url?key=${path}?bucket=output-bucket`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch signed URL');
+        }
+
+        const data = await response.json() as { url: string };
+
+        return data.url;
+    } catch (error) {
+        console.error('Error fetching video:', error);
+    }
+}
+
 async function processQueueItem(row: queueItem) {
     const path = `${row.user_id}/${row.video_id}.mp4`;
 
-    const { data: video_data, error: video_error } = await supabase
-        .storage
-        .from('videos')
-        .createSignedUrl(path, 86400); // 24 hours
+    const url = await fetchVideo(path);
 
-    if (video_error) {
-        console.log(video_error);
-        return;
-    }
-
-    if (video_data && video_data.signedUrl) {
+    if (url) {
         const controller = new AbortController();
         let cancelled = false;
 
@@ -51,7 +61,7 @@ async function processQueueItem(row: queueItem) {
                 `razvandrl/subtitler:${version}`,
                 {
                     input: {
-                        file: video_data.signedUrl,
+                        file: url,
                         batch_size: 32,
                     },
                     signal: controller.signal,
@@ -113,7 +123,7 @@ async function processQueueItem(row: queueItem) {
                 }
             );
             await $`mkdir -p ${row.user_id}`;
-            await $`curl -o ${path} ${video_data.signedUrl}`;
+            await $`curl -o ${path} ${url}`;
             let fps_cmd = await $`ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of default=noprint_wrappers=1:nokey=1 ${path}`;
             // fps_cmd will be in the form of "2997/100" and i want to add to the database only the number 29.97
             let fps = parseFloat(fps_cmd.stdout.toString().split("/")[0]) / parseFloat(fps_cmd.stdout.toString().split("/")[1]);
