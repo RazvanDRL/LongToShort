@@ -7,6 +7,6 @@ import { VERSION } from "remotion/version";
 export const REGION = "us-east-1";
 
 export const SITE_NAME = "text-warping";
-export const RAM = 512;
+export const RAM = 1024;
 export const DISK = 2048;
 export const TIMEOUT = 240;

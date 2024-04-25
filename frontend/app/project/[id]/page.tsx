@@ -139,19 +139,6 @@ const shadowSizes: Record<ShadowSize, string> = {
     XL: "0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000, 0 0 18px #000, 0 0 19px #000, 0 0 20px #000, 0 0 21px #000",
 };
 
-const Megabytes: React.FC<{
-    sizeInBytes: number;
-}> = ({ sizeInBytes }) => {
-    const megabytes = Intl.NumberFormat("en", {
-        notation: "compact",
-        style: "unit",
-        unit: "byte",
-        unitDisplay: "narrow",
-    }).format(sizeInBytes);
-    return <span>&nbsp;{megabytes}</span>;
-};
-
-
 export default function Project({ params }: { params: { id: string } }) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
@@ -258,7 +245,7 @@ export default function Project({ params }: { params: { id: string } }) {
 
     async function fetchVideo() {
         try {
-            const response = await fetch(`/api/generate-signed-url?key=${user?.id}/${params.id}.mp4?bucket=output-bucket`, {
+            const response = await fetch(`/api/generate-signed-url?key=${user?.id}/${params.id}.mp4?bucket=upload-bucket`, {
                 method: 'POST'
             });
 
@@ -332,7 +319,7 @@ export default function Project({ params }: { params: { id: string } }) {
             shadow: shadowSizes[size],
         }));
     }
-
+    
     useEffect(() => {
         if (state.status === "rendering") {
             setRender({
@@ -986,21 +973,6 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                                     Rendering&nbsp;{Math.ceil(state.progress * 100)}%
                                                 </Button>
-                                            ) : null
-                                        }
-                                        {
-                                            state.status === "done" ? (
-                                                <div>
-                                                    <Button variant="secondary" onClick={undo}>
-                                                        <Undo2 />
-                                                    </Button>
-                                                    <Button asChild>
-                                                        <Link href={state.url}>
-                                                            Download video
-                                                            <Megabytes sizeInBytes={state.size}></Megabytes>
-                                                        </Link>
-                                                    </Button>
-                                                </div>
                                             ) : null
                                         }
                                     </div>

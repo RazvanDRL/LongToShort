@@ -104,8 +104,8 @@ export const Main: React.FC<{
     <AbsoluteFill>
       <Video
         src={video!}
-        volume={1}
         startFrom={0}
+        volume={1}
         onError={(e) => console.error(e)}
       />
 

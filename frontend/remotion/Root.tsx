@@ -15,11 +15,12 @@ export const RemotionRoot: React.FC = () => {
         durationInFrames={1920}
         fps={30}
         width={1080}
-        height={1920}
+        height={1080}
         defaultProps={defaultMyCompProps}
         calculateMetadata={async ({ props }) => {
           const data = await getVideoMetadata(props.video);
           return {
+            durationInSeconds: data.durationInSeconds,
             width: data.width,
             height: data.height,
           };

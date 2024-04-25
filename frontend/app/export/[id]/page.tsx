@@ -58,6 +58,18 @@ const predefinedReasons = [
     'Other',
 ];
 
+const Megabytes: React.FC<{
+    sizeInBytes: number;
+}> = ({ sizeInBytes }) => {
+    const megabytes = Intl.NumberFormat("en", {
+        notation: "compact",
+        style: "unit",
+        unit: "byte",
+        unitDisplay: "narrow",
+    }).format(sizeInBytes);
+    return <span>&nbsp;{megabytes}</span>;
+};
+
 export default function Export({ params }: { params: { id: string } }) {
     const router = useRouter();
 

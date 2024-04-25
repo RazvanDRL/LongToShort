@@ -93,7 +93,7 @@ compatibility_flags = ["nodejs_compat"]
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#r2-buckets
 [[r2_buckets]]
 binding = "MY_BUCKET"
-bucket_name = "output-bucket"
+bucket_name = "upload-bucket"
 
 # Bind another Worker service. Use this binding to call another Worker without network overhead.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
