@@ -30,6 +30,7 @@ import {
 } from "lucide-react"
 
 import React, { useEffect, useState } from 'react';
+import Link from "next/link";
 
 type User = {
     id: string;
@@ -280,34 +281,10 @@ export default function Export({ params }: { params: { id: string } }) {
                                                 className="max-h-[500px] rounded-lg"
                                             />
                                         </div>
-                                        <Button
-                                            onClick={() => {
-                                                // Create a Blob from the video URL
-                                                fetch(video)
-                                                    .then(response => response.blob())
-                                                    .then(blob => {
-                                                        // Create a temporary URL for the Blob
-                                                        const blobUrl = URL.createObjectURL(blob);
-                                                        // Create a temporary anchor element
-                                                        const link = document.createElement('a');
-                                                        link.href = blobUrl;
-                                                        link.download = `${metadata?.name}.mp4`; // Set the default download filename
-                                                        document.body.appendChild(link);
-                                                        link.click();
-                                                        // Remove the temporary URL and anchor element
-                                                        URL.revokeObjectURL(blobUrl);
-                                                        document.body.removeChild(link);
-                                                        toast.success('Video downloaded');
-                                                    })
-                                                    .catch(error => {
-                                                        console.error('Error downloading video:', error);
-                                                        toast.error('Error downloading video');
-                                                    });
-                                            }}
-                                            className="w-full mt-6" // Adjust width to your preference
-
-                                        >
-                                            <Download className="mr-2 h-4 w-4" /> Download Video
+                                        <Button asChild className="w-full mt-6">
+                                            <Link href={video}>
+                                                <Download className="mr-2 h-4 w-4" /> Download Video
+                                            </Link>
                                         </Button>
                                         <div className="mt-4 w-full flex justify-between">
                                             {/*

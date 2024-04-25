@@ -140,15 +140,12 @@ async function processQueueItem(row: queueItem) {
                         { status: "succeeded" },
                     ])
                     .match({ id: row.id });
-                // upload to supabase .json to supabase
                 const { data, error } = await supabase
                     .from('subs')
                     .insert([
                         { id: row.video_id, user_id: row.user_id, subtitles: output },
                     ])
                     .select()
-                // await addSubToVideo(video_data.signedUrl.toString(), row.user_id, row.video_id);
-                // await upload(row.user_id, row.video_id);
             }
             await $`rm -rf ${row.user_id}`;
         } catch (error) {
@@ -157,9 +154,7 @@ async function processQueueItem(row: queueItem) {
             clearTimeout(timer);
             await supabase
                 .from("metadata")
-                .update([
-                    { processed: true },
-                ])
+                .update([{ processed: true }])
                 .match({ id: row.video_id });
 
             await supabase
@@ -175,6 +170,7 @@ async function processQueueItem(row: queueItem) {
                 .from("processing_queue")
                 .delete()
                 .match({ id: row.id });
+
             if (delete_error) {
                 console.log(delete_error);
             }

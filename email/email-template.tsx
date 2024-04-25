@@ -8,6 +8,6 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
     video_id,
 }) => (
     <div>
-        <span>Check out your processed video here <a href={`http://localhost:3000/project/${video_id}`}>http://localhost:3000/project/{video_id}</a></span>
+        <span>Check out your processed video here <a href={`http://localhost:3000/export/${video_id}`}>http://localhost:3000/project/{video_id}</a></span>
     </div>
 );

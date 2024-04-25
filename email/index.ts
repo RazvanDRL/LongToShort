@@ -5,7 +5,7 @@ import { EmailTemplate } from './email-template';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 supabase
-    .channel('metadata-update-channel-email')
+    .channel('email-channel')
     .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'metadata' },
@@ -23,12 +23,9 @@ supabase
             }
 
             if (profiles && profiles.length > 0 && profiles[0].email) {
-                const pN = payload.new.processed;
-                const pO = payload.old.processed;
-
-                if (pN !== pO && pN === true) {
+                if (payload.new.processed == true) {
                     const { data, error } = await resend.emails.send({
-                        from: 'LongToShort <onboarding@resend.dev>',
+                        from: 'LongToShort <contact@email.longtoshort.tech>',
                         to: [`${profiles[0].email}`],
                         subject: `Video ${payload.new.name} has been processed`,
                         react: EmailTemplate({ video_id: payload.new.id }),
@@ -39,3 +36,5 @@ supabase
         }
     )
     .subscribe();
+
+console.log('Listening for changes on metadata table...');

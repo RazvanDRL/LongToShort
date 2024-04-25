@@ -2,7 +2,6 @@ import { AwsRegion, RenderMediaOnLambdaOutput } from "@remotion/lambda/client";
 import {
   renderMediaOnLambda,
   speculateFunctionName,
-  presignUrl,
 } from "@remotion/lambda/client";
 import { DISK, RAM, REGION, SITE_NAME, TIMEOUT } from "../../../../config.mjs";
 import { executeApi } from "../../../../helpers/api-response";

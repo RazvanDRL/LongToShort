@@ -246,7 +246,7 @@ export default function Dashboard() {
             }
 
             const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                router.replace(`/video/${uuid}`);
+                router.push(`/video/${uuid}`);
             });
 
             toast.promise(promise, {

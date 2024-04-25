@@ -76,8 +76,7 @@ export default function Video({ params }: { params: { id: string } }) {
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'processing_queue' },
             async (payload) => {
-                if (payload.new.video_id !== params.id) return;
-                else {
+                if (payload.new.video_id == params.id) {
                     const s = payload.new.status;
                     setStatus(s);
                 }
@@ -91,14 +90,11 @@ export default function Video({ params }: { params: { id: string } }) {
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'metadata' },
             async (payload) => {
-                if (payload.new.video_id !== params.id) return;
-                else {
-                    const pN = payload.new.processed;
-                    const pO = payload.old.processed;
-
-                    if (pN !== pO && pN === true) {
+                if (payload.new.id == params.id) {
+                    console.log("processed", payload.new.processed);
+                    if (payload.new.processed == true) {
                         const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                            router.replace(`/project/${params.id}`);
+                            router.push(`/project/${params.id}`);
                         });
 
                         toast.promise(promise, {
@@ -335,10 +331,14 @@ export default function Video({ params }: { params: { id: string } }) {
                             }
                         </div>
                         <div>
-                            <Button className="mb-6 text-base font-medium" size="lg" onClick={() => processVideo()} disabled={processing}>
-                                <Sparkles className="mr-2 h-5 w-5" />
-                                Process video
-                            </Button>
+                            {
+                                status === "" ? (
+                                    <Button className="mb-6 text-base font-medium" size="lg" onClick={() => processVideo()} disabled={processing}>
+                                        <Sparkles className="mr-2 h-5 w-5" />
+                                        Process video
+                                    </Button>
+                                ) : null
+                            }
                         </div>
                     </div>
                     <div className="px-2 mx-auto bg-[#15171d] h-[500px] w-[800px] rounded-2xl">

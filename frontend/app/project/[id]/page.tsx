@@ -257,44 +257,19 @@ export default function Project({ params }: { params: { id: string } }) {
     }
 
     async function fetchVideo() {
-        const { data, error } = await supabase
-            .storage
-            .from('videos')
-            .createSignedUrl(`${user?.id}/${params.id}.mp4`, 86400);
-
-        if (error) {
-            toast.error(error.message);
-            return;
-        }
-        if (!data) {
-            toast.error("Video not found");
-            return;
-        }
-
         try {
-            const videoElement = document.createElement('video');
-            videoElement.src = data.signedUrl;
-            videoElement.onloadedmetadata = () => {
-                const resolution = {
-                    width: videoElement.videoWidth,
-                    height: videoElement.videoHeight
-                };
-                // Assuming you need to store the resolution, you can set it in state or use it as needed
-                // setStateForVideoResolution(resolution);
-            };
-            videoElement.onerror = () => {
-                console.error('Error loading video');
-            };
-        } catch (error) {
-            console.error('Error fetching video resolution:', error);
-        }
-
-        if (data && data.signedUrl) {
-            setVideo(data.signedUrl);
-            setRemo({
-                ...remo,
-                video: data.signedUrl,
+            const response = await fetch(`/api/generate-signed-url?key=${user?.id}/${params.id}.mp4?bucket=output-bucket`, {
+                method: 'POST'
             });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch signed URL');
+            }
+
+            const data = await response.json();
+            setVideo(data.url);
+        } catch (error) {
+            console.error('Error fetching video:', error);
         }
     }
 
@@ -366,7 +341,13 @@ export default function Project({ params }: { params: { id: string } }) {
             });
         }
         if (state.status === "done") {
-            uploadAWS();
+            const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+                router.push(`/export/${params.id}`);
+            });
+
+            toast.promise(promise, {
+                loading: 'File rendered successfully. Redirecting...',
+            })
         }
         if (state.status === "error") {
             console.error(state.error.message);
@@ -442,57 +423,9 @@ export default function Project({ params }: { params: { id: string } }) {
             </Space>
         );
     }
-
-
-    console.log(state);
-
-    async function uploadAWS() {
-        if (state.status === "done") {
-            // const url = await presignUrl({
-            //     region: REGION as AwsRegion,
-            //     bucketName: render.bucketName,
-            //     objectKey: "renders/" + render.renderId + "/out.mp4",
-            //     expiresInSeconds: 900,
-            //     checkIfObjectExists: true,
-            // });
-
-            // if (!url) {
-            //     console.error("Presigned URL is null.");
-            //     return;
-            // }
-
-            // console.log(url);
-
-            // try {
-            //     const response = await fetch(url);
-            //     const blob = await response.blob();
-
-            //     const { data, error } = await supabase.storage
-            //         .from('processed_videos')
-            //         .upload(`${user?.id}/${params.id}.mp4`, blob);
-
-            //     if (error) {
-            //         toast.error(error.message);
-            //         return;
-            //     }
-
-            //     if (data) {
-            //         const { error } = await supabase
-            //             .from('metadata')
-            //             .update({ processed: true })
-            //             .eq('id', params.id);
-
-            //         if (error) {
-            //             toast.error(error.message);
-            //             return;
-            //         }
-            //     }
-            // } catch (error) {
-            //     console.error("Error uploading to AWS:", error);
-            //     toast.error("Error uploading to AWS");
-            // }
-        }
-    }
+    
+    if (state.status === "rendering")
+        console.log(state.status, state.progress);
 
     return (
         <div>
