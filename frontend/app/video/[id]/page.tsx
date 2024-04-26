@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 
 import Badge from "@/components/badge";
 import Header from "@/components/header";
+import Link from "next/link";
 
 import {
+    ExternalLink,
     Sparkles,
     User,
 } from "lucide-react"
@@ -319,7 +321,7 @@ export default function Video({ params }: { params: { id: string } }) {
         <div>
             <Toaster richColors />
 
-            {user ? <Header user_email={user.email} /> : null}
+            {user ? <Header user_email={user.email} page={"/video/" + params.id} /> : null}
             <main className="flex justify-center items-center mt-24">
                 <div className="flex justify-center items-center flex-col">
                     <div className="flex justify-between items-center w-full">
@@ -336,6 +338,17 @@ export default function Video({ params }: { params: { id: string } }) {
                                     <Button className="mb-6 text-base font-medium" size="lg" onClick={() => processVideo()} disabled={processing}>
                                         <Sparkles className="mr-2 h-5 w-5" />
                                         Process video
+                                    </Button>
+                                ) : null
+                            }
+
+                            {
+                                status === "done" || status ==="succeeded" ? (
+                                    <Button asChild variant="outline" className="mb-6 text-base font-medium" size="lg">
+                                        <Link href={`/project/${params.id}`}>
+                                            <ExternalLink className="mr-2 h-5 w-5" />
+                                            Go to project
+                                        </Link>
                                     </Button>
                                 ) : null
                             }
@@ -367,7 +380,7 @@ export default function Video({ params }: { params: { id: string } }) {
                             </span>
                             <br /><br />
                             <span>
-                                Estimated cost ~ <span className="text-green-400">${queuePos?.estimated_cost}</span>
+                                Estimated cost ~ <span className="text-green-400">${(Number(queuePos?.estimated_cost) * 100).toFixed(2)}</span>
                             </span>
                             <br /><br />
                             <span>

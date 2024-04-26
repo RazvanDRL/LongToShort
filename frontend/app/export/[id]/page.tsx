@@ -265,7 +265,7 @@ export default function Export({ params }: { params: { id: string } }) {
         <div>
             <Toaster richColors />
 
-            {user ? <Header user_email={user.email} /> : null}
+            {user ? <Header user_email={user.email} page={"/export/" + params.id} /> : null}
             <main className="flex justify-center items-center mt-24">
                 <div className="flex justify-center items-center flex-col">
                     {shouldRender && video && (

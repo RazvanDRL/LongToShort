@@ -17,21 +17,86 @@ import {
     User,
 } from "lucide-react"
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { useState } from "react"
+import { toast } from "sonner";
 
-
-
-export default function Header({ user_email }: { user_email: string }) {
+export default function Header({ user_email, page }: { user_email: string, page?: string }) {
     const router = useRouter();
+    const [feedbackText, setFeedbackText] = useState("");
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
         router.replace('/login');
     };
 
+    async function sendFeedback() {
+        if (feedbackText.trim().length < 3 || feedbackText.trim().length > 150) {
+            toast.error('Feedback text must be between 3 and 150 characters.');
+            return;
+        }
+
+        if (/<(?=.*? .*?\/ ?>|br|hr|input|!--|wbr)[a-z]+.*?>|<([^>]+)>/i.test(feedbackText)) {
+            toast.error('Feedback text cannot contain HTML tags.');
+            return;
+        }
+
+        const user_id = (await supabase.auth.getUser()).data?.user?.id;
+
+        const { data, error } = await supabase
+            .from('feedback')
+            .insert([
+                {
+                    user_id: user_id,
+                    feedback: feedbackText,
+                    page: page || "unknown",
+                    email: user_email
+                }
+            ]);
+
+        if (error) {
+            toast.error('An error occurred while sending feedback.');
+        }
+        else {
+            toast.success('Feedback sent successfully. Thank you!');
+        }
+
+        setFeedbackText("");
+    }
+
     return (
         <header>
             <div className="sticky flex justify-end items-center p-8">
+                <div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" className="mr-8">Feedback</Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                            <div className="grid gap-4">
+                                <Label>Feedback</Label>
+                                <Textarea
+                                    placeholder="Ideas on how to improve"
+                                    onChange={(e) => setFeedbackText(e.target.value)}
+                                    value={feedbackText}
+                                />
+                                <Button
+                                    variant={"outline"}
+                                    onClick={async () => await sendFeedback()}
+                                >
+                                    Send feedback
+                                </Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                </div>
                 <div>
                     <Button className="mr-8">Add more credits</Button>
                 </div>
