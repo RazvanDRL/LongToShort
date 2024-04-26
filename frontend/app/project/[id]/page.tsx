@@ -911,11 +911,13 @@ export default function Project({ params }: { params: { id: string } }) {
                                     {state.status !== "rendering" ?
                                         <Button className="mb-4" variant="outline">
                                             Export video
-                                        </Button> :
+                                        </Button>
+                                        :
                                         <Button className="mb-4" variant="outline">
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                             Rendering
-                                        </Button>}
+                                        </Button>
+                                    }
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-[425px]">
                                     <DialogHeader>

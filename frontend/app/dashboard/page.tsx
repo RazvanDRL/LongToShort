@@ -24,6 +24,7 @@ import {
 
 import React, { useEffect, useState } from 'react';
 import Header from "@/components/header"
+import { Session } from "inspector";
 
 type User = {
     id: string;
@@ -219,16 +220,10 @@ export default function Dashboard() {
 
         let uuid: string = uuidv4();
 
-        const session = await supabase.auth.getSession();
-
-        if (!session) {
-            throw new Error('user not logged in');
-        }
-
         const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.mp4`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/octet-stream',
+                'Content-Type': 'video/mp4',
             },
             body: file,
         });
@@ -255,7 +250,7 @@ export default function Dashboard() {
         }
 
         if (response.status != 200) {
-            toast.error(response.ok);
+            toast.error(await response.text());
             setUploadState("error");
         }
 
