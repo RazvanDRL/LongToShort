@@ -25,13 +25,12 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { toast } from "sonner";
 
 export default function Header({ user_email, page }: { user_email: string, page?: string }) {
     const router = useRouter();
     const [feedbackText, setFeedbackText] = useState("");
-    const [credits, setCredits] = useState(0);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -72,41 +71,9 @@ export default function Header({ user_email, page }: { user_email: string, page?
         setFeedbackText("");
     }
 
-    async function getCredits() {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('credits')
-            .eq('id', (await supabase.auth.getUser()).data?.user?.id);
-
-        if (error) {
-            toast.error(error.message);
-        }
-
-        if (data && data.length > 0 && data[0].credits) {
-            setCredits(Number(data[0].credits));
-        }
-    }
-
-    useEffect(() => {
-        getCredits();
-    }, []);
-
     return (
         <header>
             <div className="sticky flex justify-end items-center p-8">
-                {credits !== 0 ? (
-                    <div className="flex items-center mr-4">
-                        <span className="relative flex h-2 w-2 opacity-60">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                        </span>
-                        <span className="ml-1.5 font-mono text-neutral-400">${(credits / 1000).toFixed(2)}</span>
-                    </div>
-                ) : null}
-                <div>
-                    <Button className="mr-8">Add more credits</Button>
-                </div>
-                {/* Feedback */}
                 <div>
                     <Popover>
                         <PopoverTrigger asChild>
@@ -129,6 +96,9 @@ export default function Header({ user_email, page }: { user_email: string, page?
                             </div>
                         </PopoverContent>
                     </Popover>
+                </div>
+                <div>
+                    <Button className="mr-8">Add more credits</Button>
                 </div>
                 <div className="flex items-center">
                     <DropdownMenu>
