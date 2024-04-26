@@ -65,7 +65,6 @@
     "stripe": "^14.24.0",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
-    "tus-js-client": "^4.0.1",
     "uuid": "^9.0.1",
     "wrangler": "^3.52.0",
     "zod": "^3.22.5"

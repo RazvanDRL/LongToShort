@@ -5,8 +5,10 @@ const MAX_UPLOAD_SIZE = 52428800; // 50MB
 
 async function executePutRequest(url: string, data: ArrayBuffer, authToken?: string): Promise<Response> {
     const headers = {
-        'Content-Type': 'video/mp4', // Set the content type to binary data
-        'Authorization': `Bearer ${authToken}` // Set the authorization header
+        'Content-Type': 'video/mp4',
+        'Authorization': `Bearer ${authToken}`,
+        'X-Content-Type-Options': 'nosniff',
+        'X-XSS-Protection': '1; mode=block',
     };
 
     try {
@@ -30,6 +32,9 @@ export async function PUT(req: Request): Promise<Response> {
     if (dataSize > MAX_UPLOAD_SIZE) {
         return new Response('File size exceeds the maximum upload limit of 50MB.', {
             status: 413,
+            headers: {
+                'Content-Security-Policy': "default-src 'self'",
+            },
         });
     }
 
@@ -37,6 +42,10 @@ export async function PUT(req: Request): Promise<Response> {
     const key = req.url.split('?key=')[1];
     try {
         const response = await executePutRequest(`${uploadUrl}/${key}`, data, secretAccessKey);
+        if (response.status !== 200) {
+            const errorMessage = await response.text();
+            return new Response(`Error uploading file: ${errorMessage}`, { status: response.status });
+        }
         return response;
     } catch (error) {
         console.error('Error uploading file:', error);
