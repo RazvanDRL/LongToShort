@@ -42,15 +42,14 @@ export const Main: React.FC<{
   video_fps = fps;
 
   const sequenceStyle: React.CSSProperties = useMemo(() => {
-    console.log(font.fontWeight);
     return {
       color: font.textColor,
-      fontFamily: "Arial",
+      fontFamily: font.fontFamily,
       justifyContent: "center",
       fontWeight: font.fontWeight,
       verticalPosition: font.verticalPosition,
       textShadow: font.shadow,
-      fontSize: font.fontSize,
+      fontSize: font.fontSize * 2,
       transform: `translateY(${100 - font.verticalPosition}%)`,
       textTransform: font.uppercase ? "uppercase" : "none",
     };

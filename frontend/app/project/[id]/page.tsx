@@ -14,7 +14,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Slider } from "@/components/ui/slider"
-import { ListPlus, Trash2 } from "lucide-react";
+import { FileVideo, ListPlus, Server, Trash2 } from "lucide-react";
 import {
     Menubar,
     MenubarMenu,
@@ -390,6 +390,27 @@ export default function Project({ params }: { params: { id: string } }) {
         );
     }
 
+    function aspectRatio(width: number, height: number) {
+        const ratio = width / height;
+        switch (ratio) {
+            case 16 / 9:
+                return { width: 640, height: 360 };
+            case 4 / 3:
+                return { width: 640, height: 480 };
+            case 5 / 4:
+                return { width: 640, height: 512 };
+            case 1:
+                return { width: 640, height: 640 };
+            case 4 / 5:
+                return { width: 512, height: 640 };
+            case 9 / 16:
+                return { width: 360, height: 640 };
+            case 3 / 4:
+                return { width: 480, height: 640 };
+            default: return { width: 360, height: 640 };
+        }
+    }
+
     if (state.status === "rendering")
         console.log(state.status, state.progress);
 
@@ -401,14 +422,14 @@ export default function Project({ params }: { params: { id: string } }) {
                 {video && metadata && (
                     <div className="flex justify-center items-center">
                         {subtitles.length > 0 && (
-                            <div className="rounded-xl bg-transparent pr-2 mr-8 w-[500px] h-[640px] flex flex-col">
+                            <div className="rounded-xl bg-transparent pr-2 mr-8 w-[500px] h-[698px] flex flex-col">
                                 <Tabs defaultValue="style" className="w-full">
-                                    <TabsList>
+                                    <TabsList className="mb-2.5">
                                         <TabsTrigger value="style">Style</TabsTrigger>
                                         <TabsTrigger value="captions">Captions</TabsTrigger>
                                     </TabsList>
                                     <TabsContent value="style">
-                                        <ScrollArea style={{ height: '593px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                        <ScrollArea style={{ height: '640px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                             {/* Themes */}
                                             <div className="p-6">
                                                 <h3 className="mb-4">Fonts</h3>
@@ -746,7 +767,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                     </div>
                                                 </div>
                                                 {/* 4th row */}
-                                                <div className="grid grid-cols-5 gap-3">
+                                                <div className="grid grid-cols-5 gap-3 mt-4">
                                                     <div className="flex flex-col items-center mt-3">
                                                         <Label className="mb-1.5 items-center" htmlFor="size">Uppercase</Label>
                                                         <Switch defaultChecked onCheckedChange={(checked) => {
@@ -770,7 +791,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                         </ScrollArea>
                                     </TabsContent>
                                     <TabsContent value="captions">
-                                        <ScrollArea style={{ height: '593px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                        <ScrollArea style={{ height: '640px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                             <div className="px-4 mt-6 mx-3 mb-3 flex shrink-0 flex-col justify-center text-sm md:text-base">
                                                 <h3 className="mb-1 flex gap-1 font-bold">
                                                     <span>LongToShort AI</span>
@@ -910,6 +931,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                 <DialogTrigger asChild>
                                     {state.status !== "rendering" ?
                                         <Button className="mb-4" variant="outline">
+                                            <FileVideo className="mr-2 h-4 w-4" />
                                             Export video
                                         </Button>
                                         :
@@ -921,7 +943,9 @@ export default function Project({ params }: { params: { id: string } }) {
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-[425px]">
                                     <DialogHeader>
-                                        <DialogTitle >Render video</DialogTitle>
+                                        <DialogTitle>
+                                            Render video
+                                        </DialogTitle>
                                         <DialogDescription>
                                             Make changes to your profile here. Click save when you&apos;re done.
                                         </DialogDescription>
@@ -950,6 +974,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             <Button
                                                                 onClick={renderMedia}
                                                             >
+                                                                <Server className="mr-2 h-4 w-4" />
                                                                 Render video
                                                             </Button>
                                                         )
@@ -971,7 +996,11 @@ export default function Project({ params }: { params: { id: string } }) {
                             <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                 <Player
                                     className="rounded-xl z-50"
-                                    style={{ width: metadata.width! / 4 + "px", height: metadata.height! / 4 + "px" }}
+                                    style={{
+                                        width: aspectRatio(metadata.width!, metadata.height!).width,
+                                        height: aspectRatio(metadata.width!, metadata.height!).height,
+
+                                    }}
                                     component={Main}
                                     inputProps={{
                                         subtitles: subtitles,
