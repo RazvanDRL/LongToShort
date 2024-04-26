@@ -98,7 +98,7 @@ export default function Header({ user_email, page }: { user_email: string, page?
                     </Popover>
                 </div>
                 <div>
-                    <Button className="mr-8">Add more credits</Button>
+                    <Button className="mr-8" variant={"outline"}>Add more credits</Button>
                 </div>
                 <div className="flex items-center">
                     <DropdownMenu>
