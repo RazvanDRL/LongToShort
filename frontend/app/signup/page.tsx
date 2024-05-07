@@ -64,7 +64,7 @@ export default function Home() {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: 'http://localhost:3000/dashboard'
+                redirectTo: '/dashboard'
             }
         })
 
@@ -77,7 +77,7 @@ export default function Home() {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'twitter',
             options: {
-                redirectTo: 'http://localhost:3000/dashboard'
+                redirectTo: '/dashboard'
             }
         })
 
@@ -125,7 +125,7 @@ export default function Home() {
             email: email,
             password: password,
             options: {
-                emailRedirectTo: 'http://localhost:3000/dashboard'
+                emailRedirectTo: '/dashboard'
             }
         });
 

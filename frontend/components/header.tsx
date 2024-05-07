@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Avvvatars from "avvvatars-react";
 import {
     CreditCard,
+    Gift,
     LogOut,
     Settings,
     User,
@@ -108,29 +109,34 @@ export default function Header({ user_email, page }: { user_email: string, page?
                             </a>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56 mr-8 mt-2">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuLabel>{user_email}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
                                 <DropdownMenuItem>
+                                    <Gift className="mr-2 h-4 w-4" />
+                                    <span>Get $10 free</span>
+                                    {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
                                     <User className="mr-2 h-4 w-4" />
                                     <span>Profile</span>
-                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                    {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <CreditCard className="mr-2 h-4 w-4" />
                                     <span>Billing</span>
-                                    <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                                    {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                {/* <DropdownMenuItem>
                                     <Settings className="mr-2 h-4 w-4" />
                                     <span>Settings</span>
                                     <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                                </DropdownMenuItem>
+                                </DropdownMenuItem> */}
                             </DropdownMenuGroup>
                             <DropdownMenuItem onClick={() => handleSignOut()}>
                                 <LogOut className="mr-2 h-4 w-4" />
                                 <span>Log out</span>
-                                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                                {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
