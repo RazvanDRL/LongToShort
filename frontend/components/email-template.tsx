@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 interface EmailTemplateProps {
-    firstName: string;
+    video_id: string;
 }
 
 export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
-    firstName,
+    video_id,
 }) => (
     <div>
-        <h1>Welcome, {firstName}!</h1>
+        <span>Check out your processed video here <a href={`https://longtoshort.tech/export/${video_id}`}>https://longtoshort.tech/project/{video_id}</a></span>
     </div>
 );

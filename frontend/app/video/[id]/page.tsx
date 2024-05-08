@@ -343,7 +343,7 @@ export default function Video({ params }: { params: { id: string } }) {
                             }
 
                             {
-                                status === "done" || status ==="succeeded" ? (
+                                status === "done" || status === "succeeded" ? (
                                     <Button asChild variant="outline" className="mb-6 text-base font-medium" size="lg">
                                         <Link href={`/project/${params.id}`}>
                                             <ExternalLink className="mr-2 h-5 w-5" />
