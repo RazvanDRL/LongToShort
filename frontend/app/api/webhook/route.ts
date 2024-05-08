@@ -29,8 +29,6 @@ export async function POST(request: NextRequest) {
                     id: userId,
                     email: email,
                     stripe_customer_id: session.customer,
-                    plan_active: true,
-                    plan_expires: null
                 })
 
             if (error) {

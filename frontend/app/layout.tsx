@@ -32,7 +32,7 @@ export default function RootLayout({
             trackFileDownloads={false}
             trackOutboundLinks={false}
             selfHosted={true}
-            enabled={true} />
+            enabled={false} />
           <Crisp />
           {children}
         </ThemeProvider>
