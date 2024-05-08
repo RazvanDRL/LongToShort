@@ -326,11 +326,11 @@ export default function Dashboard() {
     }
 
     return (
-        <div>
+        <div className="container mx-auto">
             <Toaster richColors />
 
             {user ? <Header user_email={user.email} page={"/dashboard/"} /> : null}
-            <main className="mt-36 justify-center items-center">
+            <main className="mt-20 md:mt-36 justify-center items-center">
                 <div className="flex flex-col items-center max-w-700px min-w-700px"
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
@@ -386,15 +386,15 @@ export default function Dashboard() {
                     </form>
 
                 </div>
-                <div className="mt-24 flex flex-col-1 justify-center items-center w-[70%] mx-auto">
+                <div className="mt-20 md:mt-28 flex flex-col-1 justify-center items-center w-[70%] mx-auto">
                     <div>
                         {videos !== null && videos.length > 0 ? (
                             <Collapsible
                                 open={isOpen}
                                 onOpenChange={setIsOpen}
-                                className="w-[350px] space-y-2"
+                                className="w-[335px] md:w-[400px] space-y-2"
                             >
-                                <div className="flex items-center justify-between space-x-4 px-4">
+                                <div className="flex items-center justify-between space-x-4 mb-0.5 pl-2">
                                     <h4 className="text-sm font-semibold">
                                         Your Videos
                                     </h4>

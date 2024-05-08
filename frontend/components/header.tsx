@@ -73,12 +73,12 @@ export default function Header({ user_email, page }: { user_email: string, page?
     }
 
     return (
-        <header>
-            <div className="sticky flex justify-end items-center p-8">
+        <header className="w-full">
+            <div className="sticky flex justify-end items-center py-8 sm:px-6 md:px-8">
                 <div>
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" className="mr-8">Feedback</Button>
+                            <Button variant="outline" className="mr-4 md:mr-8">Feedback</Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-80">
                             <div className="grid gap-4">
@@ -99,7 +99,7 @@ export default function Header({ user_email, page }: { user_email: string, page?
                     </Popover>
                 </div>
                 <div>
-                    <Button className="mr-8" variant={"outline"}>Add more credits</Button>
+                    <Button className="mr-6 md:mr-8" variant={"outline"}>Add more credits</Button>
                 </div>
                 <div className="flex items-center">
                     <DropdownMenu>

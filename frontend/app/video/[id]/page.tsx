@@ -318,7 +318,7 @@ export default function Video({ params }: { params: { id: string } }) {
     }
 
     return (
-        <div>
+        <div className="container mx-auto">
             <Toaster richColors />
 
             {user ? <Header user_email={user.email} page={"/video/" + params.id} /> : null}
@@ -328,14 +328,14 @@ export default function Video({ params }: { params: { id: string } }) {
                         <div>
                             {
                                 status !== "" ? (
-                                    <Badge className="px-5 py-3 mb-6" text={(status === 'succeeded' || status === 'done') && elapsedTime > 0 ? `Status: ${status}` : `Status: ${status} - ${formatTime(elapsedTime)}`} color={statusData(status!)} />
+                                    <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={(status === 'succeeded' || status === 'done') && elapsedTime > 0 ? `Status: ${status}` : `Status: ${status} - ${formatTime(elapsedTime)}`} color={statusData(status!)} />
                                 ) : null
                             }
                         </div>
                         <div>
                             {
                                 status === "" ? (
-                                    <Button className="mb-6 text-base font-medium" size="lg" onClick={() => processVideo()} disabled={processing}>
+                                    <Button className="mb-3 font-medium md:mb-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
                                         <Sparkles className="mr-2 h-5 w-5" />
                                         Process video
                                     </Button>
@@ -344,9 +344,9 @@ export default function Video({ params }: { params: { id: string } }) {
 
                             {
                                 status === "done" || status === "succeeded" ? (
-                                    <Button asChild variant="outline" className="mb-6 text-base font-medium" size="lg">
+                                    <Button asChild variant="outline" className="mb-3 font-medium md:mb-6 md:text-base md:px-8 md:py-6">
                                         <Link href={`/project/${params.id}`}>
-                                            <ExternalLink className="mr-2 h-5 w-5" />
+                                            <ExternalLink className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                                             Go to project
                                         </Link>
                                     </Button>
@@ -354,13 +354,13 @@ export default function Video({ params }: { params: { id: string } }) {
                             }
                         </div>
                     </div>
-                    <div className="px-2 mx-auto bg-[#15171d] h-[500px] w-[800px] rounded-2xl">
-                        <div className="px-8 py-10 font-mono font-medium text-2xl">
+                    <div className="px-2 mx-auto bg-[#15171d] w-[90vw] h-[360px] md:h-[500px] md:w-[800px] rounded-2xl">
+                        <div className="px-4 py-6 md:px-8 md:py-10 font-mono font-medium text-base md:text-2xl">
                             <span>
                                 Fetching video <span className="text-blue-400 truncate">{metadata?.name}</span>
                             </span>
                             <br /><br />
-                            {processing ?
+                            {status !== "" ?
                                 (
                                     <div>
                                         <span>

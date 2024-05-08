@@ -262,7 +262,7 @@ export default function Export({ params }: { params: { id: string } }) {
     }
 
     return (
-        <div>
+        <div className="container mx-auto">
             <Toaster richColors />
 
             {user ? <Header user_email={user.email} page={"/export/" + params.id} /> : null}
