@@ -23,27 +23,20 @@ export async function POST(request: NextRequest) {
             const userId = session.metadata?.user_id;
             const email = session.customer_details?.email;
 
-            // Create or update the stripe_customer_id in the stripe_customers table
             const { error } = await supabaseAdmin
                 .from('stripe_customers')
                 .upsert({
-                    user_id: userId,
+                    id: userId,
                     email: email,
                     stripe_customer_id: session.customer,
-                    subscription_id: session.subscription,
                     plan_active: true,
                     plan_expires: null
                 })
 
-
-        }
-
-        if (event.type === 'customer.subscription.updated') {
-
-        }
-
-        if (event.type === 'customer.subscription.deleted') {
-
+            if (error) {
+                console.error(error.message);
+                return NextResponse.json({ message: error.message }, { status: 500 });
+            }
         }
 
         return NextResponse.json({ message: 'success' });
