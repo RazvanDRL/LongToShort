@@ -37,7 +37,8 @@ const wait = async (milliSeconds: number) => {
 
 export const useRendering = (
   id: string,
-  inputProps: z.infer<typeof CompositionProps>
+  inputProps: z.infer<typeof CompositionProps>,
+  token: string,
 ) => {
   const [state, setState] = useState<State>({
     status: "init",
@@ -48,7 +49,7 @@ export const useRendering = (
       status: "invoking",
     });
     try {
-      const { renderId, bucketName } = await renderVideo({ id, inputProps });
+      const { renderId, bucketName } = await renderVideo({ id, inputProps, token: token});
       setState({
         status: "rendering",
         progress: 0,

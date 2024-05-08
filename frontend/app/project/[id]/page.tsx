@@ -49,6 +49,7 @@ type User = {
     id: string;
     email: string;
     aud: string;
+    access_token: string;
 };
 
 type Metadata = {
@@ -167,15 +168,18 @@ export default function Project({ params }: { params: { id: string } }) {
         };
     }, [subtitles, font, video, metadata, user]);
 
-    const { renderMedia, state } = useRendering(COMP_NAME, inputProps);
+    const { renderMedia, state } = useRendering(COMP_NAME, inputProps, user?.access_token! );
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
+        const session = await supabase.auth.getSession();
+        const token = session.data.session?.access_token;
         if (userFetch) {
             setUser({
                 id: userFetch.id,
                 email: userFetch.email || "",
                 aud: userFetch.aud,
+                access_token: token!,
             });
             if (userFetch.aud !== 'authenticated') {
                 router.replace('/login');

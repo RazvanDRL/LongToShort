@@ -6,6 +6,7 @@ import {
 import { DISK, RAM, REGION, SITE_NAME, TIMEOUT } from "../../../../config.mjs";
 import { executeApi } from "../../../../helpers/api-response";
 import { RenderRequest } from "../../../../types/schema";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
   RenderRequest,
@@ -27,6 +28,32 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       );
     }
 
+    const token = req.headers.get('Authorization')?.split('Bearer ')[1];
+
+    if (!token) {
+      throw new TypeError('unauthorized');
+    }
+
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+
+    if (!user || userError) {
+      throw new TypeError('user not found');
+    }
+
+    const { data: video, error: videoError } = await supabaseAdmin
+      .from('metadata')
+      .select('id,user_id')
+      .eq('id', body.inputProps.video_id)
+      .single();
+
+    if (!video || videoError) {
+      throw new TypeError('video not found');
+    }
+
+    if (video.user_id !== user.id) {
+      throw new TypeError('unauthorized user');
+    }
+
     // force width, force height from input props
     const result = await renderMediaOnLambda({
       codec: "h264",
@@ -39,7 +66,7 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       serveUrl: SITE_NAME,
       composition: body.id,
       inputProps: body.inputProps,
-      framesPerLambda: 10,
+      framesPerLambda: 200,
       downloadBehavior: {
         type: "download",
         fileName: "video.mp4",
@@ -48,7 +75,7 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       // deleteAfter: "1-day",
       // scale: 1,
       outName: {
-        key: `${body.inputProps.user_id}/${body.inputProps.video_id}.mp4`,
+        key: `${user.id}/${video.id}.mp4`,
         bucketName: "output-bucket",
         s3OutputProvider: {
           endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID!}.r2.cloudflarestorage.com`,
