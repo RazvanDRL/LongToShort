@@ -44,23 +44,7 @@ import { Main } from "../../../remotion/MyComp/Main";
 import { z } from "zod";
 import { useRendering } from "../../../helpers/use-rendering";
 import { Loader2 } from "lucide-react";
-
-type User = {
-    id: string;
-    email: string;
-    aud: string;
-    access_token: string;
-};
-
-type Metadata = {
-    created_at: string;
-    name: string;
-    duration: number;
-    fps?: number;
-    width?: number;
-    height?: number;
-    processed: boolean;
-};
+import type { Metadata, User } from "../../../types/constants";
 
 type Subtitle = {
     start: number;
@@ -168,7 +152,7 @@ export default function Project({ params }: { params: { id: string } }) {
         };
     }, [subtitles, font, video, metadata, user]);
 
-    const { renderMedia, state } = useRendering(COMP_NAME, inputProps, user?.access_token! );
+    const { renderMedia, state } = useRendering(COMP_NAME, inputProps, user?.access_token!);
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
@@ -218,6 +202,7 @@ export default function Project({ params }: { params: { id: string } }) {
                 width: data.width,
                 height: data.height,
                 processed: data.processed,
+                ext: data.ext,
             });
 
             // setRemo({
@@ -232,10 +217,16 @@ export default function Project({ params }: { params: { id: string } }) {
         return data;
     }
 
-    async function fetchVideo() {
+
+    async function fetchVideo(metadata: Metadata | null) {
         try {
-            const response = await fetch(`/api/generate-signed-url?key=${user?.id}/${params.id}.mp4?bucket=upload-bucket`, {
-                method: 'POST'
+            const response = await fetch(`/api/generate-signed-url`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user?.access_token}`,
+                },
+                body: JSON.stringify({ key: `${params.id}.${metadata!.ext}`, bucket: 'upload-bucket' }),
             });
 
             if (!response.ok) {
@@ -243,6 +234,7 @@ export default function Project({ params }: { params: { id: string } }) {
             }
 
             const data = await response.json();
+            console.log(data.url);
             setVideo(data.url);
         } catch (error) {
             console.error('Error fetching video:', error);
@@ -332,7 +324,7 @@ export default function Project({ params }: { params: { id: string } }) {
                 try {
                     let metadata = await fetchMetadata();
                     if (metadata.processed === true) {
-                        await fetchVideo();
+                        await fetchVideo(metadata);
                         await fetchSubtitles();
                         setFocusedSubtitleIndex(0);
                         setShouldRender(true);

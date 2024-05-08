@@ -1,5 +1,6 @@
 import S3 from 'aws-sdk/clients/s3.js';
 import { NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 const s3 = new S3({
     endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID!}.r2.cloudflarestorage.com`,
@@ -9,9 +10,35 @@ const s3 = new S3({
 });
 
 export async function POST(req: Request) {
-    const key = req.url.split('?key=')[1].slice(0, req.url.split('?key=')[1].indexOf('?'))
-    const bucketName = req.url.split('?bucket=')[1]
-    const url = await s3.getSignedUrlPromise('getObject', { Bucket: bucketName, Key: key, Expires: 3600 });
+    const token = req.headers.get('Authorization')?.split('Bearer ')[1];
+
+    if (!token) {
+        throw new TypeError('unauthorized');
+    }
+
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+
+    if (!user || userError) {
+        throw new TypeError('user not found');
+    }
+
+    const body = await req.json();
+
+    if (!body || typeof body !== 'object') {
+        throw new TypeError('invalid request body');
+    }
+
+    const { bucket, key } = body;
+
+    if (!bucket || !key) {
+        throw new TypeError('bucket or key is missing');
+    }
+
+    if (bucket !== "output-bucket" && bucket !== "upload-bucket") {
+        throw new TypeError('invalid bucket');
+    }
+
+    const url = await s3.getSignedUrlPromise('getObject', { Bucket: bucket, Key: `${user.id}/${key}`, Expires: 3600 });
 
     return NextResponse.json({ url })
 }

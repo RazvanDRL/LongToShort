@@ -1,6 +1,23 @@
 import { z } from "zod";
 export const COMP_NAME = "MyComp";
 
+export interface Metadata {
+  created_at: string;
+  name: string;
+  duration: number;
+  fps?: number;
+  width?: number;
+  height?: number;
+  processed: boolean;
+  ext: string;
+};
+
+export interface User {
+  id: string;
+  email: string;
+  aud: string;
+  access_token: string;
+}
 
 export const Font = z.object({
   textColor: z.string(),

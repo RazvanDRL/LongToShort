@@ -14,17 +14,12 @@ import {
 } from "@/components/ui/collapsible"
 
 import {
-    User,
     XCircle
 } from "lucide-react"
 
 import React, { useEffect, useState } from 'react';
 import Header from "@/components/header"
-
-type User = {
-    id: string;
-    email: string;
-}
+import type { User } from "../../types/constants";
 
 type Video = {
     id: string;
@@ -84,10 +79,14 @@ export default function Dashboard() {
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
+        const session = await supabase.auth.getSession();
+        const token = session.data.session?.access_token;
         if (userFetch) {
             setUser({
                 id: userFetch.id,
                 email: userFetch.email || "",
+                aud: userFetch.aud,
+                access_token: token!,
             });
             if (userFetch.aud !== 'authenticated') {
                 router.replace('/login');
@@ -180,8 +179,11 @@ export default function Dashboard() {
         // Define the regular expression pattern for valid characters
         const validCharsRegex = /^(\w|\/|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/;
 
+        // Remove the file extension
+        const fileNameWithoutExtension = input.replace(/\.[^.]+$/, '');
+
         // Use the RegExp test method to filter out invalid characters
-        const validCharacters = Array.from(input).filter(char => validCharsRegex.test(char));
+        const validCharacters = Array.from(fileNameWithoutExtension).filter(char => validCharsRegex.test(char));
 
         // Join the valid characters back into a string
         const sanitizedString = validCharacters.join('');
@@ -207,6 +209,10 @@ export default function Dashboard() {
         });
     }
 
+    function getFileExtension(filename: string): string {
+        return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2).toLowerCase();
+    }
+
     async function uploadFile(file: File) {
         if (!user) return;
         if (uploadState !== "idle") return;
@@ -214,8 +220,8 @@ export default function Dashboard() {
         setUploadState("uploading");
 
         let uuid: string = uuidv4();
-
-        const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.mp4`, {
+        let ext: string = getFileExtension(file.name);
+        const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.${ext}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'video/mp4',
@@ -229,7 +235,7 @@ export default function Dashboard() {
 
             const { error } = await supabase
                 .from('metadata')
-                .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, width: width, height: height });
+                .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, width: width, height: height, ext: ext });
             if (error) {
                 toast.error(error.message);
                 return;

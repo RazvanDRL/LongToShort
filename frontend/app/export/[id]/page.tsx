@@ -23,7 +23,6 @@ import { Label } from "@/components/ui/label"
 import {
     Download,
     Share2,
-    User,
     Captions,
     ThumbsDown,
     Heart,
@@ -32,21 +31,8 @@ import {
 import React, { useEffect, useState } from 'react';
 import Link from "next/link";
 
-type User = {
-    id: string;
-    email: string;
-    aud: string;
-}
+import type { Metadata, User } from "../../../types/constants";
 
-type Metadata = {
-    created_at: string;
-    name: string;
-    duration: number;
-    fps?: number;
-    width?: number;
-    height?: number;
-    processed: boolean;
-};
 
 const predefinedReasons = [
     'Rather not say',
@@ -89,11 +75,14 @@ export default function Export({ params }: { params: { id: string } }) {
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
+        const session = await supabase.auth.getSession();
+        const token = session.data.session?.access_token;
         if (userFetch) {
             setUser({
                 id: userFetch.id,
                 email: userFetch.email || "",
                 aud: userFetch.aud,
+                access_token: token!,
             });
             if (userFetch.aud !== 'authenticated') {
                 router.replace('/login');
@@ -129,6 +118,7 @@ export default function Export({ params }: { params: { id: string } }) {
                 name: data.name,
                 duration: data.duration,
                 processed: data.processed,
+                ext: data.ext,
             });
         }
 
@@ -137,8 +127,13 @@ export default function Export({ params }: { params: { id: string } }) {
 
     async function fetchVideo() {
         try {
-            const response = await fetch(`/api/generate-signed-url?key=${user?.id}/${params.id}.mp4?bucket=output-bucket`, {
-                method: 'POST'
+            const response = await fetch(`/api/generate-signed-url`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user?.access_token}`,
+                },
+                body: JSON.stringify({ key: `${params.id}.mp4`, bucket: 'output-bucket' }),
             });
 
             if (!response.ok) {

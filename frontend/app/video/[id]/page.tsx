@@ -12,26 +12,12 @@ import Link from "next/link";
 import {
     ExternalLink,
     Sparkles,
-    User,
 } from "lucide-react"
 
 import React, { useEffect, useState } from 'react';
 
-type User = {
-    id: string;
-    email: string;
-    aud: string;
-}
+import type { Metadata, User } from "../../../types/constants";
 
-type Metadata = {
-    created_at: string;
-    name: string;
-    duration: number;
-    fps?: number;
-    width?: number;
-    height?: number;
-    processed: boolean;
-};
 type QueuePos = {
     position: number;
     processing_time: string;
@@ -54,11 +40,14 @@ export default function Video({ params }: { params: { id: string } }) {
 
     async function handleSignedIn() {
         const userFetch = (await supabase.auth.getUser()).data?.user;
+        const session = await supabase.auth.getSession();
+        const token = session.data.session?.access_token;
         if (userFetch) {
             setUser({
                 id: userFetch.id,
                 email: userFetch.email || "",
                 aud: userFetch.aud,
+                access_token: token!,
             });
             if (userFetch.aud !== 'authenticated') {
                 router.replace('/login');
@@ -202,6 +191,7 @@ export default function Video({ params }: { params: { id: string } }) {
                 name: data.name,
                 duration: data.duration,
                 processed: data.processed,
+                ext: data.ext,
             });
         }
 
