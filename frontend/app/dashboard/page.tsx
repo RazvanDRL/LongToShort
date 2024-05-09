@@ -19,7 +19,7 @@ import {
 
 import React, { useEffect, useState } from 'react';
 import Header from "@/components/header"
-import type { Metadata, User } from "../../types/constants";
+import type { User } from "../../types/constants";
 
 type Video = {
     id: string;
@@ -414,16 +414,36 @@ export default function Dashboard() {
                                         </Button>
                                     </CollapsibleTrigger>
                                 </div>
-                                <a href={`/video/${videos[0].id}`} className="hover:underline">
-                                    <div className="rounded-md border px-4 py-3 font-mono text-sm">
-                                        {shortenFileName(videos[0].name) + "." + videos[0].ext}
+                                <a href={videos[0].processed ? `/project/${videos[0].id}` : `/video/${videos[0].id}`} className="">
+                                    <div className="rounded-md border px-4 py-3 font-mono text-sm flex justify-between">
+                                        <div className="flex">
+                                            <div className="flex">
+                                                {videos[0].processed ? <span className="mr-2">✅</span> : <span className="mr-2 animate-spin-slow">⏳</span>}
+                                            </div>
+                                            <div className="hover:underline">
+                                                {shortenFileName(videos[0].name) + "." + videos[0].ext}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {Math.round(videos[0].duration) + "s"}
+                                        </div>
                                     </div>
                                 </a>
                                 <CollapsibleContent className="space-y-2">
                                     {videos?.slice(1, videos.length).map((video) => (
-                                        <a key={video.id} href={video.processed ? `/project/${video.id}` : `/video/${video.id}`} className="hover:underline">
-                                            <div className="rounded-md border px-4 py-3 font-mono text-sm mt-2.5">
-                                                {shortenFileName(video.name) + "." + videos[0].ext}
+                                        <a key={video.id} href={video.processed ? `/project/${video.id}` : `/video/${video.id}`} className="">
+                                            <div className="rounded-md border px-4 py-3 font-mono text-sm mt-2.5 flex justify-between">
+                                                <div className="flex">
+                                                    <div className="flex">
+                                                        {video.processed ? <span className="mr-2">✅</span> : <span className="animate-spin-slow mr-2">⏳</span>}
+                                                    </div>
+                                                    <div className="hover:underline">
+                                                        {shortenFileName(video.name) + "." + video.ext}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    {Math.round(video.duration) + "s"}
+                                                </div>
                                             </div>
                                         </a>
                                     ))}
