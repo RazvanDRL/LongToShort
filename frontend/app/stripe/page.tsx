@@ -1,7 +1,8 @@
 "use client";
 import { loadStripe } from '@stripe/stripe-js';
 import { supabase } from '@/lib/supabaseClient';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 export default function CheckoutButton() {
     const handleCheckout = async () => {
@@ -27,10 +28,11 @@ export default function CheckoutButton() {
 
     return (
         <div>
-            <Toaster />
-            <h1>Signup for a Plan</h1>
-            <p>Clicking this button creates a new Stripe Checkout session</p>
-            <button className="p-4 bg-gray-500" onClick={handleCheckout}>Buy Now</button>
+            <Button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleCheckout}>
+                Buy Now
+            </Button>
         </div>
     );
 }

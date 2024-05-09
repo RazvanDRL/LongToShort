@@ -19,7 +19,7 @@ import {
 
 import React, { useEffect, useState } from 'react';
 import Header from "@/components/header"
-import type { User } from "../../types/constants";
+import type { Metadata, User } from "../../types/constants";
 
 type Video = {
     id: string;
@@ -27,6 +27,7 @@ type Video = {
     created_at: string;
     duration: number;
     processed: boolean;
+    ext: string;
 }
 
 export default function Dashboard() {
@@ -66,6 +67,7 @@ export default function Dashboard() {
                     created_at: file.created_at,
                     duration: file.duration,
                     processed: file.processed,
+                    ext: file.ext,
                 });
             }
 
@@ -299,6 +301,7 @@ export default function Dashboard() {
                 created_at: file.created_at,
                 duration: file.duration,
                 processed: file.processed,
+                ext: file.ext,
             });
         }
 
@@ -413,14 +416,14 @@ export default function Dashboard() {
                                 </div>
                                 <a href={`/video/${videos[0].id}`} className="hover:underline">
                                     <div className="rounded-md border px-4 py-3 font-mono text-sm">
-                                        {shortenFileName(videos[0].name)}
+                                        {shortenFileName(videos[0].name) + "." + videos[0].ext}
                                     </div>
                                 </a>
                                 <CollapsibleContent className="space-y-2">
                                     {videos?.slice(1, videos.length).map((video) => (
                                         <a key={video.id} href={video.processed ? `/project/${video.id}` : `/video/${video.id}`} className="hover:underline">
                                             <div className="rounded-md border px-4 py-3 font-mono text-sm mt-2.5">
-                                                {shortenFileName(video.name)}
+                                                {shortenFileName(video.name) + "." + videos[0].ext}
                                             </div>
                                         </a>
                                     ))}
