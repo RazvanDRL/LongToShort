@@ -125,7 +125,7 @@ export default function Dashboard() {
         }
 
         if (e.target.files[0].type !== "video/mp4") {
-            toast.error("File type is not mp4.");
+            toast.error("File type is not accepted. Contact support");
             e.target.value = "";
             return;
         }
@@ -169,7 +169,7 @@ export default function Dashboard() {
             }
 
             if (file.type !== "video/mp4") {
-                toast.error("File type is not mp4.");
+                toast.error("File type is not accepted. Contact support");
                 return;
             }
 
@@ -223,10 +223,11 @@ export default function Dashboard() {
 
         let uuid: string = uuidv4();
         let ext: string = getFileExtension(file.name);
+        let contentType: string = file.type;
         const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.${ext}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'video/mp4',
+                'Content-Type': contentType,
             },
             body: file,
         });
