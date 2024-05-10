@@ -339,7 +339,7 @@ export default function Dashboard() {
         <div className="container mx-auto">
             <Toaster richColors />
 
-            {user ? <Header user_email={user.email} page={"/dashboard/"} /> : null}
+            {user ? <Header user_email={user.email} /> : null}
             <main className="mt-20 md:mt-36 justify-center items-center">
                 <div className="flex flex-col items-center max-w-700px min-w-700px"
                     onDragOver={handleDragOver}

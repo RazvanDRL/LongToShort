@@ -314,7 +314,7 @@ export default function Video({ params }: { params: { id: string } }) {
         <div className="container mx-auto">
             <Toaster richColors />
 
-            {user ? <Header user_email={user.email} page={"/video/" + params.id} /> : null}
+            {user ? <Header user_email={user.email} /> : null}
             <main className="flex justify-center items-center mt-24">
                 <div className="flex justify-center items-center flex-col">
                     <div className="flex justify-between items-center w-full">

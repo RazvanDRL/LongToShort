@@ -29,11 +29,13 @@ import {
 } from "@/components/ui/popover"
 import { useEffect, useState } from "react"
 import { toast } from "sonner";
+import { usePathname } from 'next/navigation';
 
-export default function Header({ user_email, page }: { user_email: string, page?: string }) {
+export default function Header({ user_email }: { user_email: string}) {
     const router = useRouter();
     const [feedbackText, setFeedbackText] = useState("");
     const [credits, setCredits] = useState(0);
+    const pathname = usePathname();
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -59,7 +61,7 @@ export default function Header({ user_email, page }: { user_email: string, page?
                 {
                     user_id: user_id,
                     feedback: feedbackText,
-                    page: page || "unknown",
+                    page: pathname,
                     email: user_email
                 }
             ]);

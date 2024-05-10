@@ -413,7 +413,7 @@ export default function Project({ params }: { params: { id: string } }) {
     return (
         <div>
             <Toaster />
-            {user ? <Header user_email={user.email} page={"/project/" + params.id} /> : null}
+            {user ? <Header user_email={user.email}  /> : null}
             <main className="flex justify-center items-center mt-24">
                 {video && metadata && (
                     <div className="flex justify-center items-center">
