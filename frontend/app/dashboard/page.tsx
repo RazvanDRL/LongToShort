@@ -408,7 +408,7 @@ export default function Dashboard() {
                                     <h4 className="text-sm font-semibold">
                                         Your Videos
                                     </h4>
-                                    <CollapsibleTrigger asChild>
+                                    <CollapsibleTrigger asChild className={videos.length > 1 ? "" : "hidden"}>
                                         <Button variant="ghost" size="sm" className="w-9 p-0">
                                             <ChevronsUpDown className="h-4 w-4" />
                                             <span className="sr-only">Toggle</span>
