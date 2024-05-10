@@ -12,7 +12,7 @@ export async function POST(request: Request) {
             payment_method_types: ['card'],
             line_items: [
                 {
-                    price: priceId.toString(),
+                    price: priceId,
                     quantity: 1,
                 },
             ],

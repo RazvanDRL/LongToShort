@@ -137,7 +137,7 @@ export default function Header({ user_email }: { user_email: string}) {
                             <DropdownMenuGroup>
                                 <DropdownMenuItem>
                                     <Banknote className="mr-2 h-4 w-4" />
-                                    <span>{credits}</span>
+                                    <span>{credits} videos</span>
                                     {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>

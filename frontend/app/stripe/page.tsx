@@ -22,6 +22,7 @@ export default function CheckoutButton() {
             },
             body: JSON.stringify({ priceId: 'price_1PE8sDCXyqQaR0H8nWbNvGbm', userId: data.user?.id, email: data.user?.email }),
         });
+
         const session = await response.json();
         await stripe?.redirectToCheckout({ sessionId: session.id });
     }

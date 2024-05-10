@@ -3,6 +3,8 @@ import { stripe } from '@/lib/stripe';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import Stripe from 'stripe';
 
+// stripe listen -e customer.subscription.updated,customer.subscription.deleted,checkout.session.completed --forward-to http://localhost:3000/api/webhook
+
 export async function POST(request: NextRequest) {
     try {
         const rawBody = await request.text();
@@ -19,7 +21,6 @@ export async function POST(request: NextRequest) {
         // Handle the checkout.session.completed event
         if (event.type === 'checkout.session.completed') {
             const session: Stripe.Checkout.Session = event.data.object;
-            console.log(session);
             const userId = session.metadata?.user_id;
             const email = session.customer_details?.email;
 
