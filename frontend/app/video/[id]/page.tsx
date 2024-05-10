@@ -11,6 +11,7 @@ import Link from "next/link";
 
 import {
     ExternalLink,
+    Loader,
     Sparkles,
 } from "lucide-react"
 
@@ -304,7 +305,9 @@ export default function Video({ params }: { params: { id: string } }) {
     }, [processing, startTime]);
 
     if (!shouldRender) {
-        return <div className="bg-[#ec2626] z-50 w-screen h-screen"></div>;
+        return <div className="bg-[#ec2626] z-50 w-screen h-screen">
+            <Loader className="absolute top-1/2 right-1/2  text-gray-500 animate-spin w-16 h-16" />
+        </div>;
     }
 
     return (
@@ -347,7 +350,7 @@ export default function Video({ params }: { params: { id: string } }) {
                     <div className="px-2 mx-auto bg-[#15171d] w-[90vw] h-[360px] md:h-[500px] md:w-[800px] rounded-2xl">
                         <div className="px-4 py-6 md:px-8 md:py-10 font-mono font-medium text-base md:text-2xl">
                             <span>
-                                Fetching video <span className="text-blue-400 truncate">{metadata?.name}</span>
+                                Fetching video <span className="text-blue-400 truncate">{metadata?.name}.{metadata?.ext}</span>
                             </span>
                             <br /><br />
                             {status !== "" ?

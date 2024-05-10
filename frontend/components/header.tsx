@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Avvvatars from "avvvatars-react";
 import {
+    Banknote,
     CreditCard,
     Gift,
     LogOut,
@@ -26,12 +27,13 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner";
 
 export default function Header({ user_email, page }: { user_email: string, page?: string }) {
     const router = useRouter();
     const [feedbackText, setFeedbackText] = useState("");
+    const [credits, setCredits] = useState(0);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -71,6 +73,25 @@ export default function Header({ user_email, page }: { user_email: string, page?
 
         setFeedbackText("");
     }
+
+    async function getCredits() {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('credits')
+            .eq('id', (await supabase.auth.getUser()).data?.user?.id);
+
+        if (error) {
+            toast.error(error.message);
+        }
+
+        if (data && data.length > 0 && data[0].credits) {
+            setCredits(Number(data[0].credits));
+        }
+    }
+
+    useEffect(() => {
+        getCredits();
+    }, []);
 
     return (
         <header className="w-full">
@@ -112,6 +133,11 @@ export default function Header({ user_email, page }: { user_email: string, page?
                             <DropdownMenuLabel>{user_email}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    <Banknote className="mr-2 h-4 w-4" />
+                                    <span>{credits}</span>
+                                    {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
+                                </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <Gift className="mr-2 h-4 w-4" />
                                     <span>Get $10 free</span>
