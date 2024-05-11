@@ -137,7 +137,6 @@ export default function Project({ params }: { params: { id: string } }) {
         },
         shadow: shadowSizes.None,
     });
-    const [remo, setRemo] = useState<z.infer<typeof CompositionProps>>(defaultMyCompProps);
     const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
         return {
             subtitles,
@@ -204,19 +203,10 @@ export default function Project({ params }: { params: { id: string } }) {
                 processed: data.processed,
                 ext: data.ext,
             });
-
-            // setRemo({
-            //     ...remo,
-            //     DURATION_IN_FRAMES: data.duration * data.fps,
-            //     VIDEO_WIDTH: data.width,
-            //     VIDEO_HEIGHT: data.height,
-            //     VIDEO_FPS: data.fps,
-            // });
         }
 
         return data;
     }
-
 
     async function fetchVideo(metadata: Metadata | null) {
         try {
@@ -275,10 +265,6 @@ export default function Project({ params }: { params: { id: string } }) {
                 }
             }
             setSubtitles(newSubtitles);
-            setRemo({
-                ...remo,
-                subtitles: newSubtitles,
-            });
         } else {
             toast.error("Subtitles not found");
         }
@@ -324,10 +310,10 @@ export default function Project({ params }: { params: { id: string } }) {
                 try {
                     let metadata = await fetchMetadata();
                     if (metadata.processed === true) {
+                        setShouldRender(true);
                         await fetchVideo(metadata);
                         await fetchSubtitles();
                         setFocusedSubtitleIndex(0);
-                        setShouldRender(true);
                     }
                     else if (metadata.processed === false) {
                         router.replace(`/video/${params.id}`);
@@ -413,379 +399,380 @@ export default function Project({ params }: { params: { id: string } }) {
     return (
         <div>
             <Toaster />
-            {user ? <Header user_email={user.email}  /> : null}
+            {user ? <Header user_email={user.email} /> : null}
             <main className="flex justify-center items-center mt-24">
                 {video && metadata && (
                     <div className="flex justify-center items-center">
-                        {subtitles.length > 0 && (
-                            <div className="rounded-xl bg-transparent pr-2 mr-8 w-[500px] h-[698px] flex flex-col">
-                                <Tabs defaultValue="style" className="w-full">
-                                    <TabsList className="mb-2.5">
-                                        <TabsTrigger value="style">Style</TabsTrigger>
-                                        <TabsTrigger value="captions">Captions</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="style">
-                                        <ScrollArea style={{ height: '640px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
-                                            {/* Themes */}
-                                            <div className="p-6">
-                                                <h3 className="mb-4">Fonts</h3>
-                                                <div className="grid grid-cols-3 gap-3">
-                                                    <div className="flex flex-col items-center">
-                                                        <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TheBoldFont.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    fontFamily: TheBoldFont.style.fontFamily,
-                                                                    fontName: "TheBoldFont",
-                                                                }))
-                                                            }}
-                                                        >
-                                                            <div
-                                                                style={{
-                                                                    color: "#fff",
-                                                                    fontSize: 18,
-                                                                    fontWeight: 700,
-                                                                    textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
-                                                                    position: "relative",
-                                                                    top: "2.2px", // Adjust this value according to the space below the text
-                                                                    textAlign: "center",
-                                                                    lineHeight: 1
-                                                                }}
-                                                                className={`${TheBoldFont.className} antialiased`}
-                                                            >
-                                                                HORMOZI
-                                                            </div>
-                                                        </Button>
-                                                    </div>
-                                                    <div className="flex flex-col items-center">
-                                                        <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Komika.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
-                                                            onClick={() => {
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    fontFamily: Komika.style.fontFamily,
-                                                                    fontName: "Komika",
-                                                                }))
-                                                            }}
-                                                        >
-                                                            <div
-                                                                style={{
-                                                                    color: "#fff",
-                                                                    fontSize: 18,
-                                                                    fontWeight: 700,
-                                                                    textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
-                                                                    position: "relative",
-                                                                    top: "-1.3px", // Adjust this value according to the space below the text
-                                                                    textAlign: "center",
-                                                                    lineHeight: 1
-                                                                }}
-                                                                className={`${Komika.className} antialiased`}
-                                                            >
-                                                                BEAST
-                                                            </div>
-                                                        </Button>
-                                                    </div>
-                                                    <div className="flex flex-col items-center">
-                                                        <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TikTokSans.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
-                                                            onClick={() => {
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    fontFamily: TikTokSans.style.fontFamily,
-                                                                    fontName: "TikTokSans",
-                                                                }))
-                                                            }}
-                                                        >
-                                                            <div
-                                                                style={{
-                                                                    color: "#fff",
-                                                                    fontSize: 16,
-                                                                    fontWeight: 700,
-                                                                    textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
-                                                                    position: "relative",
-                                                                    textAlign: "center",
-                                                                    lineHeight: 1
-                                                                }}
-                                                                className={`${TikTokSans.className} antialiased`}
-                                                            >
-                                                                TikTok
-                                                            </div>
-                                                        </Button>
-                                                    </div>
-                                                    <div className="flex flex-col items-center">
-                                                        <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Montserrat.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
-                                                            onClick={() => {
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    fontFamily: Montserrat.style.fontFamily,
-                                                                    fontName: "Montserrat",
-                                                                }))
-                                                            }}
-                                                        >
-                                                            <div
-                                                                style={{
-                                                                    color: "#fff",
-                                                                    fontSize: 16,
-                                                                    fontWeight: 700,
-                                                                    textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
-                                                                    position: "relative",
-                                                                    textAlign: "center",
-                                                                    lineHeight: 1
-                                                                }}
-                                                                className={`${Montserrat.className} antialiased`}
-                                                            >
-                                                                Montserrat
-                                                            </div>
-                                                        </Button>
-                                                    </div>
-                                                    <div className="flex flex-col items-center">
-                                                        <Button
-                                                            className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Bangers.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
-                                                            onClick={() => {
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    fontFamily: Bangers.style.fontFamily,
-                                                                    fontName: "Bangers",
-                                                                    fontWeight: 400,
-                                                                }))
-                                                            }}
-                                                        >
-                                                            <div
-                                                                style={{
-                                                                    color: "#fff",
-                                                                    fontSize: 22,
-                                                                    fontWeight: 700,
-                                                                    textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
-                                                                    position: "relative",
-                                                                    textAlign: "center",
-                                                                    lineHeight: 1
-                                                                }}
-                                                                className={`${Bangers.className} antialiased`}
-                                                            >
-                                                                Bangers
-                                                            </div>
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                                <h3 className="mb-4 mt-8">Font settings</h3>
-                                                <div className="grid grid-cols-3 gap-3">
-                                                    {/* 1st row */}
-                                                    <div className="flex flex-col items-center">
-                                                        <Label className="mb-1.5 ml-3 w-full" htmlFor="size">Font color</Label>
-                                                        <TextColorPickerComponent />
-                                                    </div>
-                                                    <div className="flex flex-col items-center">
-                                                        <Label className="mb-1.5 ml-3 w-full" htmlFor="size">Font size (px)</Label>
-                                                        <Input
-                                                            className="w-32 h-10"
-                                                            type="number"
-                                                            id="size"
-                                                            min={0}
-                                                            max={100}
-                                                            placeholder={font.fontSize.toString() + "px"}
-                                                            value={font.fontSize}
-                                                            onChange={(e) => {
-                                                                const newValue = e.target.value === '' ? 0 : Number(e.target.value);
-                                                                setFont((prevFont) => ({ ...prevFont, fontSize: newValue }));
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col items-center">
-                                                        <Label className="mb-1.5 ml-3 w-full" htmlFor="weight">Font weight</Label>
-                                                        <Input
-                                                            className="w-32 h-10"
-                                                            disabled={font.fontFamily === Bangers.style.fontFamily}
-                                                            type="number"
-                                                            id="weight"
-                                                            min={100}
-                                                            step={100}
-                                                            max={900}
-                                                            placeholder={font.fontWeight.toString()}
-                                                            value={font.fontWeight}
-                                                            onChange={(e) => {
-                                                                const newValue = e.target.value === '' ? 0 : Number(e.target.value);
-                                                                setFont((prevFont) => ({ ...prevFont, fontWeight: newValue }));
-                                                            }}
-                                                        />
-                                                        <Slider
-                                                            className="w-32 mt-3"
-                                                            value={[font.fontWeight]}
-                                                            disabled={font.fontFamily === Bangers.style.fontFamily}
-                                                            id="size"
-                                                            min={100}
-                                                            step={100}
-                                                            max={900}
-                                                            onValueChange={(e) =>
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    fontWeight: e[0],
-                                                                }))
-                                                            }
-                                                        />
-                                                    </div>
-                                                    {/* 2nd row */}
-                                                    <div className="flex flex-col items-center">
-                                                        <Label className="mb-1.5 ml-3 w-full">Stroke color</Label>
-                                                        <StrokeColorPickerComponent />
-                                                    </div>
-                                                    <div className="flex flex-col col-span-2 px-1.5 items-center">
-                                                        <Label className="mb-1.5 w-full">Stroke</Label>
-                                                        <Menubar className="h-10 w-full px-2 justify-between" id="stroke">
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.stroke.strokeWidth === strokeSizes.None ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetStrokeSize('None')}
-                                                                >
-                                                                    None
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.stroke.strokeWidth === strokeSizes.S ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetStrokeSize('S')}
-                                                                >
-                                                                    S
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.stroke.strokeWidth === strokeSizes.M ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetStrokeSize('M')}
-                                                                >
-                                                                    M
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.stroke.strokeWidth === strokeSizes.L ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetStrokeSize('L')}
-                                                                >
-                                                                    L
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.stroke.strokeWidth === strokeSizes.XL ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetStrokeSize('XL')}
-                                                                >
-                                                                    XL
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                        </Menubar>
-                                                    </div>
-                                                    {/* 3rd row */}
-                                                    <div className="flex flex-col items-center mt-3">
-                                                        <Label className="mb-1.5 ml-3 w-full" htmlFor="size">Vertical position (%)</Label>
-                                                        <Input
-                                                            className="h-10 w-32"
-                                                            id="size"
-                                                            type="number"
-                                                            value={font.verticalPosition}
-                                                            min={0}
-                                                            max={100}
-                                                            onChangeCapture={(e: any) =>
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    verticalPosition: e.target.value === '' ? 0 : Number(e.target.value),
-                                                                }))
-                                                            }
-                                                        />
-                                                        <Slider
-                                                            className="w-32 mt-3"
-                                                            value={[font.verticalPosition]}
-                                                            step={1}
-                                                            id="size"
-                                                            min={0}
-                                                            max={100}
-                                                            onValueChange={(e) =>
-                                                                setFont((prevFont) => ({
-                                                                    ...prevFont,
-                                                                    verticalPosition: e[0],
-                                                                }))
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col col-span-2 px-1.5 items-center mt-3">
-                                                        <Label className="mb-1.5 w-full" htmlFor="shadow">Shadow</Label>
-                                                        <Menubar className="h-10 w-full px-2 justify-between" id="shadow">
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.shadow === shadowSizes.None ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetShadowSize('None')}
-                                                                >
-                                                                    None
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.shadow === shadowSizes.S ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetShadowSize('S')}
-                                                                >
-                                                                    S
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.shadow === shadowSizes.M ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetShadowSize('M')}
-                                                                >
-                                                                    M
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.shadow === shadowSizes.L ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetShadowSize('L')}
-                                                                >
-                                                                    L
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                            <MenubarMenu>
-                                                                <MenubarTrigger
-                                                                    className="cursor-pointer"
-                                                                    data-state={font.shadow === shadowSizes.XL ? 'open' : 'closed'}
-                                                                    onClick={() => handleSetShadowSize('XL')}
-                                                                >
-                                                                    XL
-                                                                </MenubarTrigger>
-                                                            </MenubarMenu>
-                                                        </Menubar>
-                                                    </div>
-                                                </div>
-                                                {/* 4th row */}
-                                                <div className="grid grid-cols-5 gap-3 mt-4">
-                                                    <div className="flex flex-col items-center mt-3">
-                                                        <Label className="mb-1.5 items-center" htmlFor="size">Uppercase</Label>
-                                                        <Switch defaultChecked onCheckedChange={(checked) => {
+                        <div className="rounded-xl bg-transparent pr-2 mr-8 w-[500px] h-[698px] flex flex-col">
+                            <Tabs defaultValue="style" className="w-full">
+                                <TabsList className="mb-2.5">
+                                    <TabsTrigger value="style">Style</TabsTrigger>
+                                    <TabsTrigger value="captions">Captions</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="style">
+                                    <ScrollArea style={{ height: '640px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                        {/* Themes */}
+                                        <div className="p-6">
+                                            <h3 className="mb-4">Fonts</h3>
+                                            <div className="grid grid-cols-3 gap-3">
+                                                <div className="flex flex-col items-center">
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TheBoldFont.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
-                                                                uppercase: checked,
+                                                                fontFamily: TheBoldFont.style.fontFamily,
+                                                                fontName: "TheBoldFont",
                                                             }))
-                                                        }} />
-                                                    </div>
-                                                    <div className="flex flex-col items-center mt-3">
-                                                        <Label className="mb-1.5 items-center" htmlFor="size">Punctuation</Label>
-                                                        <Switch onCheckedChange={(checked) => {
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                color: "#fff",
+                                                                fontSize: 18,
+                                                                fontWeight: 700,
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                top: "2.2px", // Adjust this value according to the space below the text
+                                                                textAlign: "center",
+                                                                lineHeight: 1
+                                                            }}
+                                                            className={`${TheBoldFont.className} antialiased`}
+                                                        >
+                                                            HORMOZI
+                                                        </div>
+                                                    </Button>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Komika.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
-                                                                punctuation: checked,
+                                                                fontFamily: Komika.style.fontFamily,
+                                                                fontName: "Komika",
                                                             }))
-                                                        }} />
-                                                    </div>
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                color: "#fff",
+                                                                fontSize: 18,
+                                                                fontWeight: 700,
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                top: "-1.3px", // Adjust this value according to the space below the text
+                                                                textAlign: "center",
+                                                                lineHeight: 1
+                                                            }}
+                                                            className={`${Komika.className} antialiased`}
+                                                        >
+                                                            BEAST
+                                                        </div>
+                                                    </Button>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TikTokSans.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        onClick={() => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: TikTokSans.style.fontFamily,
+                                                                fontName: "TikTokSans",
+                                                            }))
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                color: "#fff",
+                                                                fontSize: 16,
+                                                                fontWeight: 700,
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                textAlign: "center",
+                                                                lineHeight: 1
+                                                            }}
+                                                            className={`${TikTokSans.className} antialiased`}
+                                                        >
+                                                            TikTok
+                                                        </div>
+                                                    </Button>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Montserrat.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        onClick={() => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: Montserrat.style.fontFamily,
+                                                                fontName: "Montserrat",
+                                                            }))
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                color: "#fff",
+                                                                fontSize: 16,
+                                                                fontWeight: 700,
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                textAlign: "center",
+                                                                lineHeight: 1
+                                                            }}
+                                                            className={`${Montserrat.className} antialiased`}
+                                                        >
+                                                            Montserrat
+                                                        </div>
+                                                    </Button>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Bangers.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        onClick={() => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: Bangers.style.fontFamily,
+                                                                fontName: "Bangers",
+                                                                fontWeight: 400,
+                                                            }))
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                color: "#fff",
+                                                                fontSize: 22,
+                                                                fontWeight: 700,
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                position: "relative",
+                                                                textAlign: "center",
+                                                                lineHeight: 1
+                                                            }}
+                                                            className={`${Bangers.className} antialiased`}
+                                                        >
+                                                            Bangers
+                                                        </div>
+                                                    </Button>
                                                 </div>
                                             </div>
-                                        </ScrollArea>
-                                    </TabsContent>
+                                            <h3 className="mb-4 mt-8">Font settings</h3>
+                                            <div className="grid grid-cols-3 gap-3">
+                                                {/* 1st row */}
+                                                <div className="flex flex-col items-center">
+                                                    <Label className="mb-1.5 ml-3 w-full" htmlFor="size">Font color</Label>
+                                                    <TextColorPickerComponent />
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Label className="mb-1.5 ml-3 w-full" htmlFor="size">Font size (px)</Label>
+                                                    <Input
+                                                        className="w-32 h-10"
+                                                        type="number"
+                                                        id="size"
+                                                        min={0}
+                                                        max={100}
+                                                        placeholder={font.fontSize.toString() + "px"}
+                                                        value={font.fontSize}
+                                                        onChange={(e) => {
+                                                            const newValue = e.target.value === '' ? 0 : Number(e.target.value);
+                                                            setFont((prevFont) => ({ ...prevFont, fontSize: newValue }));
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Label className="mb-1.5 ml-3 w-full" htmlFor="weight">Font weight</Label>
+                                                    <Input
+                                                        className="w-32 h-10"
+                                                        disabled={font.fontFamily === Bangers.style.fontFamily}
+                                                        type="number"
+                                                        id="weight"
+                                                        min={100}
+                                                        step={100}
+                                                        max={900}
+                                                        placeholder={font.fontWeight.toString()}
+                                                        value={font.fontWeight}
+                                                        onChange={(e) => {
+                                                            const newValue = e.target.value === '' ? 0 : Number(e.target.value);
+                                                            setFont((prevFont) => ({ ...prevFont, fontWeight: newValue }));
+                                                        }}
+                                                    />
+                                                    <Slider
+                                                        className="w-32 mt-3"
+                                                        value={[font.fontWeight]}
+                                                        disabled={font.fontFamily === Bangers.style.fontFamily}
+                                                        id="size"
+                                                        min={100}
+                                                        step={100}
+                                                        max={900}
+                                                        onValueChange={(e) =>
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontWeight: e[0],
+                                                            }))
+                                                        }
+                                                    />
+                                                </div>
+                                                {/* 2nd row */}
+                                                <div className="flex flex-col items-center">
+                                                    <Label className="mb-1.5 ml-3 w-full">Stroke color</Label>
+                                                    <StrokeColorPickerComponent />
+                                                </div>
+                                                <div className="flex flex-col col-span-2 px-1.5 items-center">
+                                                    <Label className="mb-1.5 w-full">Stroke</Label>
+                                                    <Menubar className="h-10 w-full px-2 justify-between" id="stroke">
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.stroke.strokeWidth === strokeSizes.None ? 'open' : 'closed'}
+                                                                onClick={() => handleSetStrokeSize('None')}
+                                                            >
+                                                                None
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.stroke.strokeWidth === strokeSizes.S ? 'open' : 'closed'}
+                                                                onClick={() => handleSetStrokeSize('S')}
+                                                            >
+                                                                S
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.stroke.strokeWidth === strokeSizes.M ? 'open' : 'closed'}
+                                                                onClick={() => handleSetStrokeSize('M')}
+                                                            >
+                                                                M
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.stroke.strokeWidth === strokeSizes.L ? 'open' : 'closed'}
+                                                                onClick={() => handleSetStrokeSize('L')}
+                                                            >
+                                                                L
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.stroke.strokeWidth === strokeSizes.XL ? 'open' : 'closed'}
+                                                                onClick={() => handleSetStrokeSize('XL')}
+                                                            >
+                                                                XL
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                    </Menubar>
+                                                </div>
+                                                {/* 3rd row */}
+                                                <div className="flex flex-col items-center mt-3">
+                                                    <Label className="mb-1.5 ml-3 w-full" htmlFor="size">Vertical position (%)</Label>
+                                                    <Input
+                                                        className="h-10 w-32"
+                                                        id="size"
+                                                        type="number"
+                                                        value={font.verticalPosition}
+                                                        min={0}
+                                                        max={100}
+                                                        onChangeCapture={(e: any) =>
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                verticalPosition: e.target.value === '' ? 0 : Number(e.target.value),
+                                                            }))
+                                                        }
+                                                    />
+                                                    <Slider
+                                                        className="w-32 mt-3"
+                                                        value={[font.verticalPosition]}
+                                                        step={1}
+                                                        id="size"
+                                                        min={0}
+                                                        max={100}
+                                                        onValueChange={(e) =>
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                verticalPosition: e[0],
+                                                            }))
+                                                        }
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col col-span-2 px-1.5 items-center mt-3">
+                                                    <Label className="mb-1.5 w-full" htmlFor="shadow">Shadow</Label>
+                                                    <Menubar className="h-10 w-full px-2 justify-between" id="shadow">
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.shadow === shadowSizes.None ? 'open' : 'closed'}
+                                                                onClick={() => handleSetShadowSize('None')}
+                                                            >
+                                                                None
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.shadow === shadowSizes.S ? 'open' : 'closed'}
+                                                                onClick={() => handleSetShadowSize('S')}
+                                                            >
+                                                                S
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.shadow === shadowSizes.M ? 'open' : 'closed'}
+                                                                onClick={() => handleSetShadowSize('M')}
+                                                            >
+                                                                M
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.shadow === shadowSizes.L ? 'open' : 'closed'}
+                                                                onClick={() => handleSetShadowSize('L')}
+                                                            >
+                                                                L
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                        <MenubarMenu>
+                                                            <MenubarTrigger
+                                                                className="cursor-pointer"
+                                                                data-state={font.shadow === shadowSizes.XL ? 'open' : 'closed'}
+                                                                onClick={() => handleSetShadowSize('XL')}
+                                                            >
+                                                                XL
+                                                            </MenubarTrigger>
+                                                        </MenubarMenu>
+                                                    </Menubar>
+                                                </div>
+                                            </div>
+                                            {/* 4th row */}
+                                            <div className="grid grid-cols-5 gap-3 mt-4">
+                                                <div className="flex flex-col items-center mt-3">
+                                                    <Label className="mb-1.5 items-center" htmlFor="size">Uppercase</Label>
+                                                    <Switch defaultChecked onCheckedChange={(checked) => {
+                                                        setFont((prevFont) => ({
+                                                            ...prevFont,
+                                                            uppercase: checked,
+                                                        }))
+                                                    }} />
+                                                </div>
+                                                <div className="flex flex-col items-center mt-3">
+                                                    <Label className="mb-1.5 items-center" htmlFor="size">Punctuation</Label>
+                                                    <Switch onCheckedChange={(checked) => {
+                                                        setFont((prevFont) => ({
+                                                            ...prevFont,
+                                                            punctuation: checked,
+                                                        }))
+                                                    }} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ScrollArea>
+                                </TabsContent>
+                                {subtitles.length > 0 && (
+
                                     <TabsContent value="captions">
                                         <ScrollArea style={{ height: '640px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                             <div className="px-4 mt-6 mx-3 mb-3 flex shrink-0 flex-col justify-center text-sm md:text-base">
@@ -918,10 +905,9 @@ export default function Project({ params }: { params: { id: string } }) {
                                             </div>
                                         </ScrollArea>
                                     </TabsContent>
-
-                                </Tabs>
-                            </div>
-                        )}
+                                )}
+                            </Tabs>
+                        </div>
                         <div className="flex flex-col items-end">
                             <Dialog>
                                 <DialogTrigger asChild>
@@ -995,7 +981,6 @@ export default function Project({ params }: { params: { id: string } }) {
                                     style={{
                                         width: aspectRatio(metadata.width!, metadata.height!).width,
                                         height: aspectRatio(metadata.width!, metadata.height!).height,
-
                                     }}
                                     component={Main}
                                     inputProps={{

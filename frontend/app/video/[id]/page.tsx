@@ -86,7 +86,7 @@ export default function Video({ params }: { params: { id: string } }) {
                     console.log("processed", payload.new.processed);
                     if (payload.new.processed == true) {
                         const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                            router.push(`/project/${params.id}`);
+                            router.replace(`/project/${params.id}`);
                         });
 
                         toast.promise(promise, {
