@@ -1,12 +1,15 @@
-import { AwsRegion, RenderMediaOnLambdaOutput } from "@remotion/lambda/client";
 import {
+  AwsRegion, 
+  RenderMediaOnLambdaOutput, 
   renderMediaOnLambda,
   speculateFunctionName,
 } from "@remotion/lambda/client";
+// import { deleteRender } from "@remotion/lambda";
 import { DISK, RAM, REGION, SITE_NAME, TIMEOUT } from "../../../../config.mjs";
 import { executeApi } from "../../../../helpers/api-response";
 import { RenderRequest } from "../../../../types/schema";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+
 
 export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
   RenderRequest,
@@ -85,6 +88,15 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       }
     });
 
+    // const { freedBytes } = await deleteRender({
+    //   bucketName: result.bucketName,
+    //   region: "us-east-1",
+    //   renderId: result.renderId,
+    // });
+
+    // console.log(`Freed ${freedBytes} bytes`);
+
+    
 
     return result;
   }
