@@ -103,15 +103,11 @@ export default function Dashboard() {
         }
     }
 
-    const shortenFileName = (fileName: string) => {
-        if (fileName.length <= 30) {
-            return fileName;
+    function shortenFileName(name: string) {
+        if (name.length > 20) {
+            return name.substring(0, 20) + "..." + name.substring(name.length - 4, name.length);
         }
-        const fileExt = fileName.split(".").pop();
-        const fileNameWithoutExt = fileName.replace(`.${fileExt}`, "");
-        const shortenedFileName = fileNameWithoutExt.substring(0, 24) + "..." + fileNameWithoutExt.substring(fileNameWithoutExt.length - 3);
-
-        return shortenedFileName + "." + fileExt;
+        return name;
     }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
