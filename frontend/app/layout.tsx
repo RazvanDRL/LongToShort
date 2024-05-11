@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google';
 import './globals.css'
 import PlausibleProvider from 'next-plausible'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,6 +34,7 @@ export default function RootLayout({
             trackOutboundLinks={false}
             selfHosted={true}
             enabled={false} />
+          <SpeedInsights />
           <Crisp />
           {children}
         </ThemeProvider>
