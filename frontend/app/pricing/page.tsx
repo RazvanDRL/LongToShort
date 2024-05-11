@@ -27,6 +27,7 @@ const plans = [
     {
         title: "Starter",
         description: "Starting in content creation",
+        priceId: "price_1J2e3e2e3e2e3e2e3e2e3e2e",
         price: 20,
         priceDescription: "One time",
         features: [
@@ -38,6 +39,7 @@ const plans = [
     {
         title: "Pro",
         description: "For growing businesses",
+        priceId: "price_1J2e3e2e3e2e3e2e3e2e3e2e",
         price: 50,
         priceDescription: "One time",
         features: [
@@ -49,6 +51,7 @@ const plans = [
     {
         title: "Enterprise",
         description: "For large businesses",
+        priceId: "price_1J2e3e2e3e2e3e2e3e2e3e2e",
         price: 100,
         priceDescription: "One time",
         features: [

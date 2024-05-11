@@ -268,6 +268,13 @@ export default function Video({ params }: { params: { id: string } }) {
 
     }
 
+    function shortenFileName(name: string) {
+        if (name.length > 20) {
+            return name.substring(0, 20) + "..." + name.substring(name.length - 4, name.length);
+        }
+        return name;
+    }
+
     useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
@@ -350,7 +357,7 @@ export default function Video({ params }: { params: { id: string } }) {
                     <div className="px-2 mx-auto bg-[#15171d] w-[90vw] h-[360px] md:h-[500px] md:w-[800px] rounded-2xl">
                         <div className="px-4 py-6 md:px-8 md:py-10 font-mono font-medium text-base md:text-2xl">
                             <span>
-                                Fetching video <span className="text-blue-400 truncate">{metadata?.name}.{metadata?.ext}</span>
+                                Fetching video <span className="text-blue-400">{shortenFileName(metadata?.name!)}.{metadata?.ext}</span>
                             </span>
                             <br /><br />
                             {status !== "" ?
