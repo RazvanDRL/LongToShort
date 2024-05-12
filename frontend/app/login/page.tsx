@@ -3,7 +3,8 @@ import { Toaster } from 'sonner'
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from 'lucide-react';
 import Google from '@/public/google_logo.svg'
-import Twitter from '@/public/twitter-logo.svg'
+import Twitter from '@/public/x_logo.svg'
+import Github from '@/public/github_logo.svg'
 import Link from 'next/link'
 import { createClient } from '@/app/utils/supabase';
 import { redirect } from 'next/navigation';
@@ -49,6 +50,25 @@ export default function Login() {
     redirect(`${origin}/dashboard`);
   };
 
+  const loginGithub = async () => {
+    'use server';
+    const supabase = createClient();
+    const origin = headers().get('origin');
+    const { error, data } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      console.log(error);
+    } else {
+      return redirect(data.url);
+    }
+    redirect(`${origin}/dashboard`);
+  }
+
 
   return (
     <main>
@@ -93,6 +113,21 @@ export default function Login() {
                   />
                 </div>
                 Sign in with Twitter
+              </Button>
+            </form>
+            <form action={loginGithub}>
+              <Button
+                variant="outline"
+                className='w-full mt-3'
+              >
+                <div className="flex items-center justify-center mr-2.5">
+                  <Image
+                    className="h-5 w-5 dark:invert"
+                    src={Github}
+                    alt="Github Logo"
+                  />
+                </div>
+                Sign in with Github
               </Button>
             </form>
 
