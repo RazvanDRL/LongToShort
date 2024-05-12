@@ -45,6 +45,7 @@ import { z } from "zod";
 import { useRendering } from "../../../helpers/use-rendering";
 import { Loader2 } from "lucide-react";
 import type { Metadata, User } from "../../../types/constants";
+import { preloadVideo } from "@remotion/preload";
 
 type Subtitle = {
     start: number;
@@ -224,7 +225,7 @@ export default function Project({ params }: { params: { id: string } }) {
             }
 
             const data = await response.json();
-            console.log(data.url);
+            const unpreload = preloadVideo(data.url);
             setVideo(data.url);
         } catch (error) {
             console.error('Error fetching video:', error);
@@ -401,7 +402,7 @@ export default function Project({ params }: { params: { id: string } }) {
             <Toaster />
             {user ? <Header user_email={user.email} /> : null}
             <main className="flex justify-center items-center mt-24">
-                {video && metadata && (
+                {metadata && (
                     <div className="flex justify-center items-center">
                         <div className="rounded-xl bg-transparent pr-2 mr-8 w-[500px] h-[698px] flex flex-col">
                             <Tabs defaultValue="style" className="w-full">
@@ -908,95 +909,97 @@ export default function Project({ params }: { params: { id: string } }) {
                                 )}
                             </Tabs>
                         </div>
-                        <div className="flex flex-col items-end">
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    {state.status !== "rendering" ?
-                                        <Button className="mb-4" variant="outline">
-                                            <FileVideo className="mr-2 h-4 w-4" />
-                                            Export video
-                                        </Button>
-                                        :
-                                        <Button className="mb-4" variant="outline">
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Rendering
-                                        </Button>
-                                    }
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-[425px]">
-                                    <DialogHeader>
-                                        <DialogTitle>
-                                            Render video
-                                        </DialogTitle>
-                                        <DialogDescription>
-                                            Make changes to your profile here. Click save when you&apos;re done.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="grid gap-4 py-4">
-                                        <div className="grid grid-cols-4 items-center gap-4">
+                        {video &&
+                            <div className="flex flex-col items-end">
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        {state.status !== "rendering" ?
+                                            <Button className="mb-4" variant="outline">
+                                                <FileVideo className="mr-2 h-4 w-4" />
+                                                Export video
+                                            </Button>
+                                            :
+                                            <Button className="mb-4" variant="outline">
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Rendering
+                                            </Button>
+                                        }
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Render video
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                Make changes to your profile here. Click save when you&apos;re done.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="grid grid-cols-4 items-center gap-4">
 
+                                            </div>
                                         </div>
-                                    </div>
-                                    <DialogFooter>
-                                        <div>
-                                            <Toaster />
-                                            {state.status === "init" ||
-                                                state.status === "invoking" ||
-                                                state.status === "error" ? (
-                                                <>
-                                                    {state.status === "invoking" ?
-                                                        (
-                                                            <Button disabled>
-                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                Please wait
-                                                            </Button>
+                                        <DialogFooter>
+                                            <div>
+                                                <Toaster />
+                                                {state.status === "init" ||
+                                                    state.status === "invoking" ||
+                                                    state.status === "error" ? (
+                                                    <>
+                                                        {state.status === "invoking" ?
+                                                            (
+                                                                <Button disabled>
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                    Please wait
+                                                                </Button>
 
-                                                        ) :
-                                                        (
-                                                            <Button
-                                                                onClick={renderMedia}
-                                                            >
-                                                                <Server className="mr-2 h-4 w-4" />
-                                                                Render video
-                                                            </Button>
-                                                        )
-                                                    }
-                                                </>
-                                            ) : null}
-                                            {
-                                                state.status === "rendering" ? (
-                                                    <Button disabled>
-                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                        Rendering&nbsp;{Math.ceil(state.progress * 100)}%
-                                                    </Button>
-                                                ) : null
-                                            }
-                                        </div>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                            <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
-                                <Player
-                                    className="rounded-xl z-50"
-                                    style={{
-                                        width: aspectRatio(metadata.width!, metadata.height!).width,
-                                        height: aspectRatio(metadata.width!, metadata.height!).height,
-                                    }}
-                                    component={Main}
-                                    inputProps={{
-                                        subtitles: subtitles,
-                                        font: font,
-                                        video: video,
-                                        video_fps: metadata.fps!,
-                                    }}
-                                    durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
-                                    compositionWidth={metadata.width!}
-                                    compositionHeight={metadata.height!}
-                                    fps={metadata.fps || 30}
-                                    controls
-                                />
+                                                            ) :
+                                                            (
+                                                                <Button
+                                                                    onClick={renderMedia}
+                                                                >
+                                                                    <Server className="mr-2 h-4 w-4" />
+                                                                    Render video
+                                                                </Button>
+                                                            )
+                                                        }
+                                                    </>
+                                                ) : null}
+                                                {
+                                                    state.status === "rendering" ? (
+                                                        <Button disabled>
+                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            Rendering&nbsp;{Math.ceil(state.progress * 100)}%
+                                                        </Button>
+                                                    ) : null
+                                                }
+                                            </div>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                                <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                    <Player
+                                        className="rounded-xl z-50"
+                                        style={{
+                                            width: aspectRatio(metadata.width!, metadata.height!).width,
+                                            height: aspectRatio(metadata.width!, metadata.height!).height,
+                                        }}
+                                        component={Main}
+                                        inputProps={{
+                                            subtitles: subtitles,
+                                            font: font,
+                                            video: video,
+                                            video_fps: metadata.fps!,
+                                        }}
+                                        durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
+                                        compositionWidth={metadata.width!}
+                                        compositionHeight={metadata.height!}
+                                        fps={metadata.fps || 30}
+                                        controls
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 )}
             </main >

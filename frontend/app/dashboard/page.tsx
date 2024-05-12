@@ -219,11 +219,11 @@ export default function Dashboard() {
 
         let uuid: string = uuidv4();
         let ext: string = getFileExtension(file.name);
-        let contentType: string = file.type;
-        const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.${ext}`, {
+        // let contentType: string = file.type;
+        const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.mp4`, {
             method: 'PUT',
             headers: {
-                'Content-Type': contentType,
+                'Content-Type': 'video/mp4',
             },
             body: file,
         });
