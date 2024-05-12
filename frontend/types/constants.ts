@@ -15,7 +15,6 @@ export interface Metadata {
 export interface User {
   id: string;
   email: string;
-  aud: string;
   access_token: string;
 }
 

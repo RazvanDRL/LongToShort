@@ -74,28 +74,23 @@ export default function Export({ params }: { params: { id: string } }) {
     };
 
     async function handleSignedIn() {
-        const userFetch = (await supabase.auth.getUser()).data?.user;
+        const { data: { user } } = await supabase.auth.getUser();
         const session = await supabase.auth.getSession();
         const token = session.data.session?.access_token;
-        if (userFetch) {
+        if (user) {
             setUser({
-                id: userFetch.id,
-                email: userFetch.email || "",
-                aud: userFetch.aud,
+                id: user.id,
+                email: user.email!,
                 access_token: token!,
             });
-            if (userFetch.aud !== 'authenticated') {
-                router.replace('/login');
-                return true;
-            }
-            else
-                return false;
-        } else {
-            router.replace('/login');
+            return false;
+        }
+        else {
+            router.push("/login");
             return true;
         }
     }
-
+    
     async function fetchMetadata() {
         const { data, error } = await supabase
             .from('metadata')
