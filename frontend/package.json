@@ -38,7 +38,6 @@
     "@remotion/preload": "4.0.155",
     "@remotion/renderer": "4.0.155",
     "@remotion/transitions": "4.0.155",
-    "@sentry/nextjs": "^7.105.0",
     "@stripe/react-stripe-js": "^2.6.2",
     "@stripe/stripe-js": "^3.2.0",
     "@supabase/supabase-js": "^2.38.4",
