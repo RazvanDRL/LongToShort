@@ -33,7 +33,7 @@ type Video = {
 export default function Dashboard() {
     const router = useRouter();
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
     const [user, setUser] = useState<User | null>(null);
     const [videos, setVideos] = useState<Video[] | null>(null);
     const [shouldRender, setShouldRender] = useState(false);
@@ -45,6 +45,7 @@ export default function Dashboard() {
             const { data, error } = await supabase
                 .from('metadata')
                 .select("*")
+                .order('created_at', { ascending: false })
                 .eq('user_id', user.id);
 
             if (error) {
@@ -97,9 +98,16 @@ export default function Dashboard() {
         }
     }
 
+    function shortenFileNamePhone(name: string) {
+        if (name.length > 19) {
+            return name.substring(0, 12) + "..." + name.substring(name.length - 4, name.length);
+        }
+        return name;
+    }
+
     function shortenFileName(name: string) {
-        if (name.length > 20) {
-            return name.substring(0, 20) + "..." + name.substring(name.length - 4, name.length);
+        if (name.length > 25) {
+            return name.substring(0, 18) + "..." + name.substring(name.length - 4, name.length);
         }
         return name;
     }
@@ -133,10 +141,6 @@ export default function Dashboard() {
         if (files) {
             await uploadFile(files);
         }
-
-        const { data: file } = await supabase.storage
-            .from("videos")
-            .list(`${user?.id}`);
     }
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -299,18 +303,16 @@ export default function Dashboard() {
         setVideos(fetchedVideos);
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (user)
-                await fetchAllVideos();
-        };
-
-        fetchData();
-    }, [user]);
+    function formatSeconds(seconds: number) {
+        let date = new Date(0);
+        date.setSeconds(seconds);
+        return date.toISOString().substr(14, 5);
+    }
 
     useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
+            await fetchAllVideos();
 
             if (!result) {
                 setShouldRender(true);
@@ -319,7 +321,7 @@ export default function Dashboard() {
             }
         };
         runPrecheck();
-    }, []);
+    }, [user]);
 
     if (!shouldRender) {
         return <div className="bg-[#ec2626] z-50 w-screen h-screen"></div>;
@@ -411,12 +413,15 @@ export default function Dashboard() {
                                             <div className="flex">
                                                 {videos[0].processed ? <span className="mr-2">✅</span> : <span className="mr-2 animate-spin-slow">⏳</span>}
                                             </div>
-                                            <div className="hover:underline">
+                                            <div className="hover:underline hidden md:block">
                                                 {shortenFileName(videos[0].name) + "." + videos[0].ext}
+                                            </div>
+                                            <div className="hover:underline block md:hidden">
+                                                {shortenFileNamePhone(videos[0].name) + "." + videos[0].ext}
                                             </div>
                                         </div>
                                         <div>
-                                            {Math.round(videos[0].duration) + "s"}
+                                            {formatSeconds(Math.round(videos[0].duration))}
                                         </div>
                                     </div>
                                 </a>
@@ -428,12 +433,15 @@ export default function Dashboard() {
                                                     <div className="flex">
                                                         {video.processed ? <span className="mr-2">✅</span> : <span className="animate-spin-slow mr-2">⏳</span>}
                                                     </div>
-                                                    <div className="hover:underline">
+                                                    <div className="hover:underline hidden md:block">
                                                         {shortenFileName(video.name) + "." + video.ext}
+                                                    </div>
+                                                    <div className="hover:underline block md:hidden">
+                                                        {shortenFileNamePhone(video.name) + "." + video.ext}
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    {Math.round(video.duration) + "s"}
+                                                    {formatSeconds(Math.round(video.duration))}
                                                 </div>
                                             </div>
                                         </a>
