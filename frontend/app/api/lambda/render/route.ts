@@ -1,6 +1,6 @@
 import {
-  AwsRegion, 
-  RenderMediaOnLambdaOutput, 
+  AwsRegion,
+  RenderMediaOnLambdaOutput,
   renderMediaOnLambda,
   speculateFunctionName,
 } from "@remotion/lambda/client";
@@ -69,11 +69,12 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       serveUrl: SITE_NAME,
       composition: body.id,
       inputProps: body.inputProps,
-      framesPerLambda: 20,
+      framesPerLambda: 40,
       downloadBehavior: {
         type: "download",
         fileName: "video.mp4",
       },
+      timeoutInMilliseconds: 1000 * 60 * 5,
       privacy: "public",
       // deleteAfter: "1-day",
       // scale: 1,
@@ -96,7 +97,7 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
 
     // console.log(`Freed ${freedBytes} bytes`);
 
-    
+
 
     return result;
   }

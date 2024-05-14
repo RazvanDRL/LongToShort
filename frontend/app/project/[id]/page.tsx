@@ -171,6 +171,7 @@ export default function Project({ params }: { params: { id: string } }) {
             return true;
         }
     }
+
     async function fetchMetadata() {
         const { data, error } = await supabase
             .from('metadata')
@@ -211,7 +212,7 @@ export default function Project({ params }: { params: { id: string } }) {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${user?.access_token}`,
                 },
-                body: JSON.stringify({ key: `${params.id}.${metadata!.ext}`, bucket: 'upload-bucket' }),
+                body: JSON.stringify({ key: `${params.id}-compressed.${metadata!.ext}`, bucket: 'upload-bucket' }),
             });
 
             if (!response.ok) {
@@ -903,74 +904,73 @@ export default function Project({ params }: { params: { id: string } }) {
                                 )}
                             </Tabs>
                         </div>
-                        {video &&
-                            <div className="flex flex-col items-end">
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        {state.status !== "rendering" ?
-                                            <Button className="mb-4" variant="outline">
-                                                <FileVideo className="mr-2 h-4 w-4" />
-                                                Export video
-                                            </Button>
-                                            :
-                                            <Button className="mb-4" variant="outline">
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Rendering
-                                            </Button>
-                                        }
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[425px]">
-                                        <DialogHeader>
-                                            <DialogTitle>
-                                                Render video
-                                            </DialogTitle>
-                                            <DialogDescription>
-                                                Make changes to your profile here. Click save when you&apos;re done.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="grid gap-4 py-4">
-                                            <div className="grid grid-cols-4 items-center gap-4">
+                        <div className="flex flex-col items-end">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    {state.status !== "rendering" ?
+                                        <Button className="mb-4" variant="outline">
+                                            <FileVideo className="mr-2 h-4 w-4" />
+                                            Export video
+                                        </Button>
+                                        :
+                                        <Button className="mb-4" variant="outline">
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Rendering
+                                        </Button>
+                                    }
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            Render video
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            Make changes to your profile here. Click save when you&apos;re done.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
 
-                                            </div>
                                         </div>
-                                        <DialogFooter>
-                                            <div>
-                                                <Toaster />
-                                                {state.status === "init" ||
-                                                    state.status === "invoking" ||
-                                                    state.status === "error" ? (
-                                                    <>
-                                                        {state.status === "invoking" ?
-                                                            (
-                                                                <Button disabled>
-                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                    Please wait
-                                                                </Button>
+                                    </div>
+                                    <DialogFooter>
+                                        <div>
+                                            {state.status === "init" ||
+                                                state.status === "invoking" ||
+                                                state.status === "error" ? (
+                                                <>
+                                                    {state.status === "invoking" ?
+                                                        (
+                                                            <Button disabled>
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                Please wait
+                                                            </Button>
 
-                                                            ) :
-                                                            (
-                                                                <Button
-                                                                    onClick={renderMedia}
-                                                                >
-                                                                    <Server className="mr-2 h-4 w-4" />
-                                                                    Render video
-                                                                </Button>
-                                                            )
-                                                        }
-                                                    </>
-                                                ) : null}
-                                                {
-                                                    state.status === "rendering" ? (
-                                                        <Button disabled>
-                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                            Rendering&nbsp;{Math.ceil(state.progress * 100)}%
-                                                        </Button>
-                                                    ) : null
-                                                }
-                                            </div>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                                        ) :
+                                                        (
+                                                            <Button
+                                                                onClick={renderMedia}
+                                                            >
+                                                                <Server className="mr-2 h-4 w-4" />
+                                                                Render video
+                                                            </Button>
+                                                        )
+                                                    }
+                                                </>
+                                            ) : null}
+                                            {
+                                                state.status === "rendering" ? (
+                                                    <Button disabled>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Rendering&nbsp;{Math.ceil(state.progress * 100)}%
+                                                    </Button>
+                                                ) : null
+                                            }
+                                        </div>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                            {video &&
                                 <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                     <Player
                                         className="rounded-xl z-50"
@@ -992,8 +992,8 @@ export default function Project({ params }: { params: { id: string } }) {
                                         controls
                                     />
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
                 )}
             </main >
