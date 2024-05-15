@@ -122,7 +122,7 @@ export default function Header({ user_email }: { user_email: string}) {
                     </Popover>
                 </div>
                 <div>
-                    <Button className="mr-6 md:mr-8" variant={"outline"}>Add more credits</Button>
+                    <Button className="mr-6 md:mr-8" variant={"outline"}>Add more videos</Button>
                 </div>
                 <div className="flex items-center">
                     <DropdownMenu>

@@ -14,7 +14,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Slider } from "@/components/ui/slider"
-import { FileVideo, ListPlus, Server, Trash2 } from "lucide-react";
+import { FileVideo, ListPlus, Save, Server, Trash2 } from "lucide-react";
 import {
     Menubar,
     MenubarMenu,
@@ -117,14 +117,14 @@ export default function Project({ params }: { params: { id: string } }) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [metadata, setMetadata] = useState<Metadata | null>(null);
-    const [video, setVideo] = useState<string | null>(null);
+    const [video, setVideo] = useState<string | null>(localStorage.getItem('videoUrl'));
     const [uncompressedVideo, setUncompressedVideo] = useState<string | null>(null);
     const [shouldRender, setShouldRender] = useState(false);
-    const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
+    const [subtitles, setSubtitles] = useState<Subtitle[]>(localStorage.getItem('subtitles') ? JSON.parse(localStorage.getItem('subtitles')!) : []);
     const [startTimeSlider, setStartTimeSlider] = useState(0);
     const [endTimeSlider, setEndTimeSlider] = useState(0);
     const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
-    const [font, setFont] = useState<Font>({
+    const [font, setFont] = useState<Font>(localStorage.getItem('font') ? JSON.parse(localStorage.getItem('font')!) : {
         textColor: "#fff",
         fontSize: 30,
         fontFamily: Montserrat.style.fontFamily,
@@ -223,6 +223,7 @@ export default function Project({ params }: { params: { id: string } }) {
             const data = await response.json();
             const unpreload = preloadVideo(data.url);
             setVideo(data.url);
+            localStorage.setItem('videoUrl', data.url);
         } catch (error) {
             console.error('Error fetching video:', error);
         }
@@ -290,6 +291,11 @@ export default function Project({ params }: { params: { id: string } }) {
         }
     }
 
+    async function saveSettings() {
+        localStorage.setItem('font', JSON.stringify(font));
+        localStorage.setItem('subtitles', JSON.stringify(subtitles));
+    }
+
     const handleSetStrokeSize = (size: StrokeSize) => {
         setFont((prevFont) => ({
             ...prevFont,
@@ -331,7 +337,8 @@ export default function Project({ params }: { params: { id: string } }) {
                     let metadata = await fetchMetadata();
                     if (metadata.processed === true) {
                         setShouldRender(true);
-                        await fetchVideo(metadata);
+                        if (!video)
+                            await fetchVideo(metadata);
                         await fetchSubtitles();
                         setFocusedSubtitleIndex(0);
                     }
@@ -351,7 +358,11 @@ export default function Project({ params }: { params: { id: string } }) {
 
 
     if (!shouldRender) {
-        return <div className="bg-[#ec2626] z-50 w-screen h-screen"></div>;
+        return <div className="bg-[#0a0a0a] z-50 w-screen h-screen">
+            <div className="flex items-center justify-center">
+                <Loader2 className="animate-spin top-1/2 w-16 h-16 text-primary" />
+            </div>
+        </div>;
     }
 
     function TextColorPickerComponent() {
@@ -430,6 +441,15 @@ export default function Project({ params }: { params: { id: string } }) {
                                     <TabsTrigger value="style">Style</TabsTrigger>
                                     <TabsTrigger value="captions">Captions</TabsTrigger>
                                 </TabsList>
+                                <Button
+                                    onClick={() => {
+                                        saveSettings();
+                                    }}
+                                    variant={"ghost"}
+                                    className="ml-4"
+                                >
+                                    Save settings
+                                </Button>
                                 <TabsContent value="style">
                                     <ScrollArea style={{ height: '640px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                         {/* Themes */}
@@ -769,7 +789,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 </div>
                                             </div>
                                             {/* 4th row */}
-                                            <div className="grid grid-cols-5 gap-3 mt-4">
+                                            <div className="grid grid-cols-5 gap-3 mt-6">
                                                 <div className="flex flex-col items-center mt-3">
                                                     <Label className="mb-1.5 items-center" htmlFor="size">Uppercase</Label>
                                                     <Switch defaultChecked onCheckedChange={(checked) => {
@@ -995,7 +1015,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
-                            {video &&
+                            {video ?
                                 <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                     <Player
                                         className="rounded-xl z-50"
@@ -1016,6 +1036,18 @@ export default function Project({ params }: { params: { id: string } }) {
                                         fps={metadata.fps || 30}
                                         controls
                                     />
+                                </div>
+                                :
+                                <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                    <div
+                                        className="rounded-xl bg-neutral-950 flex justify-center items-center"
+                                        style={{
+                                            width: aspectRatio(metadata.width!, metadata.height!).width,
+                                            height: aspectRatio(metadata.width!, metadata.height!).height,
+                                        }}
+                                    >
+                                        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                                    </div>
                                 </div>
                             }
                         </div>
