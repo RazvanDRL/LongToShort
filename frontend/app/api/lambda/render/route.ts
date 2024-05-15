@@ -69,12 +69,12 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       serveUrl: SITE_NAME,
       composition: body.id,
       inputProps: body.inputProps,
-      framesPerLambda: 40,
       downloadBehavior: {
         type: "download",
         fileName: "video.mp4",
       },
       timeoutInMilliseconds: 1000 * 60 * 5,
+      framesPerLambda: 20,
       privacy: "public",
       // deleteAfter: "1-day",
       // scale: 1,

@@ -118,6 +118,7 @@ export default function Project({ params }: { params: { id: string } }) {
     const [user, setUser] = useState<User | null>(null);
     const [metadata, setMetadata] = useState<Metadata | null>(null);
     const [video, setVideo] = useState<string | null>(null);
+    const [uncompressedVideo, setUncompressedVideo] = useState<string | null>(null);
     const [shouldRender, setShouldRender] = useState(false);
     const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
     const [startTimeSlider, setStartTimeSlider] = useState(0);
@@ -227,6 +228,29 @@ export default function Project({ params }: { params: { id: string } }) {
         }
     }
 
+    async function fetchUncompressedVideo(metadata: Metadata | null) {
+        try {
+            const response = await fetch(`/api/generate-signed-url`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user?.access_token}`,
+                },
+                body: JSON.stringify({ key: `${params.id}.${metadata!.ext}`, bucket: 'upload-bucket' }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch signed URL');
+            }
+
+            const data = await response.json();
+            setUncompressedVideo(data.url);
+        } catch (error) {
+            console.error('Error fetching video:', error);
+        }
+
+    }
+
     async function fetchSubtitles() {
         const { data, error } = await supabase
             .from('subs')
@@ -314,6 +338,7 @@ export default function Project({ params }: { params: { id: string } }) {
                     else if (metadata.processed === false) {
                         router.replace(`/video/${params.id}`);
                     }
+                    await fetchUncompressedVideo(metadata);
                 }
                 catch (error: any) {
                     toast.error(error);

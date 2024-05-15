@@ -1,8 +1,8 @@
 import {
   AbsoluteFill,
+  OffthreadVideo,
   Sequence,
   useVideoConfig,
-  Video,
 } from "remotion";
 import React, { useMemo } from "react";
 
@@ -103,7 +103,7 @@ export const Main: React.FC<{
 
   return (
     <AbsoluteFill>
-      <Video
+      <OffthreadVideo
         src={video!}
         volume={1}
         onError={(e) => console.error(e)}
