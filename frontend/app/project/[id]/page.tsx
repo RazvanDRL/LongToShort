@@ -117,14 +117,14 @@ export default function Project({ params }: { params: { id: string } }) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [metadata, setMetadata] = useState<Metadata | null>(null);
-    const [video, setVideo] = useState<string | null>(localStorage.getItem('videoUrl'));
+    const [video, setVideo] = useState<string | null>(localStorage.getItem(`videoUrl_${params.id}`));
     const [uncompressedVideo, setUncompressedVideo] = useState<string | null>(null);
     const [shouldRender, setShouldRender] = useState(false);
-    const [subtitles, setSubtitles] = useState<Subtitle[]>(localStorage.getItem('subtitles') ? JSON.parse(localStorage.getItem('subtitles')!) : []);
+    const [subtitles, setSubtitles] = useState<Subtitle[]>(localStorage.getItem(`subtitles_${params.id}`) ? JSON.parse(localStorage.getItem(`subtitles_${params.id}`)!) : []);
     const [startTimeSlider, setStartTimeSlider] = useState(0);
     const [endTimeSlider, setEndTimeSlider] = useState(0);
     const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
-    const [font, setFont] = useState<Font>(localStorage.getItem('font') ? JSON.parse(localStorage.getItem('font')!) : {
+    const [font, setFont] = useState<Font>(localStorage.getItem(`font_${params.id}`) ? JSON.parse(localStorage.getItem(`font_${params.id}`)!) : {
         textColor: "#fff",
         fontSize: 30,
         fontFamily: Montserrat.style.fontFamily,
@@ -292,8 +292,8 @@ export default function Project({ params }: { params: { id: string } }) {
     }
 
     async function saveSettings() {
-        localStorage.setItem('font', JSON.stringify(font));
-        localStorage.setItem('subtitles', JSON.stringify(subtitles));
+        localStorage.setItem(`font_${params.id}`, JSON.stringify(font));
+        localStorage.setItem(`subtitles_${params.id}`, JSON.stringify(subtitles));
     }
 
     const handleSetStrokeSize = (size: StrokeSize) => {
@@ -311,58 +311,6 @@ export default function Project({ params }: { params: { id: string } }) {
             ...prevFont,
             shadow: shadowSizes[size],
         }));
-    }
-
-    useEffect(() => {
-        if (state.status === "done") {
-            const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                router.push(`/export/${params.id}`);
-            });
-
-            toast.promise(promise, {
-                loading: 'File rendered successfully. Redirecting...',
-            })
-        }
-        if (state.status === "error") {
-            console.error(state.error.message);
-        }
-    }, [state.status]);
-
-    useEffect(() => {
-        const runPrecheck = async () => {
-            const result = await handleSignedIn();
-            if (!result) {
-                if (!user) return;
-                try {
-                    let metadata = await fetchMetadata();
-                    if (metadata.processed === true) {
-                        setShouldRender(true);
-                        if (!video)
-                            await fetchVideo(metadata);
-                        await fetchSubtitles();
-                        setFocusedSubtitleIndex(0);
-                    }
-                    else if (metadata.processed === false) {
-                        router.replace(`/video/${params.id}`);
-                    }
-                    await fetchUncompressedVideo(metadata);
-                }
-                catch (error: any) {
-                    toast.error(error);
-                }
-            }
-
-        };
-        runPrecheck();
-    }, [user?.id]);
-
-
-    if (!shouldRender) {
-        return <div className="bg-[#0a0a0a] z-50 w-screen h-screen">
-            <div className="flex items-center justify-center">
-                <Loader2 className="animate-spin top-1/2 w-16 h-16 text-primary" />
-            </div>
-        </div>;
     }
 
     function TextColorPickerComponent() {
@@ -425,8 +373,55 @@ export default function Project({ params }: { params: { id: string } }) {
         }
     }
 
-    if (state.status === "rendering")
-        console.log(state.status, state.progress);
+    useEffect(() => {
+        if (state.status === "done") {
+            const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+                router.push(`/export/${params.id}`);
+            });
+
+            toast.promise(promise, {
+                loading: 'File rendered successfully. Redirecting...',
+            })
+        }
+        if (state.status === "error") {
+            console.error(state.error.message);
+        }
+    }, [state.status]);
+
+    useEffect(() => {
+        const runPrecheck = async () => {
+            const result = await handleSignedIn();
+            if (!result) {
+                if (!user) return;
+                try {
+                    let metadata = await fetchMetadata();
+                    if (metadata.processed === true) {
+                        setShouldRender(true);
+                        if (!video)
+                            await fetchVideo(metadata);
+                        await fetchSubtitles();
+                        setFocusedSubtitleIndex(0);
+                    }
+                    else if (metadata.processed === false) {
+                        router.replace(`/video/${params.id}`);
+                    }
+                    await fetchUncompressedVideo(metadata);
+                }
+                catch (error: any) {
+                    toast.error(error);
+                }
+            }
+
+        };
+        runPrecheck();
+    }, [user?.id]);
+
+    if (!shouldRender) {
+        return <div className="bg-[#0a0a0a] z-50 w-screen h-screen">
+            <Loader2 className="absolute animate-spin w-16 h-16 text-primary" />
+        </div>;
+    }
+
 
     return (
         <div>

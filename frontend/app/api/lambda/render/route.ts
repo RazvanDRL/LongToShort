@@ -74,7 +74,6 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
         fileName: "video.mp4",
       },
       timeoutInMilliseconds: 1000 * 60 * 5,
-      framesPerLambda: 20,
       privacy: "public",
       // deleteAfter: "1-day",
       // scale: 1,
