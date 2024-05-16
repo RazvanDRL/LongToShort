@@ -49,7 +49,7 @@ export const Main: React.FC<{
       fontWeight: font.fontWeight,
       verticalPosition: font.verticalPosition,
       textShadow: font.shadow,
-      fontSize: font.fontSize * 2,
+      fontSize: font.fontSize * 1.5,
       transform: `translateY(${100 - font.verticalPosition}%)`,
       textTransform: font.uppercase ? "uppercase" : "none",
     };
@@ -108,7 +108,6 @@ export const Main: React.FC<{
         volume={1}
         onError={(e) => console.error(e)}
       />
-
       {renderedSubtitles}
     </AbsoluteFill>
   );

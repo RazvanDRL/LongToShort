@@ -73,11 +73,6 @@ const Bangers = localFont({
     display: 'swap',
 })
 
-const TikTokSans = localFont({
-    src: '../../../public/TikTokSans.ttf',
-    display: 'swap',
-})
-
 type Font = {
     textColor: string;
     fontSize: number;
@@ -223,7 +218,7 @@ export default function Project({ params }: { params: { id: string } }) {
             const data = await response.json();
             const unpreload = preloadVideo(data.url);
             setVideo(data.url);
-            localStorage.setItem('videoUrl', data.url);
+            localStorage.setItem(`videoUrl_${params.id}`, data.url);
         } catch (error) {
             console.error('Error fetching video:', error);
         }
@@ -417,9 +412,13 @@ export default function Project({ params }: { params: { id: string } }) {
     }, [user?.id]);
 
     if (!shouldRender) {
-        return <div className="bg-[#0a0a0a] z-50 w-screen h-screen">
-            <Loader2 className="absolute animate-spin w-16 h-16 text-primary" />
-        </div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="bg-[#0a0a0a] z-50 w-16 h-16 flex justify-center items-center">
+                    <Loader2 className="relative animate-spin w-16 h-16 text-primary" />
+                </div>
+            </div>
+        );
     }
 
 
@@ -503,33 +502,6 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             className={`${Komika.className} antialiased`}
                                                         >
                                                             BEAST
-                                                        </div>
-                                                    </Button>
-                                                </div>
-                                                <div className="flex flex-col items-center">
-                                                    <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TikTokSans.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
-                                                        onClick={() => {
-                                                            setFont((prevFont) => ({
-                                                                ...prevFont,
-                                                                fontFamily: TikTokSans.style.fontFamily,
-                                                                fontName: "TikTokSans",
-                                                            }))
-                                                        }}
-                                                    >
-                                                        <div
-                                                            style={{
-                                                                color: "#fff",
-                                                                fontSize: 16,
-                                                                fontWeight: 700,
-                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
-                                                                position: "relative",
-                                                                textAlign: "center",
-                                                                lineHeight: 1
-                                                            }}
-                                                            className={`${TikTokSans.className} antialiased`}
-                                                        >
-                                                            TikTok
                                                         </div>
                                                     </Button>
                                                 </div>
