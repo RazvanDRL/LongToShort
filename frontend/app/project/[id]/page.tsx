@@ -423,7 +423,7 @@ export default function Project({ params }: { params: { id: string } }) {
 
 
     return (
-        <div>
+        <div className="container">
             <Toaster />
             {user ? <Header user_email={user.email} /> : null}
             <main className="flex justify-center items-center mt-24">

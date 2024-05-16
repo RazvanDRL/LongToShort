@@ -30,8 +30,17 @@ import {
 import { useEffect, useState } from "react"
 import { toast } from "sonner";
 import { usePathname } from 'next/navigation';
+import {
+    Breadcrumb,
+    BreadcrumbEllipsis,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
-export default function Header({ user_email }: { user_email: string}) {
+export default function Header({ user_email }: { user_email: string }) {
     const router = useRouter();
     const [feedbackText, setFeedbackText] = useState("");
     const [credits, setCredits] = useState(0);
@@ -97,77 +106,94 @@ export default function Header({ user_email }: { user_email: string}) {
 
     return (
         <header className="w-full">
-            <div className="sticky flex justify-end items-center py-8 sm:px-6 md:px-8">
-                <div>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" className="mr-4 md:mr-8">Feedback</Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                            <div className="grid gap-4">
-                                <Label>Feedback</Label>
-                                <Textarea
-                                    placeholder="Ideas on how to improve"
-                                    onChange={(e) => setFeedbackText(e.target.value)}
-                                    value={feedbackText}
-                                />
-                                <Button
-                                    variant={"outline"}
-                                    onClick={async () => await sendFeedback()}
-                                >
-                                    Send feedback
-                                </Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+            <div className="sticky flex justify-between items-center py-8 sm:px-6 md:px-8">
+                <div className="flex justify-start items-center">
+                    {pathname.split('/').length > 2 &&
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink href="/dashboard">dashboard</BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>{pathname.split('/')[1]}</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                    }
                 </div>
-                <div>
-                    <Button className="mr-6 md:mr-8" variant={"outline"}>Add more videos</Button>
-                </div>
-                <div className="flex items-center">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <a className="cursor-pointer grayscale">
-                                <Avvvatars value={user_email} shadow={true} size={40} />
-                            </a>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 mr-8 mt-2">
-                            <DropdownMenuLabel>{user_email}</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                                <DropdownMenuItem>
-                                    <Banknote className="mr-2 h-4 w-4" />
-                                    <span>{credits} videos</span>
-                                    {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Gift className="mr-2 h-4 w-4" />
-                                    <span>Get $10 free</span>
-                                    {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <User className="mr-2 h-4 w-4" />
-                                    <span>Profile</span>
-                                    {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <CreditCard className="mr-2 h-4 w-4" />
-                                    <span>Billing</span>
-                                    {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
-                                </DropdownMenuItem>
-                                {/* <DropdownMenuItem>
+                <div className="flex justify-end items-center">
+                    <div>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className="mr-4 md:mr-8">Feedback</Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                                <div className="grid gap-4">
+                                    <Label>Feedback</Label>
+                                    <Textarea
+                                        placeholder="Ideas on how to improve"
+                                        onChange={(e) => setFeedbackText(e.target.value)}
+                                        value={feedbackText}
+                                    />
+                                    <Button
+                                        variant={"outline"}
+                                        onClick={async () => await sendFeedback()}
+                                    >
+                                        Send feedback
+                                    </Button>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                    <div>
+                        <Button className="mr-6 md:mr-8" variant={"outline"}>Add more videos</Button>
+                    </div>
+                    <div className="flex items-center">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <a className="cursor-pointer grayscale">
+                                    <Avvvatars value={user_email} shadow={true} size={40} />
+                                </a>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 mr-8 mt-2">
+                                <DropdownMenuLabel>{user_email}</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem>
+                                        <Banknote className="mr-2 h-4 w-4" />
+                                        <span>{credits} videos</span>
+                                        {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <Gift className="mr-2 h-4 w-4" />
+                                        <span>Get $10 free</span>
+                                        {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <User className="mr-2 h-4 w-4" />
+                                        <span>Profile</span>
+                                        {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <CreditCard className="mr-2 h-4 w-4" />
+                                        <span>Billing</span>
+                                        {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
+                                    </DropdownMenuItem>
+                                    {/* <DropdownMenuItem>
                                     <Settings className="mr-2 h-4 w-4" />
                                     <span>Settings</span>
                                     <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                                 </DropdownMenuItem> */}
-                            </DropdownMenuGroup>
-                            <DropdownMenuItem onClick={() => handleSignOut()}>
-                                <LogOut className="mr-2 h-4 w-4" />
-                                <span>Log out</span>
-                                {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                </DropdownMenuGroup>
+                                <DropdownMenuItem onClick={() => handleSignOut()}>
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log out</span>
+                                    {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
             </div>
         </header>

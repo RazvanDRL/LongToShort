@@ -43,19 +43,19 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       throw new TypeError('user not found');
     }
 
-    const { data: video, error: videoError } = await supabaseAdmin
-      .from('metadata')
-      .select('id,user_id')
-      .eq('id', body.inputProps.video_id)
-      .single();
+    // const { data: video, error: videoError } = await supabaseAdmin
+    //   .from('metadata')
+    //   .select('id,user_id')
+    //   .eq('id', body.inputProps.video_id)
+    //   .single();
 
-    if (!video || videoError) {
-      throw new TypeError('video not found');
-    }
+    // if (!video || videoError) {
+    //   throw new TypeError('video not found');
+    // }
 
-    if (video.user_id !== user.id) {
-      throw new TypeError('unauthorized user');
-    }
+    // if (video.user_id !== user.id) {
+    //   throw new TypeError('unauthorized user');
+    // }
 
     // force width, force height from input props
     const result = await renderMediaOnLambda({
@@ -75,10 +75,11 @@ export const POST = executeApi<RenderMediaOnLambdaOutput, typeof RenderRequest>(
       },
       timeoutInMilliseconds: 1000 * 60 * 5,
       privacy: "public",
+      logLevel: "verbose",
       // deleteAfter: "1-day",
       // scale: 1,
       outName: {
-        key: `${user.id}/${video.id}.mp4`,
+        key: `${user.id}/${body.inputProps.video_id}.mp4`,
         bucketName: "output-bucket",
         s3OutputProvider: {
           endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID!}.r2.cloudflarestorage.com`,
