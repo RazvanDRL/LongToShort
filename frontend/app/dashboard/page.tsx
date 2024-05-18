@@ -32,7 +32,7 @@ type Video = {
 
 export default function Dashboard() {
     const router = useRouter();
-
+    
     const [isOpen, setIsOpen] = useState(true);
     const [user, setUser] = useState<User | null>(null);
     const [videos, setVideos] = useState<Video[] | null>(null);

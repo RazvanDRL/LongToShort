@@ -109,17 +109,10 @@ const shadowSizes: Record<ShadowSize, string> = {
 };
 
 export default function Project({ params }: { params: { id: string } }) {
-    const router = useRouter();
-    const [user, setUser] = useState<User | null>(null);
-    const [metadata, setMetadata] = useState<Metadata | null>(null);
-    const [video, setVideo] = useState<string | null>(localStorage.getItem(`videoUrl_${params.id}`));
-    const [uncompressedVideo, setUncompressedVideo] = useState<string | null>(null);
-    const [shouldRender, setShouldRender] = useState(false);
-    const [subtitles, setSubtitles] = useState<Subtitle[]>(localStorage.getItem(`subtitles_${params.id}`) ? JSON.parse(localStorage.getItem(`subtitles_${params.id}`)!) : []);
-    const [startTimeSlider, setStartTimeSlider] = useState(0);
-    const [endTimeSlider, setEndTimeSlider] = useState(0);
-    const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
-    const [font, setFont] = useState<Font>(localStorage.getItem(`font_${params.id}`) ? JSON.parse(localStorage.getItem(`font_${params.id}`)!) : {
+    const storedSubtitles = typeof window !== 'undefined' ? localStorage.getItem(`subtitles_${params.id}`) : null;
+    const storedFont = typeof window !== 'undefined' ? localStorage.getItem(`font_${params.id}`) : null;
+    const initialSubtitles = storedSubtitles ? JSON.parse(storedSubtitles) : [];
+    const initialFont = storedFont ? JSON.parse(storedFont) : {
         textColor: "#fff",
         fontSize: 30,
         fontFamily: Montserrat.style.fontFamily,
@@ -133,7 +126,19 @@ export default function Project({ params }: { params: { id: string } }) {
             strokeColor: "#000",
         },
         shadow: shadowSizes.None,
-    });
+    };
+
+    const router = useRouter();
+    const [user, setUser] = useState<User | null>(null);
+    const [metadata, setMetadata] = useState<Metadata | null>(null);
+    const [compressedVideo, setCompressedVideo] = useState<string | null>(null);
+    const [video, setVideo] = useState<string | null>(null);
+    const [shouldRender, setShouldRender] = useState(false);
+    const [subtitles, setSubtitles] = useState<Subtitle[]>(initialSubtitles);
+    const [startTimeSlider, setStartTimeSlider] = useState(0);
+    const [endTimeSlider, setEndTimeSlider] = useState(0);
+    const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
+    const [font, setFont] = useState<Font>(initialFont);
     const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
         return {
             subtitles,
@@ -202,7 +207,7 @@ export default function Project({ params }: { params: { id: string } }) {
 
     async function fetchVideo(metadata: Metadata | null) {
         try {
-            const response = await fetch(`/api/generate-signed-url`, {
+            const responseCompressed = await fetch(`/api/generate-signed-url`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -211,21 +216,13 @@ export default function Project({ params }: { params: { id: string } }) {
                 body: JSON.stringify({ key: `${params.id}-compressed.${metadata!.ext}`, bucket: 'upload-bucket' }),
             });
 
-            if (!response.ok) {
+            if (!responseCompressed.ok) {
                 throw new Error('Failed to fetch signed URL');
             }
 
-            const data = await response.json();
-            const unpreload = preloadVideo(data.url);
-            setVideo(data.url);
-            localStorage.setItem(`videoUrl_${params.id}`, data.url);
-        } catch (error) {
-            console.error('Error fetching video:', error);
-        }
-    }
-
-    async function fetchUncompressedVideo(metadata: Metadata | null) {
-        try {
+            const dataCompressed = await responseCompressed.json();
+            const unpreload = preloadVideo(dataCompressed.url);
+            setCompressedVideo(dataCompressed.url);
             const response = await fetch(`/api/generate-signed-url`, {
                 method: 'POST',
                 headers: {
@@ -240,11 +237,10 @@ export default function Project({ params }: { params: { id: string } }) {
             }
 
             const data = await response.json();
-            setUncompressedVideo(data.url);
+            setVideo(data.url);
         } catch (error) {
             console.error('Error fetching video:', error);
         }
-
     }
 
     async function fetchSubtitles() {
@@ -392,15 +388,13 @@ export default function Project({ params }: { params: { id: string } }) {
                     let metadata = await fetchMetadata();
                     if (metadata.processed === true) {
                         setShouldRender(true);
-                        if (!video)
-                            await fetchVideo(metadata);
+                        await fetchVideo(metadata);
                         await fetchSubtitles();
                         setFocusedSubtitleIndex(0);
                     }
                     else if (metadata.processed === false) {
                         router.replace(`/video/${params.id}`);
                     }
-                    await fetchUncompressedVideo(metadata);
                 }
                 catch (error: any) {
                     toast.error(error);
@@ -994,7 +988,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                         inputProps={{
                                             subtitles: subtitles,
                                             font: font,
-                                            video: video,
+                                            video: compressedVideo!,
                                             video_fps: metadata.fps!,
                                         }}
                                         durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
