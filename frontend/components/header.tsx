@@ -39,6 +39,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import Link from "next/link";
 
 export default function Header({ user_email }: { user_email: string }) {
     const router = useRouter();
@@ -147,7 +148,11 @@ export default function Header({ user_email }: { user_email: string }) {
                         </Popover>
                     </div>
                     <div>
-                        <Button className="mr-6 md:mr-8" variant={"outline"}>Add more videos</Button>
+                        <Button className="mr-6 md:mr-8" variant={"outline"} asChild>
+                            <Link href="/pricing">
+                                Add more videos
+                            </Link>
+                        </Button>
                     </div>
                     <div className="flex items-center">
                         <DropdownMenu>

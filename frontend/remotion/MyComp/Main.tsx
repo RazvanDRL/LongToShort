@@ -4,7 +4,8 @@ import {
   Sequence,
   useVideoConfig,
 } from "remotion";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
+import { loadFonts } from "../load-font";
 
 type Subtitle = {
   start: number;
@@ -40,11 +41,10 @@ export const Main: React.FC<{
 }> = ({ subtitles, font, video, video_fps }) => {
   const { fps } = useVideoConfig();
   video_fps = fps;
-
   const sequenceStyle: React.CSSProperties = useMemo(() => {
     return {
       color: font.textColor,
-      fontFamily: font.fontFamily,
+      fontFamily: font.fontName,
       justifyContent: "center",
       fontWeight: font.fontWeight,
       verticalPosition: font.verticalPosition,
@@ -101,12 +101,17 @@ export const Main: React.FC<{
     });
   }, [subtitles, font]);
 
+  useEffect(() => {
+    loadFonts();
+  }, [font]);
+
   return (
     <AbsoluteFill>
       <OffthreadVideo
         src={video!}
         volume={1}
         onError={(e) => console.error(e)}
+        pauseWhenBuffering={true}
       />
       {renderedSubtitles}
     </AbsoluteFill>

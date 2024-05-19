@@ -415,7 +415,6 @@ export default function Project({ params }: { params: { id: string } }) {
         );
     }
 
-
     return (
         <div className="container">
             <Toaster />
