@@ -3,14 +3,26 @@ import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Rating } from "flowbite-react";
+import Link from "next/link";
 import Image from "next/image";
 import localFont from 'next/font/local'
 import { Player } from "@remotion/player";
 import { Landing } from "@/remotion/MyComp/Landing";
 import { staticFile } from "remotion";
 import { motion } from 'framer-motion';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Label } from "@/components/ui/label"
+import { CircleCheck } from "lucide-react";
+import Footer from "@/components/footer";
 
-// Define the array of slides with numbers
 const slides = [
     { url: "/videos/1.mp4" },
     { url: "/videos/2.mp4" },
@@ -19,6 +31,55 @@ const slides = [
     { url: "/videos/5.mp4" },
     { url: "/videos/6.mp4" },
 ];
+
+const features = [
+    "AI Video Subtitles",
+    "No Watermark",
+    "Custom Branding",
+    "Custom Templates",
+    "Custom Fonts",
+    "Custom Colors",
+    "Custom Music",
+]
+
+const plans = [
+    {
+        title: "Starter",
+        description: "Starting in content creation",
+        paymentLink: "test_6oE5lkfHz0ZGes0000",
+        price: 20,
+        priceDescription: "One time",
+        features: [
+            "20 videos per month",
+            "5GB of storage",
+            "3 minutes / video",
+        ]
+    },
+    {
+        title: "Pro",
+        description: "For growing businesses",
+        paymentLink: "test_6oE5lkfHz0ZGes0000",
+        price: 50,
+        priceDescription: "One time",
+        features: [
+            "50 videos per month",
+            "10GB of storage",
+            "5 minutes / video",
+        ]
+    },
+    {
+        title: "Enterprise",
+        description: "For large businesses",
+        paymentLink: "test_6oE5lkfHz0ZGes0000",
+        price: 100,
+        priceDescription: "One time",
+        features: [
+            "100 videos per month",
+            "20GB of storage",
+            "10 minutes / video",
+        ]
+    },
+]
 
 const BricolageGrotesque = localFont({
     src: '../public/fonts/BricolageGrotesque.woff2',
@@ -102,15 +163,7 @@ export default function Home() {
                         +1
                     </div>
                 </div>
-                {/* Features */}
-                {/* <div className="container mt-16 grid grid-cols-2 w-2/3 gap-4">
-                    <div className="col-span-1 bg-green-500 p-16">
-                        <Image src="/kissing_heart.png" alt="emoji" height={64} width={64} />
-                        Negrul meu
-                    </div>
-                    <div className="col-span-1 bg-white p-16">
-                    </div>
-                </div> */}
+                {/* Bento grid */}
                 <div className="container mt-16 grid grid-cols-12 grid-rows-4 w-2/3 gap-8">
                     <div className="rounded-xl col-span-5 row-span-4 bg-transparent border border-neutral-700/80 p-8">
                         <h1 className="text-2xl font-bold text-white">Add subtitles to any video</h1>
@@ -201,8 +254,50 @@ export default function Home() {
                     </motion.div>
                 </div>
                 {/* Steps to take */}
+
                 {/* Pricing */}
+                <div className="w-full h-screen flex justify-center items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                        {plans.map((plan, index) => (
+                            <Card key={index} className={`w-[350px] ${plan.title === plans[1].title ? "border-blue-500/50" : ""}`}>
+                                <CardHeader>
+                                    <CardTitle className="mb-1">{plan.title}</CardTitle>
+                                    <CardDescription className="mb-8">{plan.description}</CardDescription>
+                                    <span className="pt-3 text-5xl font-bold">${plan.price}</span>
+                                    <CardDescription className="pb-2">{plan.priceDescription}</CardDescription>
+                                    <Button className="rounded-xl" asChild>
+                                        <Link href="/pricing">
+                                            Get Started
+                                        </Link>
+                                    </Button>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid w-full items-center gap-4 text-sm">
+                                        {plan.features.map((feature, index) => (
+                                            <span key={index}>
+                                                {feature}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                                <Separator className="w-[90%] mx-auto mb-4" />
+                                <CardFooter className="grid">
+                                    <Label className="text-lg mb-4">Features</Label>
+                                    <div className="grid w-full items-center gap-4 text-sm">
+                                        {features.map((feature, index) => (
+                                            <span key={index} className="flex items-center">
+                                                <CircleCheck className="mr-2 w-6 h-6 text-green-400" />
+                                                <span>{feature}</span>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
                 {/* Footer */}
+                <Footer />
             </div>
         </div >
     );

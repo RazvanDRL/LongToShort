@@ -40,11 +40,14 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import Link from "next/link";
+import Image from "next/image";
+import local from "next/font/local";
 
 export default function Header({ user_email }: { user_email: string }) {
     const router = useRouter();
     const [feedbackText, setFeedbackText] = useState("");
     const [credits, setCredits] = useState(0);
+    const [avatar, setAvatar] = useState(localStorage.getItem(`avatar_${user_email}`) || "");
     const pathname = usePathname();
 
     const handleSignOut = async () => {
@@ -87,17 +90,23 @@ export default function Header({ user_email }: { user_email: string }) {
     }
 
     async function getCredits() {
+        const id = (await supabase.auth.getUser()).data?.user?.id;
         const { data, error } = await supabase
             .from('profiles')
-            .select('credits')
-            .eq('id', (await supabase.auth.getUser()).data?.user?.id);
+            .select('credits,avatar')
+            .eq('id', id);
 
         if (error) {
             toast.error(error.message);
         }
 
-        if (data && data.length > 0 && data[0].credits) {
-            setCredits(Number(data[0].credits));
+        if (data && data.length > 0) {
+            if (data[0].avatar) {
+                setAvatar(data[0].avatar);
+                localStorage.setItem(`avatar_${user_email}`, data[0].avatar);
+            }
+            if (data[0].credits)
+                setCredits(Number(data[0].credits));
         }
     }
 
@@ -157,8 +166,12 @@ export default function Header({ user_email }: { user_email: string }) {
                     <div className="flex items-center">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <a className="cursor-pointer grayscale">
-                                    <Avvvatars value={user_email} shadow={true} size={40} />
+                                <a className="cursor-pointer">
+                                    {avatar !== "" ?
+                                        <Image src={avatar} alt="avatar" width={40} height={40} className="rounded-full" priority />
+                                        :
+                                        <Avvvatars value={user_email} shadow={true} size={40} />
+                                    }
                                 </a>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56 mr-8 mt-2">

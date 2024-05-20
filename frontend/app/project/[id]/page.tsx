@@ -285,6 +285,7 @@ export default function Project({ params }: { params: { id: string } }) {
     async function saveSettings() {
         localStorage.setItem(`font_${params.id}`, JSON.stringify(font));
         localStorage.setItem(`subtitles_${params.id}`, JSON.stringify(subtitles));
+        toast.success("Settings saved");
     }
 
     const handleSetStrokeSize = (size: StrokeSize) => {

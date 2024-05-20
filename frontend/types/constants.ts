@@ -16,6 +16,7 @@ export interface User {
   id: string;
   email: string;
   access_token: string;
+  avatar_url?: string;
 }
 
 export const Font = z.object({

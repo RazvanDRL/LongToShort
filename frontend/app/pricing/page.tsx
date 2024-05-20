@@ -67,7 +67,7 @@ const plans = [
     },
 ]
 
-export default function Home() {
+export default function Pricing() {
     const router = useRouter();
     const [shouldRender, setShouldRender] = useState(false);
     const [user, setUser] = useState<User | null>(null);
@@ -111,7 +111,6 @@ export default function Home() {
             </div>
         );
     }
-
 
     return (
         <div className="container">
