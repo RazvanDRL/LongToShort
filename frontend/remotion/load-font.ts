@@ -11,22 +11,22 @@ let loaded = false;
 let fonts: Font[] = [
     {
         name: 'Montserrat',
-        path: 'Montserrat.woff2',
+        path: '/fonts/Montserrat.woff2',
         weights: '100 900',
     },
     {
         name: 'TheBoldFont',
-        path: 'TheBoldFont.woff2',
+        path: '/fonts/TheBoldFont.woff2',
         weights: '100 900',
     },
     {
         name: 'Komika',
-        path: 'Komika.woff2',
+        path: '/fonts/Komika.woff2',
         weights: '100 900',
     },
     {
         name: 'Bangers',
-        path: 'Bangers.woff2',
+        path: '/fonts/Bangers.woff2',
         weights: '100 900',
     },
 ];

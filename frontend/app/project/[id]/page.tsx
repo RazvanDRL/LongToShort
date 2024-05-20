@@ -54,22 +54,22 @@ type Subtitle = {
 };
 
 const Komika = localFont({
-    src: '../../../public/Komika.woff2',
+    src: '../../../public/fonts/Komika.woff2',
     display: 'swap',
 })
 
 const Montserrat = localFont({
-    src: '../../../public/Montserrat.woff2',
+    src: '../../../public/fonts/Montserrat.woff2',
     display: 'swap',
 })
 
 const TheBoldFont = localFont({
-    src: '../../../public/TheBoldFont.woff2',
+    src: '../../../public/fonts/TheBoldFont.woff2',
     display: 'swap',
 })
 
 const Bangers = localFont({
-    src: '../../../public/Bangers.woff2',
+    src: '../../../public/fonts/Bangers.woff2',
     display: 'swap',
 })
 

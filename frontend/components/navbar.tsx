@@ -29,7 +29,10 @@ export default function Navbar() {
                 </div>
                 <div>
                     <Button asChild>
-                        <Link href="/dashboard">Dashboard</Link>
+                        <Link href="/dashboard">Login</Link>
+                    </Button>
+                    <Button asChild className="ml-4">
+                        <Link href="/signup">Sign up</Link>
                     </Button>
                 </div>
             </div>
