@@ -317,8 +317,8 @@ export default function Video({ params }: { params: { id: string } }) {
             <Toaster richColors />
 
             {user ? <Header user_email={user.email} /> : null}
-            <main className="flex justify-center items-center mt-24">
-                <div className="flex justify-center items-center flex-col">
+            <main className="w-full h-screen flex justify-center items-center">
+                <div>
                     <div className="flex justify-between items-center w-full">
                         <div>
                             {
@@ -352,7 +352,7 @@ export default function Video({ params }: { params: { id: string } }) {
                     <div className="px-2 mx-auto bg-[#15171d] w-[90vw] h-[360px] md:h-[500px] md:w-[800px] rounded-2xl">
                         <div className="px-4 py-6 md:px-8 md:py-10 font-mono font-medium text-base md:text-2xl">
                             <span>
-                                Fetching video <span className="text-blue-400">{shortenFileName(metadata?.name!)}.{metadata?.ext}</span>
+                                Fetched video <span className="text-blue-400">{shortenFileName(metadata?.name!)}.{metadata?.ext}</span>
                             </span>
                             <br /><br />
                             {status !== "" ?

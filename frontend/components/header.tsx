@@ -168,7 +168,7 @@ export default function Header({ user_email }: { user_email: string }) {
                             <DropdownMenuTrigger asChild>
                                 <a className="cursor-pointer">
                                     {avatar !== "" ?
-                                        <Image src={avatar} alt="avatar" width={40} height={40} className="rounded-full" priority />
+                                        <Image src={avatar} alt="avatar" width={40} height={40} className="rounded-full w-[40px] h-[40px]" priority />
                                         :
                                         <Avvvatars value={user_email} shadow={true} size={40} />
                                     }

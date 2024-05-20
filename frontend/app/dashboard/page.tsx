@@ -32,7 +32,7 @@ type Video = {
 
 export default function Dashboard() {
     const router = useRouter();
-    
+
     const [isOpen, setIsOpen] = useState(true);
     const [user, setUser] = useState<User | null>(null);
     const [videos, setVideos] = useState<Video[] | null>(null);
@@ -332,125 +332,127 @@ export default function Dashboard() {
             <Toaster richColors />
 
             {user ? <Header user_email={user.email} /> : null}
-            <main className="mt-20 md:mt-36 justify-center items-center">
-                <div className="flex flex-col items-center max-w-700px min-w-700px"
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                >
-                    <form className="px-4 mt-8" onSubmit={handleSubmitFile}>
-                        <label
-                            htmlFor="fileInput"
-                            className="relative flex justify-center items-center cursor-pointer font-medium text-white/65 border border-white/65 border-dashed py-5 px-20 rounded-lg overflow-hidden"
-                        >
-                            {!files?.name ? "Choose a file (MP4), or drag it here" : shortenFileName(files?.name)}
-                            <div className="absolute right-8 text-white opacity-65">
-                                {files?.name ?
-                                    <span
-                                        className="cursor-pointer"
-                                        onClick={() => {
-                                            if (uploadState === "uploading") return;
-                                            setFiles(undefined)
-                                        }}>
-                                        <XCircle />
-                                    </span>
-                                    :
-                                    ""}
-                            </div>
-                        </label>
-
-                        <input
-                            id="fileInput"
-                            className="hidden"
-                            type="file"
-                            onChange={handleFileChange}
-                            accept="video/mp4"
-                            disabled={uploadState === "uploading"}
-                        />
-                        {uploadState === "uploading" ?
-                            <div>
-                                <Button
-                                    disabled
-                                    className='w-full mt-8'
-                                >
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Uploading...
-                                </Button>
-                            </div>
-                            :
-                            <Button
-                                type="submit"
-                                className="w-full mt-8"
-                                disabled={!files}
+            <main className="w-full h-screen flex justify-center items-center">
+                <div>
+                    <div className="flex flex-col items-center max-w-700px min-w-700px"
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                    >
+                        <form className="px-4 mt-8" onSubmit={handleSubmitFile}>
+                            <label
+                                htmlFor="fileInput"
+                                className="relative flex justify-center items-center cursor-pointer font-medium text-white/65 border border-white/65 border-dashed py-5 px-20 rounded-lg overflow-hidden"
                             >
-                                Upload
-                            </Button>
-                        }
-                    </form>
-
-                </div>
-                <div className="mt-20 md:mt-28 flex flex-col-1 justify-center items-center w-[70%] mx-auto">
-                    <div>
-                        {videos !== null && videos.length > 0 ? (
-                            <Collapsible
-                                open={isOpen}
-                                onOpenChange={setIsOpen}
-                                className="w-[335px] md:w-[400px] space-y-2"
-                            >
-                                <div className="flex items-center justify-between space-x-4 mb-0.5 pl-2">
-                                    <h4 className="text-sm font-semibold">
-                                        Your Videos
-                                    </h4>
-                                    <CollapsibleTrigger asChild className={videos.length > 1 ? "" : "hidden"}>
-                                        <Button variant="ghost" size="sm" className="w-9 p-0">
-                                            <ChevronsUpDown className="h-4 w-4" />
-                                            <span className="sr-only">Toggle</span>
-                                        </Button>
-                                    </CollapsibleTrigger>
+                                {!files?.name ? "Choose a file (MP4), or drag it here" : shortenFileName(files?.name)}
+                                <div className="absolute right-8 text-white opacity-65">
+                                    {files?.name ?
+                                        <span
+                                            className="cursor-pointer"
+                                            onClick={() => {
+                                                if (uploadState === "uploading") return;
+                                                setFiles(undefined)
+                                            }}>
+                                            <XCircle />
+                                        </span>
+                                        :
+                                        ""}
                                 </div>
-                                <a href={videos[0].processed ? `/project/${videos[0].id}` : `/video/${videos[0].id}`} className="">
-                                    <div className="rounded-md border px-4 py-3 font-mono text-sm flex justify-between">
-                                        <div className="flex">
-                                            <div className="flex">
-                                                {videos[0].processed ? <span className="mr-2">✅</span> : <span className="mr-2 animate-spin-slow">⏳</span>}
-                                            </div>
-                                            <div className="hover:underline hidden md:block">
-                                                {shortenFileName(videos[0].name) + "." + videos[0].ext}
-                                            </div>
-                                            <div className="hover:underline block md:hidden">
-                                                {shortenFileNamePhone(videos[0].name) + "." + videos[0].ext}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            {formatSeconds(Math.round(videos[0].duration))}
-                                        </div>
-                                    </div>
-                                </a>
-                                <CollapsibleContent className="space-y-2">
-                                    {videos?.slice(1, videos.length).map((video) => (
-                                        <a key={video.id} href={video.processed ? `/project/${video.id}` : `/video/${video.id}`} className="">
-                                            <div className="rounded-md border px-4 py-3 font-mono text-sm mt-2.5 flex justify-between">
-                                                <div className="flex">
-                                                    <div className="flex">
-                                                        {video.processed ? <span className="mr-2">✅</span> : <span className="animate-spin-slow mr-2">⏳</span>}
-                                                    </div>
-                                                    <div className="hover:underline hidden md:block">
-                                                        {shortenFileName(video.name) + "." + video.ext}
-                                                    </div>
-                                                    <div className="hover:underline block md:hidden">
-                                                        {shortenFileNamePhone(video.name) + "." + video.ext}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    {formatSeconds(Math.round(video.duration))}
-                                                </div>
-                                            </div>
-                                        </a>
-                                    ))}
-                                </CollapsibleContent>
+                            </label>
 
-                            </Collapsible>
-                        ) : null
-                        }
+                            <input
+                                id="fileInput"
+                                className="hidden"
+                                type="file"
+                                onChange={handleFileChange}
+                                accept="video/mp4"
+                                disabled={uploadState === "uploading"}
+                            />
+                            {uploadState === "uploading" ?
+                                <div>
+                                    <Button
+                                        disabled
+                                        className='w-full mt-8'
+                                    >
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Uploading...
+                                    </Button>
+                                </div>
+                                :
+                                <Button
+                                    type="submit"
+                                    className="w-full mt-8"
+                                    disabled={!files}
+                                >
+                                    Upload
+                                </Button>
+                            }
+                        </form>
+
+                    </div>
+                    <div className="mt-20 md:mt-28 flex flex-col-1 justify-center items-center w-[70%] mx-auto">
+                        <div>
+                            {videos !== null && videos.length > 0 ? (
+                                <Collapsible
+                                    open={isOpen}
+                                    onOpenChange={setIsOpen}
+                                    className="w-[335px] md:w-[400px] space-y-2"
+                                >
+                                    <div className="flex items-center justify-between space-x-4 mb-0.5 pl-2">
+                                        <h4 className="text-sm font-semibold">
+                                            Your Videos
+                                        </h4>
+                                        <CollapsibleTrigger asChild className={videos.length > 1 ? "" : "hidden"}>
+                                            <Button variant="ghost" size="sm" className="w-9 p-0">
+                                                <ChevronsUpDown className="h-4 w-4" />
+                                                <span className="sr-only">Toggle</span>
+                                            </Button>
+                                        </CollapsibleTrigger>
+                                    </div>
+                                    <a href={videos[0].processed ? `/project/${videos[0].id}` : `/video/${videos[0].id}`} className="">
+                                        <div className="rounded-md border px-4 py-3 font-mono text-sm flex justify-between">
+                                            <div className="flex">
+                                                <div className="flex">
+                                                    {videos[0].processed ? <span className="mr-2">✅</span> : <span className="mr-2 animate-spin-slow">⏳</span>}
+                                                </div>
+                                                <div className="hover:underline hidden md:block">
+                                                    {shortenFileName(videos[0].name) + "." + videos[0].ext}
+                                                </div>
+                                                <div className="hover:underline block md:hidden">
+                                                    {shortenFileNamePhone(videos[0].name) + "." + videos[0].ext}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                {formatSeconds(Math.round(videos[0].duration))}
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <CollapsibleContent className="space-y-2">
+                                        {videos?.slice(1, videos.length).map((video) => (
+                                            <a key={video.id} href={video.processed ? `/project/${video.id}` : `/video/${video.id}`} className="">
+                                                <div className="rounded-md border px-4 py-3 font-mono text-sm mt-2.5 flex justify-between">
+                                                    <div className="flex">
+                                                        <div className="flex">
+                                                            {video.processed ? <span className="mr-2">✅</span> : <span className="animate-spin-slow mr-2">⏳</span>}
+                                                        </div>
+                                                        <div className="hover:underline hidden md:block">
+                                                            {shortenFileName(video.name) + "." + video.ext}
+                                                        </div>
+                                                        <div className="hover:underline block md:hidden">
+                                                            {shortenFileNamePhone(video.name) + "." + video.ext}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        {formatSeconds(Math.round(video.duration))}
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        ))}
+                                    </CollapsibleContent>
+
+                                </Collapsible>
+                            ) : null
+                            }
+                        </div>
                     </div>
                 </div>
             </main >

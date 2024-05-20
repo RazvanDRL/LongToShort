@@ -420,7 +420,7 @@ export default function Project({ params }: { params: { id: string } }) {
         <div className="container">
             <Toaster />
             {user ? <Header user_email={user.email} /> : null}
-            <main className="flex justify-center items-center mt-24">
+            <main className="w-full h-screen flex justify-center items-center">
                 {metadata && (
                     <div className="flex justify-center items-center">
                         <div className="rounded-xl bg-transparent pr-2 mr-8 w-[500px] h-[698px] flex flex-col">

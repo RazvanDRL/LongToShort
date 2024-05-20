@@ -113,7 +113,7 @@ export default function Pricing() {
     }
 
     return (
-        <div className="container">
+        <div className="container mx-auto">
             {user ? <Header user_email={user.email} /> : null}
             <div className="w-full h-screen flex justify-center items-center">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
