@@ -9,11 +9,12 @@ export default function Navbar() {
         { name: "Home", link: "/" },
         { name: "About", link: "/about" },
         { name: "Contact", link: "/contact" },
+        { name: "Pricing", link: "/pricing"}
     ];
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-900">
-            <div className="flex justify-between items-center py-4 px-8 bg-transparent text-white max-w-screen-lg mx-auto">
+        <div className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-900 bg-black">
+            <div className="flex justify-between items-center py-4 px-8 bg-black text-white max-w-screen-lg mx-auto">
                 <div>
                     <Image src={Logo} alt="Logo" className="w-48 h-auto" />
                 </div>

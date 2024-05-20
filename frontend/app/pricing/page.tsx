@@ -116,7 +116,7 @@ export default function Home() {
     return (
         <div className="container">
             {user ? <Header user_email={user.email} /> : null}
-            <div className="relative w-full h-screen bg-black flex justify-center items-center">
+            <div className="w-full h-screen flex justify-center items-center">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     {plans.map((plan, index) => (
                         <Card key={index} className={`w-[350px] ${plan.title === plans[1].title ? "border-blue-500/50" : ""}`}>

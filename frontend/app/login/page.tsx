@@ -28,7 +28,6 @@ export default function Login() {
     } else {
       return redirect(data.url);
     }
-    redirect(`${origin}/dashboard`);
   };
 
   const loginTwitter = async () => {
@@ -47,7 +46,6 @@ export default function Login() {
     } else {
       return redirect(data.url);
     }
-    redirect(`${origin}/dashboard`);
   };
 
   const loginGithub = async () => {
@@ -66,7 +64,6 @@ export default function Login() {
     } else {
       return redirect(data.url);
     }
-    redirect(`${origin}/dashboard`);
   }
 
 

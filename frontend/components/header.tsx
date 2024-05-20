@@ -106,7 +106,7 @@ export default function Header({ user_email }: { user_email: string }) {
     }, []);
 
     return (
-        <header className="w-full">
+        <nav className="fixed top-0 left-0 right-0 z-10 container">
             <div className="sticky flex justify-between items-center py-8 sm:px-6 md:px-8">
                 <div className="flex justify-start items-center">
                     {pathname.split('/').length > 2 &&
@@ -201,6 +201,6 @@ export default function Header({ user_email }: { user_email: string }) {
                     </div>
                 </div>
             </div>
-        </header>
+        </nav>
     );
 }
