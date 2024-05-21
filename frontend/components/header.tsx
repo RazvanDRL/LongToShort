@@ -183,21 +183,22 @@ export default function Header({ user_email }: { user_email: string }) {
                                         <span>{credits} videos</span>
                                         {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem>
+                                    {/* <DropdownMenuItem>
                                         <Gift className="mr-2 h-4 w-4" />
                                         <span>Get $10 free</span>
-                                        {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
+                                        <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
                                         <User className="mr-2 h-4 w-4" />
                                         <span>Profile</span>
-                                        {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
+                                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
                                         <CreditCard className="mr-2 h-4 w-4" />
                                         <span>Billing</span>
-                                        {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
-                                    </DropdownMenuItem>
+                                        <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                                    </DropdownMenuItem> */}
+                                    
                                     {/* <DropdownMenuItem>
                                     <Settings className="mr-2 h-4 w-4" />
                                     <span>Settings</span>

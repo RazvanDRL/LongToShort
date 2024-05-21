@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation'
 
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronsUpDown } from "lucide-react"
+import { Loader2, ChevronsUpDown, Check } from "lucide-react"
 
 import {
     Collapsible,
@@ -251,8 +251,6 @@ export default function Dashboard() {
             toast.error(await response.text());
             setUploadState("error");
         }
-
-        setUploadState("idle");
     }
 
     async function handleRemoveVideo(video_id: string) {
@@ -373,7 +371,7 @@ export default function Dashboard() {
                                 accept="video/mp4"
                                 disabled={uploadState === "uploading"}
                             />
-                            {uploadState === "uploading" ?
+                            {uploadState === "uploading" ? (
                                 <div>
                                     <Button
                                         disabled
@@ -383,7 +381,22 @@ export default function Dashboard() {
                                         Uploading...
                                     </Button>
                                 </div>
-                                :
+                            ) : uploadState === "done" ? (
+                                <Button
+                                    className="w-full mt-8"
+                                    disabled
+                                >
+                                    <Check className="mr-2 h-4 w-4" />
+                                    Done
+                                </Button>
+                            ) : uploadState === "error" ? (
+                                <Button
+                                    className="w-full mt-8"
+                                    disabled
+                                >
+                                    Error
+                                </Button>
+                            ) : (
                                 <Button
                                     type="submit"
                                     className="w-full mt-8"
@@ -391,7 +404,8 @@ export default function Dashboard() {
                                 >
                                     Upload
                                 </Button>
-                            }
+                            )}
+
                         </form>
 
                     </div>

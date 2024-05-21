@@ -15,5 +15,8 @@
     "start": "wrangler dev",
     "test": "vitest",
     "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.2"
   }
 }

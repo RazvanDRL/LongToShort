@@ -14,7 +14,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Slider } from "@/components/ui/slider"
-import { FileVideo, ListPlus, Save, Server, Trash2 } from "lucide-react";
+import { Check, FileVideo, ListPlus, Save, Server, Trash2 } from "lucide-react";
 import {
     Menubar,
     MenubarMenu,
@@ -46,6 +46,7 @@ import { useRendering } from "../../../helpers/use-rendering";
 import { Loader2 } from "lucide-react";
 import type { Metadata, User } from "../../../types/constants";
 import { preloadVideo } from "@remotion/preload";
+import Link from "next/link";
 
 type Subtitle = {
     start: number;
@@ -913,15 +914,15 @@ export default function Project({ params }: { params: { id: string } }) {
                         <div className="flex flex-col items-end">
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    {state.status !== "rendering" ?
-                                        <Button className="mb-4" variant="outline">
-                                            <FileVideo className="mr-2 h-4 w-4" />
-                                            Export video
-                                        </Button>
-                                        :
+                                    {state.status === "rendering" ?
                                         <Button className="mb-4" variant="outline">
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                             Rendering
+                                        </Button>
+                                        :
+                                        <Button className="mb-4" variant="outline">
+                                            <FileVideo className="mr-2 h-4 w-4" />
+                                            Export video
                                         </Button>
                                     }
                                 </DialogTrigger>
@@ -943,7 +944,8 @@ export default function Project({ params }: { params: { id: string } }) {
                                         <div>
                                             {state.status === "init" ||
                                                 state.status === "invoking" ||
-                                                state.status === "error" ? (
+                                                state.status === "error" ||
+                                                state.status === "done" ? (
                                                 <>
                                                     {state.status === "invoking" ?
                                                         (
@@ -954,12 +956,22 @@ export default function Project({ params }: { params: { id: string } }) {
 
                                                         ) :
                                                         (
-                                                            <Button
-                                                                onClick={renderMedia}
-                                                            >
-                                                                <Server className="mr-2 h-4 w-4" />
-                                                                Render video
-                                                            </Button>
+                                                            state.status === "done" ?
+                                                                <Button
+                                                                    asChild
+                                                                >
+                                                                    <Link href={`/export/${params.id}`}>
+                                                                        <Check className="mr-2 h-4 w-4" />
+                                                                        Done rendering
+                                                                    </Link>
+                                                                </Button>
+                                                                :
+                                                                <Button
+                                                                    onClick={renderMedia}
+                                                                >
+                                                                    <Server className="mr-2 h-4 w-4" />
+                                                                    Render video
+                                                                </Button>
                                                         )
                                                     }
                                                 </>

@@ -393,8 +393,8 @@ export default function Export({ params }: { params: { id: string } }) {
                                         <div className="w-4" /> {/* Spacer */}
                                         <Button
                                             onClick={() => {
-                                                navigator.clipboard.writeText(video);
-                                                toast.success('Link copied - available for 24 hours');
+                                                navigator.clipboard.writeText(window.location.href);
+                                                toast.success('Link to this page copied');
                                             }}
                                             className="w-[48%]"
                                             variant={"outline"}

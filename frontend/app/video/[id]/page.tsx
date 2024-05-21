@@ -30,6 +30,7 @@ export default function Video({ params }: { params: { id: string } }) {
     const router = useRouter();
 
     const [user, setUser] = useState<User | null>(null);
+    const [video, setVideo] = useState<string | null>(null);
     const [metadata, setMetadata] = useState<Metadata | null>(null);
     const [queuePos, setQueuePos] = useState<QueuePos | null>(null);
     const [estimatedTime, setEstimatedTime] = useState<number>(0);
@@ -187,6 +188,8 @@ export default function Video({ params }: { params: { id: string } }) {
                 created_at: data.created_at,
                 name: data.name,
                 duration: data.duration,
+                width: data.width,
+                height: data.height,
                 processed: data.processed,
                 ext: data.ext,
             });
@@ -271,6 +274,29 @@ export default function Video({ params }: { params: { id: string } }) {
         return name;
     }
 
+    async function fetchVideo() {
+        try {
+            const response = await fetch(`/api/generate-signed-url`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user?.access_token}`,
+                },
+                body: JSON.stringify({ key: `${params.id}.mp4`, bucket: 'upload-bucket' }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch signed URL');
+            }
+
+            const data = await response.json();
+            console.log(data.url);
+            setVideo(data.url);
+        } catch (error) {
+            console.error('Error fetching video:', error);
+        }
+    }
+
     useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
@@ -279,6 +305,7 @@ export default function Video({ params }: { params: { id: string } }) {
                 try {
                     let metadata = await fetchMetadata();
                     if (metadata.processed === false) {
+                        await fetchVideo();
                         await queuePosition(metadata);
                         await fetchProcessingData();
                         setShouldRender(true);
@@ -307,6 +334,27 @@ export default function Video({ params }: { params: { id: string } }) {
         }
     }, [processing, startTime]);
 
+    function aspectRatio(width: number, height: number) {
+        const ratio = width / height;
+        switch (ratio) {
+            case 16 / 9:
+                return { width: 640, height: 360 };
+            case 4 / 3:
+                return { width: 640, height: 480 };
+            case 5 / 4:
+                return { width: 640, height: 512 };
+            case 1:
+                return { width: 640, height: 640 };
+            case 4 / 5:
+                return { width: 512, height: 640 };
+            case 9 / 16:
+                return { width: 360, height: 640 };
+            case 3 / 4:
+                return { width: 480, height: 640 };
+            default: return { width: 360, height: 640 };
+        }
+    }
+
     if (!shouldRender) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -323,72 +371,80 @@ export default function Video({ params }: { params: { id: string } }) {
 
             {user ? <Header user_email={user.email} /> : null}
             <main className="w-full h-screen flex justify-center items-center">
-                <div>
-                    <div className="flex justify-between items-center w-full">
-                        <div>
-                            {
-                                status !== "" ? (
-                                    <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={(status === 'succeeded' || status === 'done') && elapsedTime > 0 ? `Status: ${status}` : `Status: ${status} - ${formatTime(elapsedTime)}`} color={statusData(status!)} />
-                                ) : null
-                            }
+                {status !== "" ?
+                    < div >
+                        <div className="flex justify-between items-center w-full">
+                            <div>
+                                {
+                                    status !== "" ? (
+                                        <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={(status === 'succeeded' || status === 'done') && elapsedTime > 0 ? `Status: ${status}` : `Status: ${status} - ${formatTime(elapsedTime)}`} color={statusData(status!)} />
+                                    ) : null
+                                }
+                            </div>
+                            <div>
+                                {
+                                    status === "done" || status === "succeeded" ? (
+                                        <Button asChild variant="outline" className="mb-3 font-medium md:mb-6 md:text-base md:px-8 md:py-6">
+                                            <Link href={`/project/${params.id}`}>
+                                                <ExternalLink className="mr-2 h-4 w-4 md:h-5 md:w-5" />
+                                                Go to project
+                                            </Link>
+                                        </Button>
+                                    ) : null
+                                }
+                            </div>
                         </div>
-                        <div>
-                            {
-                                status === "" ? (
-                                    <Button className="mb-3 font-medium md:mb-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
-                                        <Sparkles className="mr-2 h-5 w-5" />
-                                        Process video
-                                    </Button>
-                                ) : null
-                            }
-
-                            {
-                                status === "done" || status === "succeeded" ? (
-                                    <Button asChild variant="outline" className="mb-3 font-medium md:mb-6 md:text-base md:px-8 md:py-6">
-                                        <Link href={`/project/${params.id}`}>
-                                            <ExternalLink className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                                            Go to project
-                                        </Link>
-                                    </Button>
-                                ) : null
-                            }
-                        </div>
-                    </div>
-                    <div className="px-2 mx-auto bg-[#15171d] w-[90vw] h-[360px] md:h-[500px] md:w-[800px] rounded-2xl">
-                        <div className="px-4 py-6 md:px-8 md:py-10 font-mono font-medium text-base md:text-2xl">
-                            <span>
-                                Fetched video <span className="text-blue-400">{shortenFileName(metadata?.name!)}.{metadata?.ext}</span>
-                            </span>
-                            <br /><br />
-                            {status !== "" ?
-                                (
-                                    <div>
-                                        <span>
-                                            Queue position &rarr; <span className="text-yellow-400">{queuePos?.position}</span>
-                                        </span>
-                                        <br /><br />
-                                    </div>
-                                ) :
-                                null
-                            }
-                            <span>
-                                Estimated waiting time ~ <span className="text-green-400">{formatTime(estimatedTime)}</span>
-                            </span>
-                            <br /><br />
-                            <span>
-                                Estimated processing time ~ <span className="text-green-400">{queuePos?.processing_time}</span>
-                            </span>
-                            <br /><br />
-                            <span>
-                                Estimated cost ~ <span className="text-green-400">${(Number(queuePos?.estimated_cost) * 100).toFixed(2)}</span>
-                            </span>
-                            <br /><br />
-                            <span>
-                                You can safely leave this page, we will notify you by <span className="text-indigo-400">email</span> when your video is ready.
-                            </span>
+                        <div className="px-2 mx-auto bg-[#15171d] w-[90vw] h-[360px] md:h-[475px] md:w-[800px] rounded-2xl">
+                            <div className="px-4 py-6 md:px-8 md:py-10 font-mono font-medium text-base md:text-2xl">
+                                <span>
+                                    Fetched video <span className="text-blue-400">{shortenFileName(metadata?.name!)}.{metadata?.ext}</span>
+                                </span>
+                                <br /><br />
+                                {status !== "" ?
+                                    (
+                                        <div>
+                                            <span>
+                                                Queue position &rarr; <span className="text-yellow-400">{queuePos?.position}</span>
+                                            </span>
+                                            <br /><br />
+                                        </div>
+                                    ) :
+                                    null
+                                }
+                                <span>
+                                    Estimated waiting time ~ <span className="text-green-400">{formatTime(estimatedTime)}</span>
+                                </span>
+                                <br /><br />
+                                <span>
+                                    Estimated processing time ~ <span className="text-green-400">{queuePos?.processing_time}</span>
+                                </span>
+                                <br /><br />
+                                <span>
+                                    Estimated cost ~ <span className="text-green-400">${(Number(queuePos?.estimated_cost) * 100).toFixed(2)}</span>
+                                </span>
+                                <br /><br />
+                                <span>
+                                    You can safely leave this page, we will notify you by <span className="text-indigo-400">email</span> when your video is ready.
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    :
+                    <div className="flex justify-center items-center w-full h-full">
+                        <div className="flex flex-col justify-center items-center">
+                            <div className="mr-auto mb-2 font-medium">{metadata?.name}.{metadata?.ext}</div>
+                            <video src={video!} controls className="rounded-xl"
+                                style={{
+                                    width: aspectRatio(metadata!.width!, metadata!.height!).width,
+                                    height: aspectRatio(metadata!.width!, metadata!.height!).height,
+                                }} />
+                            <Button className="mt-3 font-medium md:mt-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
+                                <Sparkles className="mr-2 h-5 w-5" />
+                                Process video
+                            </Button>
+                        </div>
+                    </div>
+                }
             </main >
         </div >
     );
