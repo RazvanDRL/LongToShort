@@ -82,6 +82,7 @@ export default function Login() {
         </div>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <Image src="/longtoshort.svg" alt="LongtoShort Logo" className="mx-auto mb-24" width={256} height={256} />
             <form action={loginGoogle}>
               <Button
                 variant="outline"
@@ -119,7 +120,7 @@ export default function Login() {
               >
                 <div className="flex items-center justify-center mr-2.5">
                   <Image
-                    className="h-5 w-5 dark:invert"
+                    className="h-5 w-5 dark:invert "
                     src={Github}
                     alt="Github Logo"
                   />
@@ -127,7 +128,6 @@ export default function Login() {
                 Sign in with Github
               </Button>
             </form>
-
             <p className="mt-10 text-left text-xs text-gray-400">
               By signing in, you agree to our <span className='hover:underline text-sky-500'>Terms of Service</span> and <span className="hover:underline text-sky-500">Privacy Policy</span>.
             </p>
