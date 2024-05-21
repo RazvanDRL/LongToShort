@@ -90,7 +90,7 @@ export default function Export({ params }: { params: { id: string } }) {
             return true;
         }
     }
-    
+
     async function fetchMetadata() {
         const { data, error } = await supabase
             .from('metadata')

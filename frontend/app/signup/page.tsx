@@ -73,7 +73,7 @@ export default function SignUp() {
 
       <div className='flex justify-center items-center h-screen'>
         <div className="absolute top-0 left-0 m-7">
-          <Button variant="link">
+          <Button variant="link" asChild>
             <Link href="/">
               <ArrowLeft className="w-4 mr-1" aria-hidden="true" />
               Home

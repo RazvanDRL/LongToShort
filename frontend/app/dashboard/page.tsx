@@ -321,7 +321,7 @@ export default function Dashboard() {
             }
         };
         runPrecheck();
-    }, [user]);
+    }, [user?.id]);
 
     if (!shouldRender) {
         return <div className="bg-[#ec2626] z-50 w-screen h-screen"></div>;
