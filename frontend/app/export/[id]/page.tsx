@@ -26,6 +26,7 @@ import {
     Captions,
     ThumbsDown,
     Heart,
+    Loader2,
 } from "lucide-react"
 
 import React, { useEffect, useState } from 'react';
@@ -221,6 +222,51 @@ export default function Export({ params }: { params: { id: string } }) {
         }
     }
 
+    async function convertSRT(subtitleData: any) {
+        try {
+            let i: number = 1;
+            let srtData = '';
+
+            for (const subtitle of subtitleData) {
+                for (const wordObj of subtitle.words) {
+                    const startTime = isNaN(wordObj.start) ? 0 : wordObj.start;
+                    const endTime = isNaN(wordObj.end) ? 0 : wordObj.end;
+                    const word = wordObj.word;
+                    srtData += `${i}\n${formatTime(startTime)} --> ${formatTime(endTime)}\n${word}\n\n`;
+                    i++;
+                }
+            }
+
+            return srtData;
+        } catch (error) {
+            console.error('Error occurred while parsing the JSON:', error);
+        }
+    }
+
+    function formatTime(timeInSeconds: number) {
+        const hours = Math.floor(timeInSeconds / 3600);
+        const minutes = Math.floor((timeInSeconds % 3600) / 60);
+        const seconds = Math.floor(timeInSeconds % 60);
+        const milliseconds = Math.round((timeInSeconds - Math.floor(timeInSeconds)) * 1000);
+
+        return `${padZeroes(hours)}:${padZeroes(minutes)}:${padZeroes(seconds)},${padZeroes(milliseconds, 3)}`;
+    }
+
+    function padZeroes(number: number, width = 2) {
+        return String(number).padStart(width, '0');
+    }
+
+    async function downloadSRT(subtitleData: any) {
+        const srtContent = await convertSRT(subtitleData);
+        const blob = new Blob([srtContent!], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'subtitles.srt';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
     useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
@@ -248,7 +294,13 @@ export default function Export({ params }: { params: { id: string } }) {
     }, [user?.id]);
 
     if (!shouldRender) {
-        return <div className="bg-[#ec2626] z-50 w-screen h-screen"></div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="bg-[#0a0a0a] z-50 w-16 h-16 flex justify-center items-center">
+                    <Loader2 className="relative animate-spin w-16 h-16 text-primary" />
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -256,72 +308,11 @@ export default function Export({ params }: { params: { id: string } }) {
             <Toaster richColors />
 
             {user ? <Header user_email={user.email} /> : null}
-            <main className="flex justify-center items-center mt-24">
+            <main className="w-full h-screen flex justify-center items-center">
                 <div className="flex justify-center items-center flex-col">
                     {shouldRender && video && (
                         <div>
-                            <div>
-                                <div className="flex justify-between">
-                                    <div>
-                                        <div className="rounded-lg bg-gray-800/50 p-2">
-                                            <video
-                                                src={video}
-                                                controls
-                                                className="max-h-[500px] rounded-lg"
-                                            />
-                                        </div>
-                                        <Button asChild className="w-full mt-6">
-                                            <Link href={video}>
-                                                <Download className="mr-2 h-4 w-4" /> Download Video
-                                            </Link>
-                                        </Button>
-                                        <div className="mt-4 w-full flex justify-between">
-                                            <Button
-                                                onClick={() => {
-                                                    // Create a Blob from the video URL
-                                                    // fetch(subtitles)
-                                                    //     .then(response => response.blob())
-                                                    //     .then(blob => {
-                                                    //         // Create a temporary URL for the Blob
-                                                    //         const blobUrl = URL.createObjectURL(blob);
-                                                    //         // Create a temporary anchor element
-                                                    //         const link = document.createElement('a');
-                                                    //         link.href = blobUrl;
-                                                    //         // process metadata.name to remove.mp4 extenison
-                                                    //         const fileName = metadata?.name.replace('.mp4', '.srt');
-                                                    //         link.download = `${fileName}`; // Set the default download filename
-                                                    //         document.body.appendChild(link);
-                                                    //         link.click();
-                                                    //         // Remove the temporary URL and anchor element
-                                                    //         URL.revokeObjectURL(blobUrl);
-                                                    //         document.body.removeChild(link);
-                                                    //         toast.success('Subtitles downloaded');
-                                                    //     })
-                                                    //     .catch(error => {
-                                                    //         console.error('Error downloading subtitles:', error);
-                                                    //         toast.error('Error downloading subtitles');
-                                                    //     });
-                                                }}
-                                                className="w-[48%]" // Adjust width to your preference
-                                            >
-                                                <Captions className="mr-2 h-4 w-4" /> Subtitles
-                                            </Button>
-                                            <div className="w-4" /> {/* Spacer */}
-                                            <Button
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(video);
-                                                    toast.success('Link copied - available for 24 hours');
-                                                }}
-                                                className="w-[48%]" // Adjust width to your preference
-                                            >
-                                                <Share2 className="mr-2 h-4 w-4" /> Copy link
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* Rating */}
-                            <div className="flex gap-3">
+                            <div className="flex gap-3 mb-6">
                                 <Heart
                                     className={`cursor-pointer mt-4 h-8 w-8 ${positiveClicked ? 'text-red-600 scale-110' : 'text-red-700 hover:text-red-600 hover:scale-110'
                                         }`}
@@ -376,6 +367,42 @@ export default function Export({ params }: { params: { id: string } }) {
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
+                            </div>
+                            <div className="flex justify-between">
+                                <div>
+                                    <div className="rounded-lg bg-neutral-800/20 p-2">
+                                        <video
+                                            src={video}
+                                            controls
+                                            className="max-h-[500px] rounded-lg"
+                                        />
+                                    </div>
+                                    <Button asChild className="w-full mt-6" variant={"outline"}>
+                                        <Link href={video}>
+                                            <Download className="mr-2 h-4 w-4" /> Download Video
+                                        </Link>
+                                    </Button>
+                                    <div className="mt-4 w-full flex justify-between">
+                                        <Button
+                                            onClick={() => downloadSRT(JSON.parse(subtitles!))}
+                                            className="w-[48%]"
+                                            variant={"outline"}
+                                        >
+                                            <Captions className="mr-2 h-4 w-4" /> Subtitles
+                                        </Button>
+                                        <div className="w-4" /> {/* Spacer */}
+                                        <Button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(video);
+                                                toast.success('Link copied - available for 24 hours');
+                                            }}
+                                            className="w-[48%]"
+                                            variant={"outline"}
+                                        >
+                                            <Share2 className="mr-2 h-4 w-4" /> Copy link
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}

@@ -324,7 +324,13 @@ export default function Dashboard() {
     }, [user?.id]);
 
     if (!shouldRender) {
-        return <div className="bg-[#ec2626] z-50 w-screen h-screen"></div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="bg-[#0a0a0a] z-50 w-16 h-16 flex justify-center items-center">
+                    <Loader2 className="relative animate-spin w-16 h-16 text-primary" />
+                </div>
+            </div>
+        );
     }
 
     return (
