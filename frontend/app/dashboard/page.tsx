@@ -93,7 +93,7 @@ export default function Dashboard() {
             return false;
         }
         else {
-            router.push("/login");
+            router.replace("/login");
             return true;
         }
     }

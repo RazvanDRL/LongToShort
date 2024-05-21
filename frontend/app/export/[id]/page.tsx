@@ -87,7 +87,7 @@ export default function Export({ params }: { params: { id: string } }) {
             return false;
         }
         else {
-            router.push("/login");
+            router.replace("/login");
             return true;
         }
     }

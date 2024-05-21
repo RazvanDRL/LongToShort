@@ -85,7 +85,7 @@ export default function Pricing() {
             return false;
         }
         else {
-            router.push("/login");
+            router.replace("/login");
             return true;
         }
     }

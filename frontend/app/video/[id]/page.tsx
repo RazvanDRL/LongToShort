@@ -53,11 +53,11 @@ export default function Video({ params }: { params: { id: string } }) {
             return false;
         }
         else {
-            router.push("/login");
+            router.replace("/login");
             return true;
         }
     }
-    
+
     supabase
         .channel('processing-queue-update-channel')
         .on(
