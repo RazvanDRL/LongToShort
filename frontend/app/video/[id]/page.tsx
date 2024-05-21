@@ -14,6 +14,7 @@ import {
     Loader,
     Loader2,
     Sparkles,
+    VideoIcon,
 } from "lucide-react"
 
 import React, { useEffect, useState } from 'react';
@@ -432,7 +433,10 @@ export default function Video({ params }: { params: { id: string } }) {
                     :
                     <div className="flex justify-center items-center w-full h-full">
                         <div className="flex flex-col justify-center items-center">
-                            <div className="mr-auto mb-2 font-medium">{metadata?.name}.{metadata?.ext}</div>
+                            <div className="mr-auto mb-2 font-medium flex items-center justify-center">
+                                <VideoIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                                {metadata?.name}.{metadata?.ext}
+                            </div>
                             <video src={video!} controls className="rounded-xl"
                                 style={{
                                     width: aspectRatio(metadata!.width!, metadata!.height!).width,
