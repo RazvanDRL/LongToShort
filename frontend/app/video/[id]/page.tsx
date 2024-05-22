@@ -65,7 +65,7 @@ export default function Video({ params }: { params: { id: string } }) {
         .on(
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'processing_queue' },
-            async (payload) => {
+            async (payload: any) => {
                 if (payload.new.video_id == params.id) {
                     const s = payload.new.status;
                     setStatus(s);

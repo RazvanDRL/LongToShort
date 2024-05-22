@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
                     .on(
                         'postgres_changes',
                         { event: 'UPDATE', schema: 'public', table: 'metadata' },
-                        (payload) => {
+                        (payload: any) => {
                             if (payload.new.id === id && payload.new.processed) {
                                 sendEvent({ type: 'video-processed', videoId: id });
                             }

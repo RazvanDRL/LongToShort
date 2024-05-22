@@ -10,20 +10,19 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@supabase/supabase-js';
 
 interface Env {
 	MY_BUCKET: R2Bucket;
 	AUTH_SECRET: string;
-	SUPABASE_URL: string;
-	SUPABASE_KEY: string;
+	// SUPABASE_URL: string;
+	// SUPABASE_KEY: string;
 }
 
 export default {
 	async fetch(request, env): Promise<Response> {
 		// Note that you could require authentication for all requests
 		// by moving this code to the top of the fetch function.
-		const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
 		const auth = request.headers.get('Authorization');
 		const expectedAuth = `Bearer ${env.AUTH_SECRET}`;
 
@@ -34,13 +33,15 @@ export default {
 		const url = new URL(request.url);
 		const key = url.pathname.slice(1);
 
+		// const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
+
 		if (request.method === 'PUT') {
 			await env.MY_BUCKET.put(key, request.body);
-			await supabase
-				.from("profiles")
-				.select("credits")
-				.eq('id', key.split('/')[0])
-				.single();
+			// await supabase
+			// 	.from("profiles")
+			// 	.select("credits")
+			// 	.eq('id', key.split('/')[0])
+			// 	.single();
 
 
 			return new Response(`Object ${key} uploaded successfully!`);
