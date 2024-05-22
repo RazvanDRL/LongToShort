@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/popover"
 import { Slider } from "@/components/ui/slider"
 import { Check, FileVideo, ListPlus, Save, Server, Trash2 } from "lucide-react";
+
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 import {
     Menubar,
     MenubarMenu,
@@ -423,8 +425,8 @@ export default function Project({ params }: { params: { id: string } }) {
             {user ? <Header user_email={user.email} /> : null}
             <main className="w-full h-screen flex justify-center items-center">
                 {metadata && (
-                    <div className="flex justify-center items-center">
-                        <div className="rounded-xl bg-transparent pr-2 mr-8 w-[500px] h-[698px] flex flex-col">
+                    <div className="flex justify-center items-center flex-col-reverse md:flex-row">
+                        <div className="rounded-xl bg-transparent md:pr-2 md:mr-8 w-[500px] h-[698px] flex flex-col">
                             <Tabs defaultValue="style" className="w-full">
                                 <TabsList className="mb-2.5">
                                     <TabsTrigger value="style">Style</TabsTrigger>
@@ -911,9 +913,9 @@ export default function Project({ params }: { params: { id: string } }) {
                                 )}
                             </Tabs>
                         </div>
-                        <div className="flex flex-col items-end">
+                        <div className="flex flex-col items-center">
                             <Dialog>
-                                <DialogTrigger asChild>
+                                <DialogTrigger className="ml-auto" asChild>
                                     {state.status === "rendering" ?
                                         <Button className="mb-4" variant="outline">
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -989,27 +991,25 @@ export default function Project({ params }: { params: { id: string } }) {
                                 </DialogContent>
                             </Dialog>
                             {video ?
-                                <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
-                                    <Player
-                                        className="rounded-xl z-50"
-                                        style={{
-                                            width: aspectRatio(metadata.width!, metadata.height!).width,
-                                            height: aspectRatio(metadata.width!, metadata.height!).height,
-                                        }}
-                                        component={Main}
-                                        inputProps={{
-                                            subtitles: subtitles,
-                                            font: font,
-                                            video: compressedVideo!,
-                                            video_fps: metadata.fps!,
-                                        }}
-                                        durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
-                                        compositionWidth={metadata.width!}
-                                        compositionHeight={metadata.height!}
-                                        fps={metadata.fps || 30}
-                                        controls
-                                    />
-                                </div>
+                                <Player
+                                    className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800 z-50 aspect-auto max-h-[50vh]"
+                                    component={Main}
+                                    style={{
+                                        width: aspectRatio(metadata.width!, metadata.height!).width,
+                                        height: aspectRatio(metadata.width!, metadata.height!).height,
+                                    }}
+                                    inputProps={{
+                                        subtitles: subtitles,
+                                        font: font,
+                                        video: compressedVideo!,
+                                        video_fps: metadata.fps!,
+                                    }}
+                                    durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
+                                    compositionWidth={metadata.width!}
+                                    compositionHeight={metadata.height!}
+                                    fps={metadata.fps || 30}
+                                    controls
+                                />
                                 :
                                 <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
                                     <div
