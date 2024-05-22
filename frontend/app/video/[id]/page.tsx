@@ -74,29 +74,6 @@ export default function Video({ params }: { params: { id: string } }) {
         )
         .subscribe();
 
-    supabase
-        .channel('metadata-update-channel')
-        .on(
-            'postgres_changes',
-            { event: 'UPDATE', schema: 'public', table: 'metadata' },
-            async (payload) => {
-                if (payload.new.id == params.id) {
-                    console.log("processed", payload.new.processed);
-                    if (payload.new.processed == true) {
-                        const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                            router.replace(`/project/${params.id}`);
-                        });
-
-                        toast.promise(promise, {
-                            loading: 'File processed successfully. Redirecting...',
-                        })
-                    }
-                }
-            }
-        )
-        .subscribe();
-
-
     function formatTime(seconds: number) {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
@@ -335,6 +312,50 @@ export default function Video({ params }: { params: { id: string } }) {
         }
     }, [processing, startTime]);
 
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                // When the tab becomes visible, trigger a fetch request
+                fetchProcessingData();
+            }
+        };
+
+        // Add event listener for visibility change
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        // Initial check when component mounts
+        fetchProcessingData();
+
+        // Cleanup function to remove event listener
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
+    useEffect(() => {
+        const sse = new EventSource(`/api/sse?id=${params.id}`);
+
+        sse.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'video-processed' && data.videoId === params.id) {
+                toast.success('Video processed successfully. Redirecting...');
+                setTimeout(() => {
+                    router.replace(`/project/${data.videoId}`);
+                }, 2000);
+            }
+        };
+
+        sse.onerror = (error) => {
+            console.error('EventSource failed:', error);
+            sse.close();
+        };
+
+        return () => {
+            sse.close();
+        };
+    }, [params.id, router]);
+
     if (!shouldRender) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -415,7 +436,7 @@ export default function Video({ params }: { params: { id: string } }) {
                             <div className="flex flex-col justify-center items-center">
                                 <div className="mr-auto mb-2 font-medium flex items-center justify-center">
                                     <VideoIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                                    {metadata?.name}.{metadata?.ext}
+                                    {shortenFileName(metadata?.name)}.{metadata?.ext}
                                 </div>
                                 <video
                                     src={video!}

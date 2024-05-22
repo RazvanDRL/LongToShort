@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "bun run deploy.mjs"
+    "deploy": "bun run deploy.mjs",
+    "ngrok": "ngrok http 3000"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
@@ -45,6 +46,7 @@
     "@types/uuid": "^9.0.7",
     "@types/web": "^0.0.143",
     "@vercel/speed-insights": "^1.0.10",
+    "ai": "^3.1.12",
     "antd": "^5.16.1",
     "avvvatars-react": "^0.4.2",
     "aws-sdk": "^2.1605.0",
