@@ -12,9 +12,12 @@ import { Button } from "@/components/ui/button";
 import Avvvatars from "avvvatars-react";
 import {
     Banknote,
+    CirclePlus,
     CreditCard,
     Gift,
+    Home,
     LogOut,
+    MessageSquareText,
     Settings,
     User,
 } from "lucide-react"
@@ -116,13 +119,14 @@ export default function Header({ user_email }: { user_email: string }) {
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-10 container">
-            <div className="sticky flex justify-between items-center py-8 sm:px-6 md:px-8">
+            <div className="sticky flex justify-between items-center py-4 md:py-6 md:px-8">
                 <div className="flex justify-start items-center">
                     {pathname.split('/').length > 2 &&
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href="/dashboard">dashboard</BreadcrumbLink>
+                                    <BreadcrumbLink href="/dashboard" className="hidden md:block">dashboard</BreadcrumbLink>
+                                    <BreadcrumbLink href="/dashboard" className="md:hidden"><Home className="w-4 h-4" /></BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
@@ -133,10 +137,44 @@ export default function Header({ user_email }: { user_email: string }) {
                     }
                 </div>
                 <div className="flex justify-end items-center">
-                    <div>
+                    <div className="hidden md:flex">
+                        <div>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" className="mr-4 md:mr-8">Feedback</Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80">
+                                    <div className="grid gap-4">
+                                        <Label>Feedback</Label>
+                                        <Textarea
+                                            placeholder="Ideas on how to improve"
+                                            onChange={(e) => setFeedbackText(e.target.value)}
+                                            value={feedbackText}
+                                        />
+                                        <Button
+                                            variant={"outline"}
+                                            onClick={async () => await sendFeedback()}
+                                        >
+                                            Send feedback
+                                        </Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        <div>
+                            <Button className="mr-6 md:mr-8" variant={"outline"} asChild>
+                                <Link href="/pricing">
+                                    Add more videos
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="flex md:hidden">
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button variant="outline" className="mr-4 md:mr-8">Feedback</Button>
+                                <Button variant="outline" className="mr-2">
+                                    <MessageSquareText className="w-4 h-4" />
+                                </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-80">
                                 <div className="grid gap-4">
@@ -155,13 +193,14 @@ export default function Header({ user_email }: { user_email: string }) {
                                 </div>
                             </PopoverContent>
                         </Popover>
-                    </div>
-                    <div>
-                        <Button className="mr-6 md:mr-8" variant={"outline"} asChild>
-                            <Link href="/pricing">
-                                Add more videos
-                            </Link>
-                        </Button>
+                        <div>
+                            <Button className="mr-3" variant={"outline"} asChild>
+                                <Link href="/pricing">
+                                    <CirclePlus className="w-4 h-4 mr-2" />
+                                    Videos
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
                     <div className="flex items-center">
                         <DropdownMenu>
@@ -198,7 +237,7 @@ export default function Header({ user_email }: { user_email: string }) {
                                         <span>Billing</span>
                                         <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                                     </DropdownMenuItem> */}
-                                    
+
                                     {/* <DropdownMenuItem>
                                     <Settings className="mr-2 h-4 w-4" />
                                     <span>Settings</span>
