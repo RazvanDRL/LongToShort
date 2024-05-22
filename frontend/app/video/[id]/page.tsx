@@ -335,27 +335,6 @@ export default function Video({ params }: { params: { id: string } }) {
         }
     }, [processing, startTime]);
 
-    function aspectRatio(width: number, height: number) {
-        const ratio = width / height;
-        switch (ratio) {
-            case 16 / 9:
-                return { width: 640, height: 360 };
-            case 4 / 3:
-                return { width: 640, height: 480 };
-            case 5 / 4:
-                return { width: 640, height: 512 };
-            case 1:
-                return { width: 640, height: 640 };
-            case 4 / 5:
-                return { width: 512, height: 640 };
-            case 9 / 16:
-                return { width: 360, height: 640 };
-            case 3 / 4:
-                return { width: 480, height: 640 };
-            default: return { width: 360, height: 640 };
-        }
-    }
-
     if (!shouldRender) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -432,21 +411,24 @@ export default function Video({ params }: { params: { id: string } }) {
                     </div>
                     :
                     <div className="flex justify-center items-center w-full h-full">
-                        <div className="flex flex-col justify-center items-center">
-                            <div className="mr-auto mb-2 font-medium flex items-center justify-center">
-                                <VideoIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                                {metadata?.name}.{metadata?.ext}
+                        {metadata &&
+                            <div className="flex flex-col justify-center items-center">
+                                <div className="mr-auto mb-2 font-medium flex items-center justify-center">
+                                    <VideoIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                                    {metadata?.name}.{metadata?.ext}
+                                </div>
+                                <video
+                                    src={video!}
+                                    className="rounded-xl border border-neutral-800/80 aspect-auto max-h-[60vh]"
+                                    controls
+                                    disablePictureInPicture
+                                />
+                                <Button className="mt-3 font-medium md:mt-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
+                                    <Sparkles className="mr-2 h-5 w-5" />
+                                    Process video
+                                </Button>
                             </div>
-                            <video src={video!} controls className="rounded-xl"
-                                style={{
-                                    width: aspectRatio(metadata!.width!, metadata!.height!).width,
-                                    height: aspectRatio(metadata!.width!, metadata!.height!).height,
-                                }} />
-                            <Button className="mt-3 font-medium md:mt-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
-                                <Sparkles className="mr-2 h-5 w-5" />
-                                Process video
-                            </Button>
-                        </div>
+                        }
                     </div>
                 }
             </main >
