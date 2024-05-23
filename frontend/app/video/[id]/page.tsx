@@ -11,7 +11,6 @@ import Link from "next/link";
 
 import {
     ExternalLink,
-    Loader,
     Loader2,
     Sparkles,
     VideoIcon,
@@ -24,6 +23,7 @@ import type { Metadata, User } from "../../../types/constants";
 type QueuePos = {
     position: number;
     processing_time: string;
+    estimated_time: string;
     estimated_cost: string;
 }
 
@@ -34,7 +34,6 @@ export default function Video({ params }: { params: { id: string } }) {
     const [video, setVideo] = useState<string | null>(null);
     const [metadata, setMetadata] = useState<Metadata | null>(null);
     const [queuePos, setQueuePos] = useState<QueuePos | null>(null);
-    const [estimatedTime, setEstimatedTime] = useState<number>(0);
     const [processing, setProcessing] = useState(false);
     const [status, setStatus] = useState<string | null>("");
     const [elapsedTime, setElapsedTime] = useState<number>(0);
@@ -64,12 +63,22 @@ export default function Video({ params }: { params: { id: string } }) {
         .channel('processing-queue-update-channel')
         .on(
             'postgres_changes',
-            { event: 'UPDATE', schema: 'public', table: 'processing_queue' },
+            { event: '*', schema: 'public', table: 'processing_queue' },
             async (payload: any) => {
                 if (payload.new.video_id == params.id) {
                     const s = payload.new.status;
                     setStatus(s);
                 }
+                await queuePosition().then(async (pos) => {
+                    await fetchEstimatedTime(pos!, metadata!).then((data) => {
+                        setQueuePos({
+                            position: pos!,
+                            processing_time: data.processingTime,
+                            estimated_time: data.waitingTime,
+                            estimated_cost: String(5 * 0.000575),
+                        });
+                    });
+                });
             }
         )
         .subscribe();
@@ -81,10 +90,11 @@ export default function Video({ params }: { params: { id: string } }) {
         return `${hours ? hours + "h" : ""} ${minutes ? minutes + "m" : ""} ${secs ? secs + "s" : ""}`;
     };
 
-    async function queuePosition(metadata: Metadata) {
+    async function queuePosition() {
         let { data, error } = await supabase
             .from('processing_queue')
             .select('*')
+            .order('created_at', { ascending: true })
         if (error) {
             toast.error(error.message);
             return;
@@ -93,56 +103,27 @@ export default function Video({ params }: { params: { id: string } }) {
             toast.error("Video not found");
             return;
         }
-        if (data && metadata && metadata.processed === false) {
-            let pos = data.length;
-            data = data.filter((item: any) => item.video_id === params.id);
-            let dur = metadata.duration;
-            if (dur <= 3) dur = 1;
-            if (dur > 3 && dur <= 15) dur /= 3;
-            if (dur > 15 && dur <= 30) dur /= 5;
-            if (dur > 30 && dur <= 60) dur /= 7;
-            if (dur > 60 && dur <= 120) dur /= 9;
-            if (dur > 120 && dur <= 300) dur /= 11;
-            if (dur > 300 && dur <= 600) dur /= 13;
+        let p = 1;
+        data.forEach((element: any, index: number) => {
+            if (element.video_id === params.id)
+                p = index + 1;
+        })
+        return p;
+    }
 
-            if (pos === 0 && data.length === 0) {
-                setQueuePos(
-                    {
-                        position: 1,
-                        processing_time: await formatTime(dur),
-                        estimated_cost: (dur * 0.000225).toFixed(6),
-                    });
-                setEstimatedTime(dur + 210);
-            }
-            else if (pos === 1 && data.length !== 0) {
-                setProcessing(true);
-                setQueuePos(
-                    {
-                        position: 1,
-                        processing_time: await formatTime(dur),
-                        estimated_cost: (dur * 0.000225).toFixed(6),
-                    });
-                setEstimatedTime(dur + 210);
-            }
-            else if (data.length === 0) {
-                setQueuePos(
-                    {
-                        position: pos + 1,
-                        processing_time: await formatTime(dur),
-                        estimated_cost: (dur * 0.000225).toFixed(6),
-                    });
-                setEstimatedTime((pos + 1) * (Math.floor(Math.random() * 3) + 5) + 150);
-            } else if (data.length !== 0) {
-                setProcessing(true);
-                setQueuePos(
-                    {
-                        position: pos,
-                        processing_time: await formatTime(dur),
-                        estimated_cost: (dur * 0.000225).toFixed(6),
-                    });
-                setEstimatedTime((pos) * (Math.floor(Math.random() * 3) + 5) + 150);
-            }
-        }
+    async function fetchEstimatedTime(pos: number, metadata: Metadata) {
+        let dur = metadata?.duration;
+        if (dur <= 3) dur = 1;
+        if (dur > 3 && dur <= 15) dur /= 3;
+        if (dur > 15 && dur <= 30) dur /= 5;
+        if (dur > 30 && dur <= 60) dur /= 7;
+        if (dur > 60 && dur <= 120) dur /= 9;
+        if (dur > 120 && dur <= 300) dur /= 11;
+        if (dur > 300 && dur <= 600) dur /= 13;
+        return {
+            waitingTime: formatTime(90 + Math.floor(dur + ((pos - 1) * 7))),
+            processingTime: formatTime(Math.floor(dur)),
+        };
     }
 
     async function fetchMetadata() {
@@ -196,6 +177,7 @@ export default function Video({ params }: { params: { id: string } }) {
             .insert({
                 video_id: params.id,
                 user_id: user?.id,
+                status: "in queue",
             });
 
         if (error) {
@@ -210,16 +192,30 @@ export default function Video({ params }: { params: { id: string } }) {
 
         if (!error) {
             toast.success("Video added to queue");
-
             const { data: update_created_at_data, error: update_created_at_error } = await supabase
                 .from("processing_queue")
                 .update([
                     { created_at: new Date().toISOString() },
                 ])
                 .match({ id: params.id });
-            // set time as date in unix format
-            setStartTime(new Date().getTime());
-            setStatus("in queue");
+            if (update_created_at_error) {
+                toast.error(update_created_at_error.message);
+                return;
+            }
+            if (!update_created_at_error) {
+                await queuePosition().then(async (pos) => {
+                    await fetchEstimatedTime(pos!, metadata!).then((data) => {
+                        setQueuePos({
+                            position: pos!,
+                            processing_time: data.processingTime,
+                            estimated_time: data.waitingTime,
+                            estimated_cost: String(5 * 0.000575),
+                        });
+                    });
+                });
+                setStartTime(new Date().getTime());
+                setStatus("in queue");
+            }
         }
     }
 
@@ -239,6 +235,7 @@ export default function Video({ params }: { params: { id: string } }) {
         }
 
         if (data !== null && data.length > 0) {
+            ;
             setStatus(data[0].status);
             setStartTime(new Date(data[0].created_at).getTime());
         }
@@ -284,8 +281,17 @@ export default function Video({ params }: { params: { id: string } }) {
                     let metadata = await fetchMetadata();
                     if (metadata.processed === false) {
                         await fetchVideo();
-                        await queuePosition(metadata);
                         await fetchProcessingData();
+                        await queuePosition().then(async (pos) => {
+                            await fetchEstimatedTime(pos!, metadata!).then((data) => {
+                                setQueuePos({
+                                    position: pos!,
+                                    processing_time: data.processingTime,
+                                    estimated_time: data.waitingTime,
+                                    estimated_cost: String(5 * 0.000575),
+                                });
+                            });
+                        });
                         setShouldRender(true);
                     }
                     else if (metadata.processed === true) {
@@ -301,22 +307,23 @@ export default function Video({ params }: { params: { id: string } }) {
     }, [user?.id]);
 
     useEffect(() => {
-        if (processing) {
+        if (!startTime) setElapsedTime(0);
+        else {
             const interval = setInterval(() => {
                 const currentTime = Date.now();
                 const diffInSeconds = Math.floor((currentTime - startTime!) / 1000);
                 setElapsedTime(diffInSeconds);
             }, 1000);
-
             return () => clearInterval(interval);
+
         }
-    }, [processing, startTime]);
+    }, [processing, startTime, status]);
 
     useEffect(() => {
-        const handleVisibilityChange = () => {
+        const handleVisibilityChange = async () => {
             if (!document.hidden) {
                 // When the tab becomes visible, trigger a fetch request
-                fetchProcessingData();
+                await fetchProcessingData();
             }
         };
 
@@ -324,7 +331,9 @@ export default function Video({ params }: { params: { id: string } }) {
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
         // Initial check when component mounts
-        fetchProcessingData();
+        (async () => {
+            await fetchProcessingData();
+        })();
 
         // Cleanup function to remove event listener
         return () => {
@@ -354,7 +363,7 @@ export default function Video({ params }: { params: { id: string } }) {
         return () => {
             sse.close();
         };
-    }, [params.id, router]);
+    }, [params.id]);
 
     if (!shouldRender) {
         return (
@@ -373,7 +382,7 @@ export default function Video({ params }: { params: { id: string } }) {
             {user ? <Header user_email={user.email} /> : null}
             <main className="w-full h-screen flex justify-center items-center">
                 {status !== "" ?
-                    < div >
+                    <div>
                         <div className="flex justify-between items-center w-full">
                             <div>
                                 {
@@ -413,7 +422,7 @@ export default function Video({ params }: { params: { id: string } }) {
                                     null
                                 }
                                 <span>
-                                    Estimated waiting time ~ <span className="text-green-400">{formatTime(estimatedTime)}</span>
+                                    Estimated waiting time ~ <span className="text-green-400">{queuePos?.estimated_time}</span>
                                 </span>
                                 <br /><br />
                                 <span>
@@ -421,7 +430,7 @@ export default function Video({ params }: { params: { id: string } }) {
                                 </span>
                                 <br /><br />
                                 <span>
-                                    Estimated cost ~ <span className="text-green-400">${(Number(queuePos?.estimated_cost) * 100).toFixed(2)}</span>
+                                    Estimated cost ~ <span className="text-green-400">${queuePos?.estimated_cost}</span>
                                 </span>
                                 <br /><br />
                                 <span>
