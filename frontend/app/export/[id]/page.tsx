@@ -262,9 +262,10 @@ export default function Export({ params }: { params: { id: string } }) {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'subtitles.srt';
+        a.download = metadata?.name + '.srt';
         a.click();
         window.URL.revokeObjectURL(url);
+        toast.success('Subtitles downloaded');
     }
 
     useEffect(() => {
