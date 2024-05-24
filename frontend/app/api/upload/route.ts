@@ -1,6 +1,6 @@
 const secretAccessKey = process.env.CLOUDFLARE_AWS_SECRET_ACCESS_KEY!;
 
-const MAX_UPLOAD_SIZE = 52428800; // 50MB
+const MAX_UPLOAD_SIZE = 52428800 * 10; // 500MB
 
 
 async function executePutRequest(url: string, data: ArrayBuffer, authToken?: string): Promise<Response> {
@@ -30,7 +30,7 @@ export async function PUT(req: Request): Promise<Response> {
     const dataSize = data.byteLength;
 
     if (dataSize > MAX_UPLOAD_SIZE) {
-        return new Response('File size exceeds the maximum upload limit of 50MB.', {
+        return new Response('File size exceeds the maximum upload limit of 500MB.', {
             status: 413,
             headers: {
                 'Content-Security-Policy': "default-src 'self'",

@@ -158,7 +158,7 @@ export default function Video({ params }: { params: { id: string } }) {
     }
 
     function statusData(status: string) {
-        if (status === "starting") {
+        if (status === "starting" || status === "loading") {
             return "yellow";
         }
         if (status === "processing") {
@@ -387,13 +387,13 @@ export default function Video({ params }: { params: { id: string } }) {
                             <div>
                                 {
                                     status !== "" ? (
-                                        <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={(status === 'succeeded' || status === 'done') && elapsedTime > 0 ? `Status: ${status}` : `Status: ${status} - ${formatTime(elapsedTime)}`} color={statusData(status!)} />
+                                        <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={(status === 'loading' || status === 'done') && elapsedTime > 0 ? `Status: ${status}` : `Status: ${status} - ${formatTime(elapsedTime)}`} color={statusData(status!)} />
                                     ) : null
                                 }
                             </div>
                             <div>
                                 {
-                                    status === "done" || status === "succeeded" ? (
+                                    status === "done" ? (
                                         <Button asChild variant="outline" className="mb-3 font-medium md:mb-6 md:text-base md:px-8 md:py-6">
                                             <Link href={`/project/${params.id}`}>
                                                 <ExternalLink className="mr-2 h-4 w-4 md:h-5 md:w-5" />
@@ -455,7 +455,7 @@ export default function Video({ params }: { params: { id: string } }) {
                                 />
                                 <Button className="mt-3 font-medium md:mt-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
                                     <Sparkles className="mr-2 h-5 w-5" />
-                                    Process video
+                                    Generate subtitles
                                 </Button>
                             </div>
                         }

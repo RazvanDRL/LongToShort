@@ -364,7 +364,8 @@ export default function Project({ params }: { params: { id: string } }) {
                 return { width: 360, height: 640 };
             case 3 / 4:
                 return { width: 480, height: 640 };
-            default: return { width: 360, height: 640 };
+            default:
+                return { width: 360, height: 640 };
         }
     }
 
@@ -784,14 +785,6 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 <h3 className="mb-1 flex gap-1 font-bold">
                                                     <span>LongToShort AI</span>
                                                 </h3>
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm text-gray-600">Auto captions accuracy</span>
-                                                        <span className="h-fit items-center gap-1 font-semibold rounded p-1 text-xs inline-block bg-green-50 text-green-500" data-testid="flowbite-badge">
-                                                            <span>96.55%</span>
-                                                        </span>
-                                                    </div>
-                                                </div>
                                             </div>
                                             <div className="px-6 py-4">
                                                 {subtitles.map((subtitle, index) => (
@@ -934,7 +927,8 @@ export default function Project({ params }: { params: { id: string } }) {
                                             Render video
                                         </DialogTitle>
                                         <DialogDescription>
-                                            Make changes to your profile here. Click save when you&apos;re done.
+                                            In order to download you video, we need to render it first.
+                                            Click the button below to start rendering.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="grid gap-4 py-4">
@@ -992,11 +986,11 @@ export default function Project({ params }: { params: { id: string } }) {
                             </Dialog>
                             {video ?
                                 <Player
-                                    className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800 z-50 aspect-auto max-h-[50vh]"
+                                    className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800 z-50"
                                     component={Main}
                                     style={{
-                                        width: aspectRatio(metadata.width!, metadata.height!).width,
                                         height: aspectRatio(metadata.width!, metadata.height!).height,
+                                        width: aspectRatio(metadata.width!, metadata.height!).width,
                                     }}
                                     inputProps={{
                                         subtitles: subtitles,

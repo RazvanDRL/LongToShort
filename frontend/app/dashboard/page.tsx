@@ -116,7 +116,7 @@ export default function Dashboard() {
         if (!e.target.files || !e.target.files[0] || !e.target.files[0].size || !e.target.files[0].type) return;
         if (uploadState !== "idle") return;
 
-        if (e.target.files[0].size > 52428800) {
+        if (e.target.files[0].size > 52428800 * 10) {
             toast.error("File size is too big.");
             e.target.value = "";
             return;
@@ -157,7 +157,7 @@ export default function Dashboard() {
         if (droppedFiles.length > 0) {
             const file = droppedFiles[0];
 
-            if (file.size > 52428800) {
+            if (file.size > 52428800 * 10) {
                 toast.error("File size is too big.");
                 return;
             }
