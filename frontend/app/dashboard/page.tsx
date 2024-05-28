@@ -20,6 +20,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import Header from "@/components/header"
 import type { User } from "../../types/constants";
+import { Input } from "@/components/ui/input";
 
 type Video = {
     id: string;
@@ -32,13 +33,13 @@ type Video = {
 
 export default function Dashboard() {
     const router = useRouter();
-
     const [isOpen, setIsOpen] = useState(true);
     const [user, setUser] = useState<User | null>(null);
     const [videos, setVideos] = useState<Video[] | null>(null);
     const [shouldRender, setShouldRender] = useState(false);
     const [files, setFiles] = useState<File>();
     const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
+    const [videoUrl, setVideoUrl] = useState<string>("");
 
     const fetchAllVideos = async () => {
         if (user && user.id) {
@@ -307,6 +308,29 @@ export default function Dashboard() {
         return date.toISOString().substr(14, 5);
     }
 
+    async function downloadFromUrl(url: string, filename: string) {
+        let body = {
+            video_url: url,
+        }
+
+        const options = {
+            method: 'POST',
+            body: JSON.stringify(body),
+        };
+
+        try {
+            const response = await fetch("/api/instagram", options);
+            const result = await response.json();
+            console.log(result);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function handleVideoUrlChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setVideoUrl(e.target.value);
+    }
+
     useEffect(() => {
         const runPrecheck = async () => {
             const result = await handleSignedIn();
@@ -338,6 +362,8 @@ export default function Dashboard() {
             {user ? <Header user_email={user.email} /> : null}
             <main className="w-full h-screen flex justify-center items-center">
                 <div>
+                    <Input onChange={handleVideoUrlChange}></Input>
+                    <Button onClick={() => downloadFromUrl(videoUrl, "video.mp4")}>Download</Button>
                     <div className="flex flex-col items-center max-w-700px min-w-700px"
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}

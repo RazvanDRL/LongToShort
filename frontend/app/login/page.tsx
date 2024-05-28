@@ -26,6 +26,7 @@ export default function Login() {
     if (error) {
       console.log(error);
     } else {
+      console.log(data.url, `${origin}/auth/callback`);
       return redirect(data.url);
     }
   };
@@ -65,7 +66,6 @@ export default function Login() {
       return redirect(data.url);
     }
   }
-
 
   return (
     <main>
