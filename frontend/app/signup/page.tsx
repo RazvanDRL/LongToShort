@@ -19,7 +19,7 @@ export default function SignUp() {
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${origin}/auth/callback`,
+        redirectTo: `${origin}/dashboard`,
       },
     });
 
@@ -37,7 +37,7 @@ export default function SignUp() {
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider: 'twitter',
       options: {
-        redirectTo: `${origin}/auth/callback`,
+        redirectTo: `${origin}/dashboard`,
       },
     });
 
@@ -55,7 +55,7 @@ export default function SignUp() {
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${origin}/auth/callback`,
+        redirectTo: `${origin}/dashboard`,
       },
     });
 

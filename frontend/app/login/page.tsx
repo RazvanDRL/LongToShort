@@ -26,7 +26,6 @@ export default function Login() {
     if (error) {
       console.log(error);
     } else {
-      console.log(data.url, `${origin}/auth/callback`);
       return redirect(data.url);
     }
   };
@@ -38,7 +37,7 @@ export default function Login() {
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider: 'twitter',
       options: {
-        redirectTo: `${origin}/auth/callback`,
+        redirectTo: `${origin}/dashboard`,
       },
     });
 
@@ -56,7 +55,7 @@ export default function Login() {
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${origin}/auth/callback`,
+        redirectTo: `${origin}/dashboard`,
       },
     });
 
