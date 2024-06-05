@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { type Tiktok } from '@/types/constants';
+import { type downloadAll } from '@/types/constants';
 
 export async function POST(req: Request) {
     // const token = req.headers.get('Authorization')?.split('Bearer ')[1];
@@ -27,28 +27,28 @@ export async function POST(req: Request) {
         throw new TypeError('Video url is missing');
     }
 
-    const fetch_url = 'https://all-media-downloader.p.rapidapi.com/rapid_download/download';
+    const fetch_url = 'https://auto-download-all-in-one.p.rapidapi.com/v1/social/autolink';
     const options = {
         method: 'POST',
         headers: {
-            'content-type': 'application/x-www-form-urlencoded',
+            'content-type': 'application/json',
             'X-RapidAPI-Key': process.env.RAPIDAPI_KEY!,
-            'X-RapidAPI-Host': 'all-media-downloader.p.rapidapi.com'
+            'X-RapidAPI-Host': 'auto-download-all-in-one.p.rapidapi.com'
         },
-        body: new URLSearchParams({
+        body: JSON.stringify({
             url: video_url
         })
     };
 
     try {
         const response = await fetch(fetch_url, options);
-        const result: Tiktok = await response.json();
+        const result = await response.json();
         return NextResponse.json({
-            url: result.url,
-            ext: result.video_ext,
             thumbnail: result.thumbnail,
-            height: result.height,
-            width: result.width
+            duration: result.duration,
+            url: result.medias[0].url,
+            quality: result.medias[0].quality,
+            title: result.title,
         });
 
     } catch (error) {

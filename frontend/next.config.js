@@ -11,6 +11,14 @@ const nextConfig = {
             },
         ],
     },
+    async rewrites() {
+        return [
+            {
+                source: '/instagram-dw/:path*',
+                destination: 'https://scontent.cdninstagram.com/:path*',
+            },
+        ]
+    },
 }
 
 // module.exports = withPlausibleProxy({

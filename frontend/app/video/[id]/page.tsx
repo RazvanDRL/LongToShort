@@ -147,8 +147,6 @@ export default function Video({ params }: { params: { id: string } }) {
                 created_at: data.created_at,
                 name: data.name,
                 duration: data.duration,
-                width: data.width,
-                height: data.height,
                 processed: data.processed,
                 ext: data.ext,
             });
@@ -280,7 +278,19 @@ export default function Video({ params }: { params: { id: string } }) {
                 try {
                     let metadata = await fetchMetadata();
                     if (metadata.processed === false) {
-                        await fetchVideo();
+                        if (metadata.video_src === null) {
+                            await fetchVideo();
+                        }
+                        else {
+                            // decide if platform is tiktok or instagram based on the video_src hostname
+                            const hostname = new URL(metadata.video_src).hostname;
+                            if (hostname.includes("tiktokcdn"))
+                                setVideo(metadata.video_src);
+                            else {
+                                const video_path = metadata.video_src.replace(/^(?:\/\/|[^\/]+)*\//, "/");
+                                setVideo("/instagram-dw" + video_path);
+                            }
+                        }
                         await fetchProcessingData();
                         await queuePosition().then(async (pos) => {
                             await fetchEstimatedTime(pos!, metadata!).then((data) => {
@@ -288,7 +298,7 @@ export default function Video({ params }: { params: { id: string } }) {
                                     position: pos!,
                                     processing_time: data.processingTime,
                                     estimated_time: data.waitingTime,
-                                    estimated_cost: String(5 * 0.000575),
+                                    estimated_cost: "1",
                                 });
                             });
                         });
@@ -449,6 +459,7 @@ export default function Video({ params }: { params: { id: string } }) {
                                 </div>
                                 <video
                                     src={video!}
+                                    crossOrigin="anonymous"
                                     className="rounded-xl border border-neutral-800/80 aspect-auto max-h-[60vh]"
                                     controls
                                     disablePictureInPicture

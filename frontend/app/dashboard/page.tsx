@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation'
 
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronsUpDown, Check } from "lucide-react"
+import { Loader2, ChevronsUpDown, Check, Link } from "lucide-react"
 
 import {
     Collapsible,
@@ -20,7 +20,6 @@ import {
 import React, { useEffect, useState } from 'react';
 import Header from "@/components/header"
 import type { User } from "../../types/constants";
-import { Input } from "@/components/ui/input";
 
 type Video = {
     id: string;
@@ -229,11 +228,11 @@ export default function Dashboard() {
 
         if (response.status == 200) {
             setUploadState("done");
-            const { duration, width, height } = await getDuration(file);
+            const { duration, height, width } = await getDuration(file);
 
             const { error } = await supabase
                 .from('metadata')
-                .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, width: width, height: height, ext: ext });
+                .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, height: height, width: width, ext: ext });
             if (error) {
                 toast.error(error.message);
                 return;
@@ -308,7 +307,7 @@ export default function Dashboard() {
         return date.toISOString().substr(14, 5);
     }
 
-    async function downloadFromUrl(url: string, filename: string) {
+    async function downloadFromUrl(url: string) {
         let body = {
             video_url: url,
         }
@@ -319,9 +318,42 @@ export default function Dashboard() {
         };
 
         try {
-            const response = await fetch("/api/instagram", options);
+            const response = await fetch("/api/download", options);
+            if (!response.ok) {
+                toast.error("Error downloading video");
+                return;
+            }
             const result = await response.json();
+
             console.log(result);
+
+            if (result.error) {
+                toast.error("Error downloading video");
+                return;
+            }
+
+            let uuid: string = uuidv4();
+            let ext: string = "mp4";
+
+            const { error } = await supabase
+                .from('metadata')
+                .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(result.title)}`, video_src: result.url, thumbnail: result.thumbnail, duration: result.duration, ext: ext });
+
+            if (error) {
+                toast.error(error.message);
+                return;
+            }
+
+            const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+                router.push(`/video/${uuid}`);
+            });
+
+            toast.promise(promise, {
+                loading: 'File uploaded successfully. Redirecting...',
+            })
+
+
+
         } catch (error) {
             console.error(error);
         }
@@ -362,16 +394,36 @@ export default function Dashboard() {
             {user ? <Header user_email={user.email} /> : null}
             <main className="w-full h-screen flex justify-center items-center">
                 <div>
-                    <Input onChange={handleVideoUrlChange}></Input>
-                    <Button onClick={() => downloadFromUrl(videoUrl, "video.mp4")}>Download</Button>
+                    <div className="px-4 w-full mx-auto py-2 relative flex">
+
+                        <div className="pointer-events-none absolute inset-y-0 left-[8%] flex items-center text-muted-foreground">
+                            <Link className="w-5 h-5" />
+                        </div>
+
+                        <input
+                            className="text-muted-foreground pl-14 w-full flex h-16 rounded-xl border placeholder:font-medium border-input bg-background px-6 py-2 text-medium ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                            onChange={handleVideoUrlChange}
+                            placeholder="Enter video URL"
+                            style={{
+                                outline: 'none',
+                            }}
+                        />
+                        <Button
+                            className="w-full h-16 rounded-xl ml-2 font-xl"
+                            onClick={() => downloadFromUrl(videoUrl)}
+                        >
+                            Download
+                        </Button>
+                    </div>
+
                     <div className="flex flex-col items-center max-w-700px min-w-700px"
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                     >
-                        <form className="px-4 mt-8" onSubmit={handleSubmitFile}>
+                        <form className="px-4" onSubmit={handleSubmitFile}>
                             <label
                                 htmlFor="fileInput"
-                                className="relative flex justify-center items-center cursor-pointer font-medium text-white/65 border border-white/65 border-dashed py-5 px-20 rounded-lg overflow-hidden"
+                                className="relative flex justify-center items-center cursor-pointer font-medium text-muted-foreground border border-input border-dashed py-5 px-20 rounded-xl overflow-hidden"
                             >
                                 {!files?.name ? "Choose a file (MP4), or drag it here" : shortenFileName(files?.name)}
                                 <div className="absolute right-8 text-white opacity-65">
@@ -431,7 +483,6 @@ export default function Dashboard() {
                                     Upload
                                 </Button>
                             )}
-
                         </form>
 
                     </div>

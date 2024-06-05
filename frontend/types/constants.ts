@@ -1,12 +1,16 @@
 import { z } from "zod";
 export const COMP_NAME = "MyComp";
 
-export type Tiktok = {
-  url: string;
-  video_ext: string;
-  height: number;
-  width: number;
+export type downloadAll = {
+  title: string;
   thumbnail: string;
+  duration: number;
+  medias: {
+    url: string;
+    quality: string;
+    extension: string;
+    type: string;
+  }[];
 };
 
 export interface Metadata {
@@ -16,6 +20,8 @@ export interface Metadata {
   fps?: number;
   width?: number;
   height?: number;
+  video_src?: string;
+  thumbnail?: string;
   processed: boolean;
   ext: string;
 };
