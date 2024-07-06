@@ -22,9 +22,8 @@ import type { Metadata, User } from "../../../types/constants";
 
 type QueuePos = {
     position: number;
-    processing_time: string;
-    estimated_time: string;
-    estimated_cost: string;
+    estimated_time: number;
+    processing_time: number;
 }
 
 export default function Video({ params }: { params: { id: string } }) {
@@ -73,9 +72,8 @@ export default function Video({ params }: { params: { id: string } }) {
                     await fetchEstimatedTime(pos!, metadata!).then((data) => {
                         setQueuePos({
                             position: pos!,
-                            processing_time: data.processingTime,
                             estimated_time: data.waitingTime,
-                            estimated_cost: String(5 * 0.000575),
+                            processing_time: data.processingTime,
                         });
                     });
                 });
@@ -120,9 +118,10 @@ export default function Video({ params }: { params: { id: string } }) {
         if (dur > 60 && dur <= 120) dur /= 9;
         if (dur > 120 && dur <= 300) dur /= 11;
         if (dur > 300 && dur <= 600) dur /= 13;
+
         return {
-            waitingTime: formatTime(90 + Math.floor(dur + ((pos - 1) * 7))),
-            processingTime: formatTime(Math.floor(dur)),
+            waitingTime: 90 + Math.floor(dur + ((pos - 1) * 7)),
+            processingTime: dur,
         };
     }
 
@@ -205,9 +204,8 @@ export default function Video({ params }: { params: { id: string } }) {
                     await fetchEstimatedTime(pos!, metadata!).then((data) => {
                         setQueuePos({
                             position: pos!,
-                            processing_time: data.processingTime,
                             estimated_time: data.waitingTime,
-                            estimated_cost: String(5 * 0.000575),
+                            processing_time: data.processingTime,
                         });
                     });
                 });
@@ -296,9 +294,8 @@ export default function Video({ params }: { params: { id: string } }) {
                             await fetchEstimatedTime(pos!, metadata!).then((data) => {
                                 setQueuePos({
                                     position: pos!,
-                                    processing_time: data.processingTime,
                                     estimated_time: data.waitingTime,
-                                    estimated_cost: "1",
+                                    processing_time: data.processingTime,
                                 });
                             });
                         });
@@ -397,7 +394,7 @@ export default function Video({ params }: { params: { id: string } }) {
                             <div>
                                 {
                                     status !== "" ? (
-                                        <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={(status === 'loading' || status === 'done') && elapsedTime > 0 ? `Status: ${status}` : `Status: ${status} - ${formatTime(elapsedTime)}`} color={statusData(status!)} />
+                                        <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={`Status: ${status}`} color={statusData(status!)} />
                                     ) : null
                                 }
                             </div>
@@ -414,40 +411,21 @@ export default function Video({ params }: { params: { id: string } }) {
                                 }
                             </div>
                         </div>
-                        <div className="px-2 mx-auto bg-[#15171d] w-[90vw] h-[360px] md:h-[475px] md:w-[800px] rounded-2xl">
-                            <div className="px-4 py-6 md:px-8 md:py-10 font-mono font-medium text-base md:text-2xl">
-                                <span>
-                                    Fetched video <span className="text-blue-400">{shortenFileName(metadata?.name!)}.{metadata?.ext}</span>
-                                </span>
-                                <br /><br />
-                                {status !== "" ?
-                                    (
-                                        <div>
-                                            <span>
-                                                Queue position &rarr; <span className="text-yellow-400">{queuePos?.position}</span>
-                                            </span>
-                                            <br /><br />
-                                        </div>
-                                    ) :
-                                    null
-                                }
-                                <span>
-                                    Estimated waiting time ~ <span className="text-green-400">{queuePos?.estimated_time}</span>
-                                </span>
-                                <br /><br />
-                                <span>
-                                    Estimated processing time ~ <span className="text-green-400">{queuePos?.processing_time}</span>
-                                </span>
-                                <br /><br />
-                                <span>
-                                    Estimated cost ~ <span className="text-green-400">${queuePos?.estimated_cost}</span>
-                                </span>
-                                <br /><br />
-                                <span>
-                                    You can safely leave this page, we will notify you by <span className="text-indigo-400">email</span> when your video is ready.
-                                </span>
+                        {queuePos &&
+                            <div className="relative">
+                                <div className="font-bold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white z-50">
+                                    {Math.min((elapsedTime * 100) / queuePos?.estimated_time, 100).toFixed(0)}%
+                                </div>
+                                <div className="w-full h-full bg-slate-800 opacity-70 rounded-xl z-30 absolute" />
+                                <video
+                                    src={video!}
+                                    crossOrigin="anonymous"
+                                    className="rounded-xl aspect-auto max-h-[60vh]"
+                                    disablePictureInPicture
+                                />
                             </div>
-                        </div>
+                        }
+
                     </div>
                     :
                     <div className="flex justify-center items-center w-full h-full">
@@ -460,7 +438,7 @@ export default function Video({ params }: { params: { id: string } }) {
                                 <video
                                     src={video!}
                                     crossOrigin="anonymous"
-                                    className="rounded-xl border border-neutral-800/80 aspect-auto max-h-[60vh]"
+                                    className="rounded-xl aspect-auto max-h-[60vh]"
                                     controls
                                     disablePictureInPicture
                                 />

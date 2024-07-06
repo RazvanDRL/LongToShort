@@ -8,7 +8,7 @@ build:
     - "ffmpeg"
   python_version: "3.11"
   python_packages:
-    - "git+https://github.com/m-bain/whisperX.git@78dcfaab51005aa703ee21375f81ed31bc248560"
+    - "git+https://github.com/RazvanDRL/whisperX.git"
     - "torch==2.2.0"
     - "torchvision==0.17.0"
     - "torchaudio==2.2.0"

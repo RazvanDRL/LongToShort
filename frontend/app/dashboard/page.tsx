@@ -38,9 +38,9 @@ export default function Dashboard() {
     const [shouldRender, setShouldRender] = useState(false);
     const [files, setFiles] = useState<File>();
     const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
-    const [videoUrl, setVideoUrl] = useState<string>("");
 
     const fetchAllVideos = async () => {
+        console.log("Fetching all videos...");
         if (user && user.id) {
             const { data, error } = await supabase
                 .from('metadata')
@@ -218,6 +218,16 @@ export default function Dashboard() {
         let uuid: string = uuidv4();
         let ext: string = getFileExtension(file.name);
         // let contentType: string = file.type;
+
+        // try {
+        //     const thumbnailBlob = await generateThumbnail(file);
+        //     const thumbnailUrl = URL.createObjectURL(thumbnailBlob);
+        //     setThumbnailUrl(thumbnailUrl);
+        // } catch (error) {
+        //     console.error('Failed to generate thumbnail:', error);
+        //     toast.error('Failed to generate thumbnail');
+        // }
+
         const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.mp4`, {
             method: 'PUT',
             headers: {
@@ -251,6 +261,33 @@ export default function Dashboard() {
             toast.error(await response.text());
             setUploadState("error");
         }
+    }
+
+    async function generateThumbnail(file: File): Promise<Blob> {
+        return new Promise((resolve, reject) => {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = function () {
+                video.currentTime = 0; // Seek to 1 second
+            };
+            video.onseeked = function () {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => {
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('Failed to generate thumbnail'));
+                    }
+                }, 'image/jpeg', 0.7); // JPEG at 70% quality
+            };
+            video.onerror = function () {
+                reject(new Error('Error occurred while loading video'));
+            };
+            video.src = URL.createObjectURL(file);
+        });
     }
 
     async function handleRemoveVideo(video_id: string) {
@@ -307,61 +344,61 @@ export default function Dashboard() {
         return date.toISOString().substr(14, 5);
     }
 
-    async function downloadFromUrl(url: string) {
-        let body = {
-            video_url: url,
-        }
+    // async function downloadFromUrl(url: string) {
+    //     let body = {
+    //         video_url: url,
+    //     }
 
-        const options = {
-            method: 'POST',
-            body: JSON.stringify(body),
-        };
+    //     const options = {
+    //         method: 'POST',
+    //         body: JSON.stringify(body),
+    //     };
 
-        try {
-            const response = await fetch("/api/download", options);
-            if (!response.ok) {
-                toast.error("Error downloading video");
-                return;
-            }
-            const result = await response.json();
+    //     try {
+    //         const response = await fetch("/api/download", options);
+    //         if (!response.ok) {
+    //             toast.error("Error downloading video");
+    //             return;
+    //         }
+    //         const result = await response.json();
 
-            console.log(result);
+    //         console.log(result);
 
-            if (result.error) {
-                toast.error("Error downloading video");
-                return;
-            }
+    //         if (result.error) {
+    //             toast.error("Error downloading video");
+    //             return;
+    //         }
 
-            let uuid: string = uuidv4();
-            let ext: string = "mp4";
+    //         let uuid: string = uuidv4();
+    //         let ext: string = "mp4";
 
-            const { error } = await supabase
-                .from('metadata')
-                .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(result.title)}`, video_src: result.url, thumbnail: result.thumbnail, duration: result.duration, ext: ext });
+    //         const { error } = await supabase
+    //             .from('metadata')
+    //             .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(result.title)}`, video_src: result.url, thumbnail: result.thumbnail, duration: result.duration, ext: ext });
 
-            if (error) {
-                toast.error(error.message);
-                return;
-            }
+    //         if (error) {
+    //             toast.error(error.message);
+    //             return;
+    //         }
 
-            const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                router.push(`/video/${uuid}`);
-            });
+    //         const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+    //             router.push(`/video/${uuid}`);
+    //         });
 
-            toast.promise(promise, {
-                loading: 'File uploaded successfully. Redirecting...',
-            })
+    //         toast.promise(promise, {
+    //             loading: 'File uploaded successfully. Redirecting...',
+    //         })
 
 
 
-        } catch (error) {
-            console.error(error);
-        }
-    }
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // }
 
-    function handleVideoUrlChange(e: React.ChangeEvent<HTMLInputElement>) {
-        setVideoUrl(e.target.value);
-    }
+    // function handleVideoUrlChange(e: React.ChangeEvent<HTMLInputElement>) {
+    //     setVideoUrl(e.target.value);
+    // }
 
     useEffect(() => {
         const runPrecheck = async () => {
@@ -380,7 +417,7 @@ export default function Dashboard() {
     if (!shouldRender) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <div className="bg-[#0a0a0a] z-50 w-16 h-16 flex justify-center items-center">
+                <div className="z-50 w-16 h-16 flex justify-center items-center">
                     <Loader2 className="relative animate-spin w-16 h-16 text-primary" />
                 </div>
             </div>
@@ -394,7 +431,8 @@ export default function Dashboard() {
             {user ? <Header user_email={user.email} /> : null}
             <main className="w-full h-screen flex justify-center items-center">
                 <div>
-                    <div className="px-4 w-full mx-auto py-2 relative flex">
+                    {/* Remove url feature */}
+                    {/* <div className="px-4 w-full mx-auto py-2 relative flex">
 
                         <div className="pointer-events-none absolute inset-y-0 left-[8%] flex items-center text-muted-foreground">
                             <Link className="w-5 h-5" />
@@ -414,7 +452,7 @@ export default function Dashboard() {
                         >
                             Download
                         </Button>
-                    </div>
+                    </div> */}
 
                     <div className="flex flex-col items-center max-w-700px min-w-700px"
                         onDragOver={handleDragOver}
@@ -484,7 +522,6 @@ export default function Dashboard() {
                                 </Button>
                             )}
                         </form>
-
                     </div>
                     <div className="mt-20 md:mt-28 flex flex-col-1 justify-center items-center w-[70%] mx-auto">
                         <div>
