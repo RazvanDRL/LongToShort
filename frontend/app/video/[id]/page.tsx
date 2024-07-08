@@ -11,6 +11,7 @@ import Link from "next/link";
 
 import {
     ExternalLink,
+    Loader,
     Loader2,
     Sparkles,
     VideoIcon,
@@ -26,6 +27,8 @@ type QueuePos = {
     processing_time: number;
 }
 
+type Status = "starting" | "in queue" | "processing" | "succeeded" | "done" | "";
+
 export default function Video({ params }: { params: { id: string } }) {
     const router = useRouter();
 
@@ -34,10 +37,10 @@ export default function Video({ params }: { params: { id: string } }) {
     const [metadata, setMetadata] = useState<Metadata | null>(null);
     const [queuePos, setQueuePos] = useState<QueuePos | null>(null);
     const [processing, setProcessing] = useState(false);
-    const [status, setStatus] = useState<string | null>("");
-    const [elapsedTime, setElapsedTime] = useState<number>(0);
+    const [status, setStatus] = useState<Status>("");
     const [startTime, setStartTime] = useState<number | null>(0);
     const [shouldRender, setShouldRender] = useState<boolean>(false);
+    const [progress, setProgress] = useState<number>(0);
 
 
     async function handleSignedIn() {
@@ -231,7 +234,6 @@ export default function Video({ params }: { params: { id: string } }) {
         }
 
         if (data !== null && data.length > 0) {
-            ;
             setStatus(data[0].status);
             setStartTime(new Date(data[0].created_at).getTime());
         }
@@ -243,6 +245,15 @@ export default function Video({ params }: { params: { id: string } }) {
             return name.substring(0, 20) + "..." + name.substring(name.length - 4, name.length);
         }
         return name;
+    }
+
+    function translateStatus(status: Status) {
+        if (status === "in queue") return "Queueing for processing";
+        if (status === "starting") return "AI model is starting";
+        if (status === "processing") return "The AI does its magic";
+        if (status === "succeeded") return "Succeeded";
+        if (status === "done") return "Done";
+        return "";
     }
 
     async function fetchVideo() {
@@ -314,12 +325,12 @@ export default function Video({ params }: { params: { id: string } }) {
     }, [user?.id]);
 
     useEffect(() => {
-        if (!startTime) setElapsedTime(0);
+        if (!startTime) return;
         else {
             const interval = setInterval(() => {
                 const currentTime = Date.now();
                 const diffInSeconds = Math.floor((currentTime - startTime!) / 1000);
-                setElapsedTime(diffInSeconds);
+                setProgress(Math.min((diffInSeconds * 100) / queuePos?.estimated_time!, 100));
             }, 1000);
             return () => clearInterval(interval);
 
@@ -375,7 +386,7 @@ export default function Video({ params }: { params: { id: string } }) {
     if (!shouldRender) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <div className="bg-[#0a0a0a] z-50 w-16 h-16 flex justify-center items-center">
+                <div className="z-50 w-16 h-16 flex justify-center items-center">
                     <Loader2 className="relative animate-spin w-16 h-16 text-primary" />
                 </div>
             </div>
@@ -391,12 +402,11 @@ export default function Video({ params }: { params: { id: string } }) {
                 {status !== "" ?
                     <div>
                         <div className="flex justify-between items-center w-full">
-                            <div>
-                                {
-                                    status !== "" ? (
-                                        <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={`Status: ${status}`} color={statusData(status!)} />
-                                    ) : null
-                                }
+                            <div>                                {
+                                status ? (
+                                    <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={`${translateStatus(status)}`} color={statusData(status!)} />
+                                ) : null
+                            }
                             </div>
                             <div>
                                 {
@@ -414,7 +424,7 @@ export default function Video({ params }: { params: { id: string } }) {
                         {queuePos &&
                             <div className="relative">
                                 <div className="font-bold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white z-50">
-                                    {Math.min((elapsedTime * 100) / queuePos?.estimated_time, 100).toFixed(0)}%
+                                    <Loader className="relative animate-spin w-12 h-12 text-secondary" />
                                 </div>
                                 <div className="w-full h-full bg-slate-800 opacity-70 rounded-xl z-30 absolute" />
                                 <video
