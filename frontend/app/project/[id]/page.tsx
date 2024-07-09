@@ -1,5 +1,5 @@
 "use client";
-import { Player } from "@remotion/player";
+import { Player, PlayerRef } from "@remotion/player";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
@@ -131,6 +131,7 @@ export default function Project({ params }: { params: { id: string } }) {
         shadow: shadowSizes.None,
     };
 
+    const playerRef = useRef<PlayerRef>(null);
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [metadata, setMetadata] = useState<Metadata | null>(null);
@@ -247,6 +248,9 @@ export default function Project({ params }: { params: { id: string } }) {
     }
 
     async function fetchSubtitles() {
+        if (initialSubtitles.length != 0) {
+            return;
+        }
         const { data, error } = await supabase
             .from('subs')
             .select('subtitles')
@@ -312,7 +316,7 @@ export default function Project({ params }: { params: { id: string } }) {
         return (
             <Space direction="vertical">
                 <ColorPicker
-                    className="bg-background border border-neutral-800 w-32 h-10"
+                    className="bg-background border border-[#E2E8F0] rounded-md w-32 h-10"
                     value={font.textColor}
                     onChangeComplete={(c) => {
                         setFont((prevFont) => ({
@@ -320,7 +324,7 @@ export default function Project({ params }: { params: { id: string } }) {
                             textColor: c.toHexString(),
                         }))
                     }}
-                    showText={(color) => <span className="text-white/80">{color.toHexString().toUpperCase()}</span>}
+                    showText={(color) => <span>{color.toHexString().toUpperCase()}</span>}
                 />
             </Space>
         );
@@ -330,7 +334,7 @@ export default function Project({ params }: { params: { id: string } }) {
         return (
             <Space direction="vertical">
                 <ColorPicker
-                    className="bg-background border border-neutral-800 w-32 h-10 px-2"
+                    className="bg-background border border-[#E2E8F0] rounded-md w-32 h-10 px-2"
                     value={font.stroke.strokeColor}
                     onChangeComplete={(c) => {
                         setFont((prevFont) => ({
@@ -341,7 +345,7 @@ export default function Project({ params }: { params: { id: string } }) {
                             }
                         }))
                     }}
-                    showText={(color) => <span className="text-white/80">{color.toHexString().toUpperCase()}</span>}
+                    showText={(color) => <span>{color.toHexString().toUpperCase()}</span>}
                 />
             </Space>
         );
@@ -368,6 +372,14 @@ export default function Project({ params }: { params: { id: string } }) {
                 return { width: 360, height: 640 };
         }
     }
+
+    const handleSubtitleTextChange = (index: number, newText: string) => {
+        setSubtitles(prevSubtitles =>
+            prevSubtitles.map((subtitle, i) =>
+                i === index ? { ...subtitle, text: newText } : subtitle
+            )
+        );
+    };
 
     useEffect(() => {
         if (state.status === "done") {
@@ -413,7 +425,7 @@ export default function Project({ params }: { params: { id: string } }) {
     if (!shouldRender) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <div className="bg-[#0a0a0a] z-50 w-16 h-16 flex justify-center items-center">
+                <div className="z-50 w-16 h-16 flex justify-center items-center">
                     <Loader2 className="relative animate-spin w-16 h-16 text-primary" />
                 </div>
             </div>
@@ -443,14 +455,14 @@ export default function Project({ params }: { params: { id: string } }) {
                                     Save settings
                                 </Button>
                                 <TabsContent value="style">
-                                    <ScrollArea style={{ height: '640px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                    <ScrollArea style={{ height: '640px' }} className="rounded-xl shadow-xl">
                                         {/* Themes */}
                                         <div className="p-6">
                                             <h3 className="mb-4">Fonts</h3>
                                             <div className="grid grid-cols-3 gap-3">
                                                 <div className="flex flex-col items-center">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === TheBoldFont.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === TheBoldFont.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
                                                                 fontFamily: TheBoldFont.style.fontFamily,
@@ -463,7 +475,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 color: "#fff",
                                                                 fontSize: 18,
                                                                 fontWeight: 700,
-                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000 ",
                                                                 position: "relative",
                                                                 top: "2.2px", // Adjust this value according to the space below the text
                                                                 textAlign: "center",
@@ -477,7 +489,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 </div>
                                                 <div className="flex flex-col items-center">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Komika.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Komika.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                         onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
@@ -491,7 +503,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 color: "#fff",
                                                                 fontSize: 18,
                                                                 fontWeight: 700,
-                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000 ",
                                                                 position: "relative",
                                                                 top: "-1.3px", // Adjust this value according to the space below the text
                                                                 textAlign: "center",
@@ -505,7 +517,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 </div>
                                                 <div className="flex flex-col items-center">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Montserrat.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Montserrat.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
                                                         onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
@@ -519,7 +531,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 color: "#fff",
                                                                 fontSize: 16,
                                                                 fontWeight: 700,
-                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000 ",
                                                                 position: "relative",
                                                                 textAlign: "center",
                                                                 lineHeight: 1
@@ -532,7 +544,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 </div>
                                                 <div className="flex flex-col items-center">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-neutral-800 ${font.fontFamily === Bangers.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Bangers.style.fontFamily ? 'bg-white' : 'bg-blue-300/40'}`}
                                                         onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
@@ -547,7 +559,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 color: "#fff",
                                                                 fontSize: 22,
                                                                 fontWeight: 700,
-                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000, 0 0 14px #000, 0 0 15px #000, 0 0 16px #000, 0 0 17px #000",
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000 ",
                                                                 position: "relative",
                                                                 textAlign: "center",
                                                                 lineHeight: 1
@@ -778,9 +790,8 @@ export default function Project({ params }: { params: { id: string } }) {
                                     </ScrollArea>
                                 </TabsContent>
                                 {subtitles.length > 0 && (
-
                                     <TabsContent value="captions">
-                                        <ScrollArea style={{ height: '640px' }} className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                        <ScrollArea style={{ height: '640px' }} className="rounded-xl shadow-xl">
                                             <div className="px-4 mt-6 mx-3 mb-3 flex shrink-0 flex-col justify-center text-sm md:text-base">
                                                 <h3 className="mb-1 flex gap-1 font-bold">
                                                     <span>LongToShort AI</span>
@@ -790,7 +801,11 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 {subtitles.map((subtitle, index) => (
                                                     <div
                                                         key={index}
-                                                        className={`rounded-xl py-2 px-2 mb-2 flex flex-col cursor-pointer ${focusedSubtitleIndex === index ? 'bg-neutral-900' : 'bg-transparent'} hover:bg-neutral-900`} onFocus={() => setFocusedSubtitleIndex(index)}
+                                                        className={`rounded-xl py-2 px-2 mb-2 flex flex-col cursor-pointer ${focusedSubtitleIndex === index ? 'bg-gray-100' : 'bg-transparent'} hover:bg-gray-100`} onFocus={() => setFocusedSubtitleIndex(index)}
+                                                        onClick={() => {
+                                                            playerRef.current?.pause();
+                                                            playerRef.current?.seekTo(subtitle.start * metadata.fps!);
+                                                        }}
                                                         onBlur={() => setFocusedSubtitleIndex(null)}
                                                         tabIndex={0} // Ensure that the div can receive focus
                                                     >
@@ -892,12 +907,11 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <div
-                                                            contentEditable={true}
-                                                            className="mt-4 mb-2 ml-3"
-                                                        >
-                                                            {subtitle.text}
-                                                        </div>
+                                                        <input
+                                                            value={subtitle.text}
+                                                            onChange={(e) => handleSubtitleTextChange(index, e.target.value)}
+                                                            className="mt-4 mb-2 ml-3 bg-transparent w-fit"
+                                                        />
                                                     </div>
                                                 ))}
                                             </div>
@@ -963,7 +977,11 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                 </Button>
                                                                 :
                                                                 <Button
-                                                                    onClick={renderMedia}
+                                                                    onClick={() => {
+                                                                        saveSettings().then(() => {
+                                                                            renderMedia();
+                                                                        });
+                                                                    }}
                                                                 >
                                                                     <Server className="mr-2 h-4 w-4" />
                                                                     Render video
@@ -986,7 +1004,8 @@ export default function Project({ params }: { params: { id: string } }) {
                             </Dialog>
                             {video ?
                                 <Player
-                                    className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800 z-50"
+                                    ref={playerRef}
+                                    className="rounded-xl shadow-xl z-50"
                                     component={Main}
                                     style={{
                                         height: aspectRatio(metadata.width!, metadata.height!).height,
@@ -1005,9 +1024,9 @@ export default function Project({ params }: { params: { id: string } }) {
                                     controls
                                 />
                                 :
-                                <div className="rounded-xl border border-neutral-800 shadow-xl shadow-neutral-800">
+                                <div className="rounded-xl shadow-xl">
                                     <div
-                                        className="rounded-xl bg-neutral-950 flex justify-center items-center"
+                                        className="rounded-xl flex justify-center items-center"
                                         style={{
                                             width: aspectRatio(metadata.width!, metadata.height!).width,
                                             height: aspectRatio(metadata.width!, metadata.height!).height,
