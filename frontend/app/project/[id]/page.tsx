@@ -156,6 +156,7 @@ export default function Project({ params }: { params: { id: string } }) {
             video_fps: metadata?.fps!,
         };
     }, [subtitles, font, video, metadata, user]);
+    const [words, setWords] = useState<number>(1);
 
     const { renderMedia, state } = useRendering(COMP_NAME, inputProps, user?.access_token!);
 
@@ -462,7 +463,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                             <div className="grid grid-cols-3 gap-3">
                                                 <div className="flex flex-col items-center">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === TheBoldFont.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`} onClick={() => {
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === TheBoldFont.style.fontFamily ? 'bg-blue-400/50' : 'bg-white'}`} onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
                                                                 fontFamily: TheBoldFont.style.fontFamily,
@@ -489,7 +490,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 </div>
                                                 <div className="flex flex-col items-center">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Komika.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Komika.style.fontFamily ? 'bg-blue-400/50' : 'bg-white'}`}
                                                         onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
@@ -517,7 +518,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 </div>
                                                 <div className="flex flex-col items-center">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Montserrat.style.fontFamily ? 'bg-white' : 'bg-neutral-200/20'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Montserrat.style.fontFamily ? 'bg-blue-400/50' : 'bg-white'}`}
                                                         onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
@@ -544,7 +545,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 </div>
                                                 <div className="flex flex-col items-center">
                                                     <Button
-                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Bangers.style.fontFamily ? 'bg-white' : 'bg-blue-300/40'}`}
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Bangers.style.fontFamily ? 'bg-blue-400/50' : 'bg-white'}`}
                                                         onClick={() => {
                                                             setFont((prevFont) => ({
                                                                 ...prevFont,
@@ -796,6 +797,14 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 <h3 className="mb-1 flex gap-1 font-bold">
                                                     <span>LongToShort AI</span>
                                                 </h3>
+                                                <Label className="mb-4 mt-8 font-semibold">Words - {words}</Label>
+                                                <Slider
+                                                    className="w-1/2"
+                                                    value={[words]}
+                                                    min={1}
+                                                    max={6}
+                                                    onValueChange={(e) => setWords(e[0])}
+                                                />
                                             </div>
                                             <div className="px-6 py-4">
                                                 {subtitles.map((subtitle, index) => (
@@ -898,12 +907,6 @@ export default function Project({ params }: { params: { id: string } }) {
                                                                             setSubtitles(updatedSubtitles);
                                                                         }}
                                                                     />
-                                                                    {/* <Eye
-                                                                className="w-6 h-6 ml-1 cursor-pointer rounded-lg"
-                                                                onClick={() => {
-                                                                    playerRef.current?.seekTo(subtitle.start * metadata.fps!);
-                                                                }}
-                                                            /> */}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -1016,6 +1019,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                         font: font,
                                         video: compressedVideo!,
                                         video_fps: metadata.fps!,
+                                        words: words,
                                     }}
                                     durationInFrames={Math.ceil((metadata.duration) * (metadata.fps || 30))}
                                     compositionWidth={metadata.width!}

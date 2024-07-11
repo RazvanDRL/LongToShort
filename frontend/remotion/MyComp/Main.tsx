@@ -38,7 +38,8 @@ export const Main: React.FC<{
   font: Font;
   video: string;
   video_fps: number;
-}> = ({ subtitles, font, video, video_fps }) => {
+  words: number;
+}> = ({ subtitles, font, video, video_fps, words }) => {
   const { fps } = useVideoConfig();
   video_fps = fps;
   const sequenceStyle: React.CSSProperties = useMemo(() => {
@@ -47,7 +48,6 @@ export const Main: React.FC<{
       fontFamily: font.fontName,
       justifyContent: "center",
       fontWeight: font.fontWeight,
-      verticalPosition: font.verticalPosition,
       textShadow: font.shadow,
       fontSize: font.fontSize * 1.5,
       transform: `translateY(${100 - font.verticalPosition}%)`,
@@ -55,17 +55,33 @@ export const Main: React.FC<{
     };
   }, [font]);
 
+  if (words > 1) {
+    const newSubtitles: Subtitle[] = [];
+
+    for (let i = 0; i < subtitles.length; i += words) {
+      const subtitle = subtitles.slice(i, i + words);
+      const start = subtitle[0].start;
+      const end = subtitle[subtitle.length - 1].end;
+
+      const text = subtitle.map(s => s.text).join(" ");
+      newSubtitles.push({ start, end, text });
+    }
+
+    subtitles = newSubtitles;
+  }
+
   const renderedSubtitles = useMemo(() => {
     return subtitles.map((subtitle) => {
       if (subtitle.start === 0 && subtitle.end === 0) {
 
-        const previousSubtitle = subtitles[subtitles.indexOf(subtitle) - 1];
+        const index = subtitles.indexOf(subtitle);
+        const previousSubtitle = subtitles[index - 1];
 
         if (previousSubtitle) {
           subtitle.start = previousSubtitle.end;
         };
 
-        const nextSubtitle = subtitles[subtitles.indexOf(subtitle) + 1];
+        const nextSubtitle = subtitles[index + 1];
 
         if (nextSubtitle) {
           subtitle.end = nextSubtitle.start;
