@@ -48,12 +48,12 @@
     "@vercel/speed-insights": "^1.0.12",
     "antd": "^5.19.1",
     "avvvatars-react": "^0.4.2",
-    "aws-sdk": "^2.1657.0",
+    "aws-sdk": "^2.1659.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "flowbite-react": "^0.8.0",
-    "framer-motion": "^11.2.14",
+    "framer-motion": "^11.3.2",
     "lucide-react": "^0.356.0",
     "mini-svg-data-uri": "^1.4.4",
     "next": "latest",
@@ -70,7 +70,7 @@
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^9.0.1",
-    "wrangler": "^3.63.2",
+    "wrangler": "^3.64.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

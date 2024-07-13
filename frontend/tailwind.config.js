@@ -73,6 +73,14 @@ module.exports = {
             backgroundPosition: "-200% 0",
           },
         },
+        "shine": {
+          from: {
+            backgroundPosition: '200% 0'
+          },
+          to: {
+            backgroundPosition: '-200% 0'
+          },
+        },
         "accordion-down": {
           from: { height: 0 },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -84,6 +92,7 @@ module.exports = {
       },
       animation: {
         'spin-slow': 'spin 2s linear infinite',
+        "shine": "shine 8s ease-in-out infinite",
         "shimmer": "shimmer 2s linear infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",

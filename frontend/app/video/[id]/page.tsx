@@ -171,49 +171,56 @@ export default function Video({ params }: { params: { id: string } }) {
     }
 
     async function processVideo() {
-        setProcessing(true);
-        const { data, error } = await supabase
-            .from('processing_queue')
-            .insert({
-                video_id: params.id,
-                user_id: user?.id,
-                status: "in queue",
-            });
-
-        if (error) {
-            if (error.message.includes("duplicate key value violates unique constraint")) {
-                toast.error("Video already in queue");
-                return;
-            }
-            else
-                toast.error(error.message);
+        const credits = await supabase.from("profiles").select("credits").eq("id", user?.id);
+        if (credits.data && credits.data.length > 0 && credits.data[0].credits < 1) {
+            toast.error("Not enough credits");
             return;
         }
+        else {
+            setProcessing(true);
+            const { data, error } = await supabase
+                .from('processing_queue')
+                .insert({
+                    video_id: params.id,
+                    user_id: user?.id,
+                    status: "in queue",
+                });
 
-        if (!error) {
-            toast.success("Video added to queue");
-            const { data: update_created_at_data, error: update_created_at_error } = await supabase
-                .from("processing_queue")
-                .update([
-                    { created_at: new Date().toISOString() },
-                ])
-                .match({ id: params.id });
-            if (update_created_at_error) {
-                toast.error(update_created_at_error.message);
+            if (error) {
+                if (error.message.includes("duplicate key value violates unique constraint")) {
+                    toast.error("Video already in queue");
+                    return;
+                }
+                else
+                    toast.error(error.message);
                 return;
             }
-            if (!update_created_at_error) {
-                await queuePosition().then(async (pos) => {
-                    await fetchEstimatedTime(pos!, metadata!).then((data) => {
-                        setQueuePos({
-                            position: pos!,
-                            estimated_time: data.waitingTime,
-                            processing_time: data.processingTime,
+
+            if (!error) {
+                toast.success("Video added to queue");
+                const { data: update_created_at_data, error: update_created_at_error } = await supabase
+                    .from("processing_queue")
+                    .update([
+                        { created_at: new Date().toISOString() },
+                    ])
+                    .match({ id: params.id });
+                if (update_created_at_error) {
+                    toast.error(update_created_at_error.message);
+                    return;
+                }
+                if (!update_created_at_error) {
+                    await queuePosition().then(async (pos) => {
+                        await fetchEstimatedTime(pos!, metadata!).then((data) => {
+                            setQueuePos({
+                                position: pos!,
+                                estimated_time: data.waitingTime,
+                                processing_time: data.processingTime,
+                            });
                         });
                     });
-                });
-                setStartTime(new Date().getTime());
-                setStatus("in queue");
+                    setStartTime(new Date().getTime());
+                    setStatus("in queue");
+                }
             }
         }
     }
@@ -452,7 +459,7 @@ export default function Video({ params }: { params: { id: string } }) {
                                     controls
                                     disablePictureInPicture
                                 />
-                                <Button className="mt-3 font-medium md:mt-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
+                                <Button variant="ringHover" className="mt-3 font-medium md:mt-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
                                     <Sparkles className="mr-2 h-5 w-5" />
                                     Generate subtitles
                                 </Button>
