@@ -371,7 +371,7 @@ export default function Export({ params }: { params: { id: string } }) {
                             </div>
                             <div className="flex justify-between">
                                 <div>
-                                    <div className="rounded-lg bg-neutral-800/20 p-2">
+                                    <div className="rounded-lg">
                                         <video
                                             src={video}
                                             controls

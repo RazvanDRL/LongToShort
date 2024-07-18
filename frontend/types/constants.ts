@@ -65,6 +65,7 @@ export const CompositionProps = z.object({
   video_width: z.number(),
   video_duration: z.number(),
   video_fps: z.number(),
+  words: z.number(),
 });
 
 export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
@@ -97,4 +98,5 @@ export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
   video_width: 0,
   video_duration: 0,
   video_fps: 0,
+  words: 1,
 };

@@ -143,6 +143,7 @@ export default function Project({ params }: { params: { id: string } }) {
     const [endTimeSlider, setEndTimeSlider] = useState(0);
     const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
     const [font, setFont] = useState<Font>(initialFont);
+    const [words, setWords] = useState<number>(1);
     const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
         return {
             subtitles,
@@ -154,9 +155,9 @@ export default function Project({ params }: { params: { id: string } }) {
             video_width: metadata?.width!,
             video_duration: metadata?.duration!,
             video_fps: metadata?.fps!,
+            words: words,
         };
     }, [subtitles, font, video, metadata, user]);
-    const [words, setWords] = useState<number>(1);
 
     const { renderMedia, state } = useRendering(COMP_NAME, inputProps, user?.access_token!);
 

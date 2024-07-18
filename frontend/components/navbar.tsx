@@ -2,37 +2,21 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Logo from "@/public/longtoshort.svg";
 import React from "react";
-import Link from "next/link"
+import Link from "next/link";
+
+
 
 export default function Navbar() {
-    const navItems = [
-        { name: "Home", link: "/" },
-        { name: "About", link: "/about" },
-        { name: "Contact", link: "/contact" },
-        { name: "Pricing", link: "/pricing"}
-    ];
-
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-900 bg-black">
-            <div className="flex justify-between items-center py-4 px-8 bg-black text-white max-w-screen-lg mx-auto">
+        <div className="container mx-auto w-full top-0 left-0 right-0 z-50 bg-background">
+            <div className="flex justify-between items-center py-10 px-10 bg-background text-black">
                 <div>
-                    <Image src={Logo} alt="Logo" className="w-48 h-auto" />
+                    <Image src={Logo} alt="Logo" className="invert w-48 h-auto" />
                 </div>
+
                 <div>
-                    <ul className="flex space-x-12">
-                        {navItems.map((item) => (
-                            <li key={item.name}>
-                                <a href={item.link}>{item.name}</a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div>
-                    <Button asChild>
+                    <Button className="text-md font-semibold bg-black" asChild>
                         <Link href="/dashboard">Login</Link>
-                    </Button>
-                    <Button asChild className="ml-4">
-                        <Link href="/signup">Sign up</Link>
                     </Button>
                 </div>
             </div>

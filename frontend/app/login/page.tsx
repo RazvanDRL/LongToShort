@@ -104,7 +104,7 @@ export default function Login() {
               >
                 <div className="flex items-center justify-center mr-2.5">
                   <Image
-                    className="h-4 w-4 fill-black"
+                    className="h-4 w-4 invert"
                     src={Twitter}
                     alt="Twitter Logo"
                   />
