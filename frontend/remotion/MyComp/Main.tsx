@@ -51,6 +51,7 @@ export const Main: React.FC<{
       textShadow: font.shadow,
       fontSize: font.fontSize * 1.5,
       transform: `translateY(${100 - font.verticalPosition}%)`,
+      verticalAlign: font.verticalPosition,
       textTransform: font.uppercase ? "uppercase" : "none",
     };
   }, [font]);
@@ -108,10 +109,13 @@ export const Main: React.FC<{
           >
             {font.punctuation == false ? removePunctuation(subtitle.text) : subtitle.text}
           </span>
-          {font.stroke?.strokeWidth.length > 0 &&
+          {
+            font.stroke?.strokeWidth.length > 0
+            &&
             <span style={{ WebkitTextStroke: font.stroke.strokeWidth + font.stroke.strokeColor }}>
               {font.punctuation == false ? removePunctuation(subtitle.text) : subtitle.text}
-            </span>}
+            </span>
+          }
         </Sequence>
       );
     });

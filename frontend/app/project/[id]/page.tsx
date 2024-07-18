@@ -223,12 +223,13 @@ export default function Project({ params }: { params: { id: string } }) {
             });
 
             if (!responseCompressed.ok) {
-                throw new Error('Failed to fetch signed URL');
+                setCompressedVideo(null);
+                console.error('Failed to fetch compressed video');
+            } else {
+                const dataCompressed = await responseCompressed.json();
+                const unpreload = preloadVideo(dataCompressed.url);
+                setCompressedVideo(dataCompressed.url);
             }
-
-            const dataCompressed = await responseCompressed.json();
-            const unpreload = preloadVideo(dataCompressed.url);
-            setCompressedVideo(dataCompressed.url);
             const response = await fetch(`/api/generate-signed-url`, {
                 method: 'POST',
                 headers: {
@@ -244,6 +245,7 @@ export default function Project({ params }: { params: { id: string } }) {
 
             const data = await response.json();
             setVideo(data.url);
+            console.log(data.url);
         } catch (error) {
             console.error('Error fetching video:', error);
         }
@@ -1018,7 +1020,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                     inputProps={{
                                         subtitles: subtitles,
                                         font: font,
-                                        video: compressedVideo!,
+                                        video: compressedVideo !== null ? compressedVideo : video,
                                         video_fps: metadata.fps!,
                                         words: words,
                                     }}
