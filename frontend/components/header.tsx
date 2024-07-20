@@ -5,21 +5,16 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
 import Avvvatars from "avvvatars-react";
 import {
-    Banknote,
     CirclePlus,
-    CreditCard,
-    Gift,
     Home,
     LogOut,
     MessageSquareText,
-    Settings,
-    User,
+    Video,
 } from "lucide-react"
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from 'next/navigation';
@@ -35,7 +30,6 @@ import { toast } from "sonner";
 import { usePathname } from 'next/navigation';
 import {
     Breadcrumb,
-    BreadcrumbEllipsis,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
@@ -44,7 +38,6 @@ import {
 } from "@/components/ui/breadcrumb"
 import Link from "next/link";
 import Image from "next/image";
-import local from "next/font/local";
 
 export default function Header({ user_email }: { user_email: string }) {
     const router = useRouter();
@@ -121,7 +114,7 @@ export default function Header({ user_email }: { user_email: string }) {
         <nav className="fixed top-0 left-0 right-0 z-10 container bg-background">
             <div className="sticky flex justify-between items-center py-4 md:py-6 md:px-8">
                 <div className="flex justify-start items-center">
-                    {pathname.split('/').length > 2 &&
+                    {pathname !== '/dashboard' &&
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
@@ -135,6 +128,7 @@ export default function Header({ user_email }: { user_email: string }) {
                             </BreadcrumbList>
                         </Breadcrumb>
                     }
+
                 </div>
                 <div className="flex justify-end items-center">
                     <div className="hidden md:flex">
@@ -218,7 +212,7 @@ export default function Header({ user_email }: { user_email: string }) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem>
-                                        <Banknote className="mr-2 h-4 w-4" />
+                                        <Video className="mr-2 h-4 w-4" />
                                         <span>{credits} videos</span>
                                         {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
                                     </DropdownMenuItem>
