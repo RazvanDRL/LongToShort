@@ -185,7 +185,7 @@ export default function Home() {
                         Easily generate <span className="font-bold">subtitles</span> for your videos in seconds. Just upload your video and we&apos;ll do the rest.
                     </p>
                     <div>
-                        <Button className="bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6">
+                        <Button className="transition-transform duration-300 ease-in-out hover:scale-95 bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6">
                             <Link href="/login">
                                 Go Viral Today
                             </Link>
@@ -202,8 +202,8 @@ export default function Home() {
                 </div>
 
                 <section className="relative mt-96 w-screen bg-primary rounded-t-[60px] z-10">
-                    <div className="max-w-7xl mx-auto px-8 py-16 md:py-32 items-center text-center">
-                        <div className="py-32">
+                    <div className="max-w-7xl mx-auto py-16 md:py-32 items-center text-center">
+                        <div className="py-16">
                             <h2 className={`mb-32 text-center leading-none text-[48px] ${Satoshi.className} font-black text-white`}>
                                 60% of potential views
                                 <br />
@@ -229,13 +229,19 @@ export default function Home() {
                                     <h3 className="font-bold">Inconsistency</h3>
                                 </div>
                             </div>
+                            <Button className="bg-white text-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-28 transition-transform duration-300 ease-in-out hover:scale-95 hover:bg-background    ">
+                                <Link href="/login">
+                                    Gain 60% more views
+                                </Link>
+                                <ArrowRight className="w-5 h-5 ml-2" />
+                            </Button>
                         </div>
                     </div>
 
 
                 </section>
-                <section className="bg-white w-screen z-10 py-16">
-                    <div className="max-w-7xl mx-auto px-8 py-16 md:py-32 items-center text-center">
+                <section className="bg-background w-screen z-10">
+                    <div className="max-w-7xl mx-auto py-16 md:py-32 items-center text-center">
                         <h2 className={`text-center leading-none text-[48px] ${Satoshi.className} font-black text-black`}>
                             The #1 Views Booster 🚀
                         </h2>
@@ -296,11 +302,17 @@ export default function Home() {
                                 </div>
                             </div>
                         </div>
+                        <Button className="bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-16">
+                            <Link href="/login">
+                                Boost views now
+                            </Link>
+                            <ArrowRight className="w-5 h-5 ml-2" />
+                        </Button>
                     </div>
                 </section>
-                <section className="bg-neutral-800 w-screen z-10">
-                    <div className="max-w-7xl mx-auto px-8 py-16 md:py-32 items-center text-center">
-                        <h3 className={`mb-32 text-center leading-none text-[32px] ${Satoshi.className} font-black text-white`}>
+                <section className="bg-background w-screen z-10">
+                    <div className="max-w-7xl mx-auto md:py-32 items-center text-center">
+                        <h3 className={`mb-32 text-center leading-none text-[32px] ${Satoshi.className} font-black text-black`}>
                             Be like the top 1%
                         </h3>
                         <div className="container overflow-hidden w-full rounded-lg relative">
