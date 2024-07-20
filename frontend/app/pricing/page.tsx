@@ -30,7 +30,7 @@ const features = [
 
 const plans = [
     {
-        title: "Starter",
+        title: "Solo 🙂",
         description: "Starting in content creation",
         paymentLink: "test_6oE5lkfHz0ZGes0000",
         price: 20,
@@ -39,10 +39,11 @@ const plans = [
             "20 videos per month",
             "5GB of storage",
             "3 minutes / video",
-        ]
+        ],
+        cta: "Seems good"
     },
     {
-        title: "Pro",
+        title: "Creator 🤩",
         description: "For growing businesses",
         paymentLink: "test_6oE5lkfHz0ZGes0000",
         price: 50,
@@ -52,10 +53,11 @@ const plans = [
             "10GB of storage",
             "5 minutes / video",
         ],
+        cta: "That's better",
         popular: true
     },
     {
-        title: "Enterprise",
+        title: "Teams 🚀",
         description: "For large businesses",
         paymentLink: "test_6oE5lkfHz0ZGes0000",
         price: 100,
@@ -64,7 +66,8 @@ const plans = [
             "100 videos per month",
             "20GB of storage",
             "10 minutes / video",
-        ]
+        ],
+        cta: "Best value"
     },
 ]
 
@@ -113,10 +116,10 @@ export default function Pricing() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto">
             {user ? <Header user_email={user.email} /> : null}
             <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-[48px] font-bold text-center mb-4 mt-12 md:mt-24 lg:mt-0 leading-tight">
+                <h1 className="text-[32px] md:text-[36px] lg:text-[48px] font-bold text-center mb-4 mt-24    lg:mt-0 leading-tight">
                     Start making <span className="text-primary underline underline-offset-8 decoration-primary decoration-dashed">amazing videos, today.</span>
                 </h1>
                 <p className="text-[18px] text-black/50 text-center mb-8">
@@ -135,9 +138,9 @@ export default function Pricing() {
                                 <CardDescription className="mb-4">{plan.description}</CardDescription>
                                 <span className="text-4xl font-bold">${plan.price}</span>
                                 <CardDescription className="mb-4">{plan.priceDescription}</CardDescription>
-                                <Button className="w-full rounded-xl" asChild>
+                                <Button className="w-full rounded-xl transition-transform duration-300 ease-in-out hover:scale-95" asChild>
                                     <Link href={`https://buy.stripe.com/${plan.paymentLink}?prefilled_email=${user?.email}&client_reference_id=${user?.id}`}>
-                                        Get Started
+                                        {plan.cta}
                                     </Link>
                                 </Button>
                             </CardHeader>
