@@ -118,7 +118,7 @@ export default function Header({ user_email }: { user_email: string }) {
     }, []);
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-10 container">
+        <nav className="fixed top-0 left-0 right-0 z-10 container bg-background">
             <div className="sticky flex justify-between items-center py-4 md:py-6 md:px-8">
                 <div className="flex justify-start items-center">
                     {pathname.split('/').length > 2 &&

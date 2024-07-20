@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import {
@@ -51,7 +51,8 @@ const plans = [
             "50 videos per month",
             "10GB of storage",
             "5 minutes / video",
-        ]
+        ],
+        popular: true
     },
     {
         title: "Enterprise",
@@ -97,7 +98,6 @@ export default function Pricing() {
                 if (!user) return;
                 setShouldRender(true);
             }
-
         };
         runPrecheck();
     }, [user?.id]);
@@ -105,7 +105,7 @@ export default function Pricing() {
     if (!shouldRender) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <div className=" z-50 w-16 h-16 flex justify-center items-center">
+                <div className="z-50 w-16 h-16 flex justify-center items-center">
                     <Loader2 className="relative animate-spin w-16 h-16 text-primary" />
                 </div>
             </div>
@@ -113,39 +113,51 @@ export default function Pricing() {
     }
 
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4 py-8">
             {user ? <Header user_email={user.email} /> : null}
-            <div className="w-full h-screen flex justify-center items-center">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            <div className="flex flex-col items-center justify-center min-h-screen">
+                <h1 className="text-[48px] font-bold text-center mb-4 mt-12 md:mt-24 lg:mt-0 leading-tight">
+                    Start making <span className="text-primary underline underline-offset-8 decoration-primary decoration-dashed">amazing videos, today.</span>
+                </h1>
+                <p className="text-[18px] text-black/50 text-center mb-8">
+                    No hidden fees. Videos never expire.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
                     {plans.map((plan, index) => (
-                        <Card key={index} className={`w-[350px] ${plan.title === plans[1].title ? "border-blue-500/50" : ""}`}>
+                        <Card key={index} className={`w-full ${plan.popular ? "border-primary/80 border-2 relative" : ""}`}>
+                            {plan.popular && (
+                                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
+                                    Most Popular
+                                </div>
+                            )}
                             <CardHeader>
-                                <CardTitle className="mb-1">{plan.title}</CardTitle>
-                                <CardDescription className="mb-8">{plan.description}</CardDescription>
-                                <span className="pt-3 text-5xl font-bold">${plan.price}</span>
-                                <CardDescription className="pb-2">{plan.priceDescription}</CardDescription>
-                                <Button className="rounded-xl" asChild>
+                                <CardTitle className="mb-1 text-xl">{plan.title}</CardTitle>
+                                <CardDescription className="mb-4">{plan.description}</CardDescription>
+                                <span className="text-4xl font-bold">${plan.price}</span>
+                                <CardDescription className="mb-4">{plan.priceDescription}</CardDescription>
+                                <Button className="w-full rounded-xl" asChild>
                                     <Link href={`https://buy.stripe.com/${plan.paymentLink}?prefilled_email=${user?.email}&client_reference_id=${user?.id}`}>
                                         Get Started
                                     </Link>
                                 </Button>
                             </CardHeader>
                             <CardContent>
-                                <div className="grid w-full items-center gap-4 text-sm">
+                                <div className="grid w-full items-center gap-2 text-sm">
                                     {plan.features.map((feature, index) => (
-                                        <span key={index}>
-                                            {feature}
+                                        <span key={index} className="flex items-center">
+                                            <CircleCheck className="mr-2 w-4 h-4 text-green-400 flex-shrink-0" />
+                                            <span>{feature}</span>
                                         </span>
                                     ))}
                                 </div>
                             </CardContent>
                             <Separator className="w-[90%] mx-auto mb-4" />
-                            <CardFooter className="grid">
+                            <CardFooter className="flex flex-col items-start">
                                 <Label className="text-lg mb-4">Features</Label>
-                                <div className="grid w-full items-center gap-4 text-sm">
+                                <div className="grid w-full items-start gap-2 text-sm">
                                     {features.map((feature, index) => (
                                         <span key={index} className="flex items-center">
-                                            <CircleCheck className="mr-2 w-6 h-6 text-green-400" />
+                                            <CircleCheck className="mr-2 w-4 h-4 text-green-400 flex-shrink-0" />
                                             <span>{feature}</span>
                                         </span>
                                     ))}

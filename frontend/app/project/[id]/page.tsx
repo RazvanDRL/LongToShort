@@ -800,14 +800,15 @@ export default function Project({ params }: { params: { id: string } }) {
                                                 <h3 className="mb-1 flex gap-1 font-bold">
                                                     <span>LongToShort AI</span>
                                                 </h3>
-                                                <Label className="mb-4 mt-8 font-semibold">Words - {words}</Label>
+                                                {/* Experimental feature */}
+                                                {/* <Label className="mb-4 mt-8 font-semibold">Words - {words}</Label>
                                                 <Slider
                                                     className="w-1/2"
                                                     value={[words]}
                                                     min={1}
                                                     max={6}
                                                     onValueChange={(e) => setWords(e[0])}
-                                                />
+                                                /> */}
                                             </div>
                                             <div className="px-6 py-4">
                                                 {subtitles.map((subtitle, index) => (
