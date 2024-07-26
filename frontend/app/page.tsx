@@ -3,82 +3,10 @@ import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Image from "next/image";
 import localFont from 'next/font/local'
-import { Player } from "@remotion/player";
-import { Landing } from "@/remotion/MyComp/Landing";
-import { staticFile } from "remotion";
 import { motion } from 'framer-motion';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Label } from "@/components/ui/label"
-import { ArrowDown, ArrowRight, CircleCheck, Star } from "lucide-react";
-import Footer from "@/components/footer";
-
-const slides = [
-    { url: "/videos/1.mp4" },
-    { url: "/videos/2.mp4" },
-    { url: "/videos/3.mp4" },
-    { url: "/videos/4.mp4" },
-    { url: "/videos/5.mp4" },
-    { url: "/videos/6.mp4" },
-];
-
-const features = [
-    "AI Video Subtitles",
-    "No Watermark",
-    "Custom Branding",
-    "Custom Templates",
-    "Custom Fonts",
-    "Custom Colors",
-    "Custom Music",
-]
-
-const plans = [
-    {
-        title: "Starter",
-        description: "Starting in content creation",
-        paymentLink: "test_6oE5lkfHz0ZGes0000",
-        price: 20,
-        priceDescription: "One time",
-        features: [
-            "20 videos per month",
-            "5GB of storage",
-            "3 minutes / video",
-        ]
-    },
-    {
-        title: "Pro",
-        description: "For growing businesses",
-        paymentLink: "test_6oE5lkfHz0ZGes0000",
-        price: 50,
-        priceDescription: "One time",
-        features: [
-            "50 videos per month",
-            "10GB of storage",
-            "5 minutes / video",
-        ]
-    },
-    {
-        title: "Enterprise",
-        description: "For large businesses",
-        paymentLink: "test_6oE5lkfHz0ZGes0000",
-        price: 100,
-        priceDescription: "One time",
-        features: [
-            "100 videos per month",
-            "20GB of storage",
-            "10 minutes / video",
-        ]
-    },
-]
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 const Satoshi = localFont({
     src: '../public/fonts/Satoshi.woff2',
@@ -90,10 +18,35 @@ const Poppins = localFont({
     display: 'swap',
 })
 
+const videos = [
+    {
+        src: "/videos/video1.mp4",
+        caption: "Andrew Huberman",
+        username: "@hubermanlab",
+        avatar: "/avatars/huberman.jpg",
+    },
+    {
+        src: "/videos/video2.mp4",
+        caption: "MrBeast",
+        username: "@mrbeast",
+        avatar: "/avatars/mrbeast.png",
+    },
+    {
+        src: "/videos/video3.mp4",
+        caption: "Iman Gadzhi",
+        username: "@imangadzhi",
+        avatar: "/avatars/gadzhi.jpg",
+    },
+    {
+        src: "/videos/video4.mp4",
+        caption: "Alex Hormozi",
+        username: "@hormozi",
+        avatar: "/avatars/hormozi.jpg",
+    },
+]
+
 
 export default function Home() {
-    const [showSubtitles, setShowSubtitles] = useState(false)
-    const duplicatedSlides = [...slides, ...slides];
 
     return (
         <div className="container mx-auto bg-background">
@@ -241,11 +194,11 @@ export default function Home() {
 
                 </section>
                 <section className="bg-background w-screen z-10">
-                    <div className="max-w-7xl mx-auto py-16 md:py-32 items-center text-center">
+                    <div className="max-w-7xl mx-auto pt-16 md:pt-32 items-center text-center">
                         <h2 className={`text-center leading-none text-[48px] ${Satoshi.className} font-black text-black`}>
                             The #1 Views Booster 🚀
                         </h2>
-                        <p className="mt-4 mb-16 text-black/50 text-[20px]">
+                        <p className="mt-4 mb-10 text-black/50 text-[20px]">
                             Boost views, engagement, and retention of your videos with one magical click.
                         </p>
                         <div className="grid grid-row-2 grid-cols-2 gap-8 text-black text-left">
@@ -311,121 +264,44 @@ export default function Home() {
                     </div>
                 </section>
                 <section className="bg-background w-screen z-10">
-                    <div className="max-w-7xl mx-auto md:py-32 items-center text-center">
-                        <h3 className={`mb-32 text-center leading-none text-[32px] ${Satoshi.className} font-black text-black`}>
-                            Be like the top 1%
+                    <div className="max-w-fit px-2 mx-auto md:py-32 items-center text-center">
+                        <h3 className={`mb-4 text-center leading-none text-[48px] ${Satoshi.className} font-black text-black`}>
+                            Post like the best influencers
                         </h3>
-                        <div className="container overflow-hidden w-full rounded-lg relative">
-                            <div className="absolute inset-0 z-20 before:absolute before:left-0 before:top-0 before:w-1/4 before:h-full before:bg-gradient-to-r before:from-neutral-800 before:to-transparent before:filter before:blur-3 after:absolute after:right-0 after:top-0 after:w-1/4 after:h-full after:bg-gradient-to-l after:from-neutral-800 after:to-transparent after:filter after:blur-3"></div>
-                            <motion.div
-                                className="flex"
-                                animate={{
-                                    x: ['-100%', '0%'],
-                                    transition: {
-                                        ease: 'linear',
-                                        duration: 20,
-                                        repeat: Infinity,
-                                    }
-                                }}
-                            >
-                                {duplicatedSlides.map((slide, index) => (
-                                    <motion.div
-                                        key={index}
-                                        className="flex-shrink-0 px-8 relative"
-                                        style={{ width: `${100 / slides.length * 1.5}%` }}
-                                    >
-                                        <motion.video
-                                            className="rounded-lg"
-                                            src={slide.url}
-                                            autoPlay
-                                            loop
-                                            muted
+                        <p className="mt-4 mb-10 text-black/50 text-[20px]">
+                            Dominate your niche with AI-crafted shorts, crush it with influencer-level impact.
+                        </p>
+                        <div className="grid grid-cols-4 gap-5">
+                            {videos.map((video, index) => (
+                                <div key={index} className="flex flex-col items-center">
+                                    <div className="flex items-center mb-4">
+                                        <Image
+                                            src={video.avatar}
+                                            className="rounded-full"
+                                            width={50}
+                                            height={50}
+                                            loading="lazy"
+                                            alt={`${video.caption} avatar`}
                                         />
-                                    </motion.div>
-                                ))}
-                            </motion.div>
+                                        <div className="ml-3 text-left">
+                                            <div className="font-semibold">{video.caption}</div>
+                                            <div className="text-gray-500">{video.username}</div>
+                                        </div>
+                                    </div>
+                                    <video
+                                        src={video.src}
+                                        className="rounded-[1.5rem] w-full max-w-[270px] h-auto drop-shadow-lg"
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
 
-                {/* Video slider */}
-                {/* <div className="container overflow-hidden w-3/4 my-48 rounded-lg py-8 relative">
-                    <div className="absolute inset-0 z-20 before:absolute before:left-0 before:top-0 before:w-1/4 before:h-full before:bg-gradient-to-r before:from-background before:to-transparent before:filter before:blur-3 after:absolute after:right-0 after:top-0 after:w-1/4 after:h-full after:bg-gradient-to-l after:from-background after:to-transparent after:filter after:blur-3"></div>
-                    <motion.div
-                        className="flex"
-                        animate={{
-                            x: ['-100%', '0%'],
-                            transition: {
-                                ease: 'linear',
-                                duration: 20,
-                                repeat: Infinity,
-                            }
-                        }}
-                    >
-                        {duplicatedSlides.map((slide, index) => (
-                            <motion.div
-                                key={index}
-                                className="flex-shrink-0 px-8 relative"
-                                style={{ width: `${100 / slides.length * 1.5}%` }}
-                            >
-                                <motion.video
-                                    className="rounded-lg"
-                                    src={slide.url}
-                                    autoPlay
-                                    loop
-                                    muted
-                                    whileHover={{
-                                        scale: 1.1,
-                                    }}
-                                />
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                </div> */}
-
-                {/* Pricing */}
-                {/* <div className="w-full h-screen flex justify-center items-center">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                        {plans.map((plan, index) => (
-                            <Card key={index} className={`w-[350px] ${plan.title === plans[1].title ? "border-blue-500/50" : ""}`}>
-                                <CardHeader>
-                                    <CardTitle className="mb-1">{plan.title}</CardTitle>
-                                    <CardDescription className="mb-8">{plan.description}</CardDescription>
-                                    <span className="pt-3 text-5xl font-bold">${plan.price}</span>
-                                    <CardDescription className="pb-2">{plan.priceDescription}</CardDescription>
-                                    <Button className="rounded-xl" asChild>
-                                        <Link href="/pricing">
-                                            Get Started
-                                        </Link>
-                                    </Button>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid w-full items-center gap-4 text-sm">
-                                        {plan.features.map((feature, index) => (
-                                            <span key={index}>
-                                                {feature}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                                <Separator className="w-[90%] mx-auto mb-4" />
-                                <CardFooter className="grid">
-                                    <Label className="text-lg mb-4">Features</Label>
-                                    <div className="grid w-full items-center gap-4 text-sm">
-                                        {features.map((feature, index) => (
-                                            <span key={index} className="flex items-center">
-                                                <CircleCheck className="mr-2 w-6 h-6 text-green-400" />
-                                                <span>{feature}</span>
-                                            </span>
-                                        ))}
-                                    </div>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                </div> */}
-                {/* Footer */}
-                {/* <Footer /> */}
             </div>
         </div >
     );
