@@ -155,7 +155,7 @@ export default function Home() {
                 </div>
 
                 <section className="relative mt-96 w-screen bg-primary rounded-t-[60px] z-10">
-                    <div className="max-w-7xl mx-auto py-16 md:py-32 items-center text-center">
+                    <div className="max-w-6xl mx-auto py-16 md:py-32 items-center text-center">
                         <div className="py-16">
                             <h2 className={`mb-32 text-center leading-none text-[48px] ${Satoshi.className} font-black text-white`}>
                                 60% of potential views
@@ -194,7 +194,7 @@ export default function Home() {
 
                 </section>
                 <section className="bg-background w-screen z-10">
-                    <div className="max-w-7xl mx-auto pt-16 md:pt-32 items-center text-center">
+                    <div className="max-w-6xl mx-auto pt-16 md:pt-32 items-center text-center">
                         <h2 className={`text-center leading-none text-[48px] ${Satoshi.className} font-black text-black`}>
                             The #1 Views Booster 🚀
                         </h2>
@@ -203,7 +203,7 @@ export default function Home() {
                         </p>
                         <div className="grid grid-row-2 grid-cols-2 gap-8 text-black text-left">
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-7xl mr-6">
+                                <div className="text-6xl mr-6">
                                     😉
                                 </div>
                                 <div>
@@ -216,7 +216,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-7xl mr-6">
+                                <div className="text-6xl mr-6">
                                     ✍️
                                 </div>
                                 <div>
@@ -229,7 +229,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-7xl mr-6">
+                                <div className="text-6xl mr-6">
                                     ✨
                                 </div>
                                 <div>
@@ -242,7 +242,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-7xl mr-6">
+                                <div className="text-6xl mr-6">
                                     🏆
                                 </div>
                                 <div>
@@ -299,6 +299,12 @@ export default function Home() {
                                 </div>
                             ))}
                         </div>
+                        <Button className="bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-16">
+                            <Link href="/login">
+                                Post now
+                            </Link>
+                            <ArrowRight className="w-5 h-5 ml-2" />
+                        </Button>
                     </div>
                 </section>
 

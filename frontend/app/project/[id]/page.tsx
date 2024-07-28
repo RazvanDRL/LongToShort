@@ -76,6 +76,16 @@ const Bangers = localFont({
     display: 'swap',
 })
 
+const Geist = localFont({
+    src: '../../../public/fonts/Geist.woff2',
+    display: 'swap',
+})
+
+const Helvetica = localFont({
+    src: '../../../public/fonts/Helvetica.woff2',
+    display: 'swap',
+})
+
 type Font = {
     textColor: string;
     fontSize: number;
@@ -90,6 +100,7 @@ type Font = {
         strokeColor: string,
     };
     shadow: string;
+    letterSpacing: number;
 }
 
 type StrokeSize = 'None' | 'S' | 'M' | 'L' | 'XL';
@@ -129,6 +140,7 @@ export default function Project({ params }: { params: { id: string } }) {
             strokeColor: "#000",
         },
         shadow: shadowSizes.None,
+        letterSpacing: 10,
     };
 
     const playerRef = useRef<PlayerRef>(null);
@@ -574,6 +586,60 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         </div>
                                                     </Button>
                                                 </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Geist.style.fontFamily ? 'bg-blue-400/50' : 'bg-white'}`}
+                                                        onClick={() => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: Geist.style.fontFamily,
+                                                                fontName: "Geist",
+                                                            }))
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                color: "#fff",
+                                                                fontSize: 20,
+                                                                fontWeight: 700,
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000 ",
+                                                                position: "relative",
+                                                                textAlign: "center",
+                                                                lineHeight: 1
+                                                            }}
+                                                            className={`${Geist.className} antialiased`}
+                                                        >
+                                                            Geist
+                                                        </div>
+                                                    </Button>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                    <Button
+                                                        className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Helvetica.style.fontFamily ? 'bg-blue-400/50' : 'bg-white'}`}
+                                                        onClick={() => {
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                fontFamily: Helvetica.style.fontFamily,
+                                                                fontName: "Helvetica",
+                                                            }))
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                color: "#fff",
+                                                                fontSize: 18,
+                                                                fontWeight: 700,
+                                                                textShadow: "0 0 8px #000, 0 0 9px #000, 0 0 10px #000, 0 0 11px #000, 0 0 12px #000, 0 0 13px #000 ",
+                                                                position: "relative",
+                                                                textAlign: "center",
+                                                                lineHeight: 1
+                                                            }}
+                                                            className={`${Helvetica.className} antialiased`}
+                                                        >
+                                                            Helvetica
+                                                        </div>
+                                                    </Button>
+                                                </div>
                                             </div>
                                             <h3 className="mb-4 mt-8">Font settings</h3>
                                             <div className="grid grid-cols-3 gap-3">
@@ -788,6 +854,24 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             punctuation: checked,
                                                         }))
                                                     }} />
+                                                </div>
+                                                <div className="flex flex-col items-center mt-3">
+                                                    <Label className="mb-1.5 items-center" htmlFor="size">Letter spacing</Label>
+                                                    <Input
+                                                        className="h-10 w-32"
+                                                        id="size"
+                                                        type="number"
+                                                        value={font.letterSpacing}
+                                                        min={-50}
+                                                        max={50}
+                                                        onChangeCapture={(e: any) =>
+                                                            setFont((prevFont) => ({
+                                                                ...prevFont,
+                                                                letterSpacing: e.target.value === '' ? 0 : Number(e.target.value),
+                                                            }))
+                                                        }
+                                                    />
+                                                    <Slider className="w-32 mt-3" value={[font.letterSpacing]} step={1} id="size" min={-50} max={50} onValueChange={(e) => setFont((prevFont) => ({ ...prevFont, letterSpacing: e[0] }))} />
                                                 </div>
                                             </div>
                                         </div>

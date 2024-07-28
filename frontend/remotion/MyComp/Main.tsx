@@ -27,6 +27,7 @@ type Font = {
     strokeColor: string,
   };
   shadow: string;
+  letterSpacing: number;
 }
 
 function removePunctuation(text: string) {
@@ -53,6 +54,7 @@ export const Main: React.FC<{
       transform: `translateY(${100 - font.verticalPosition}%)`,
       verticalAlign: font.verticalPosition,
       textTransform: font.uppercase ? "uppercase" : "none",
+      letterSpacing: font.letterSpacing,
     };
   }, [font]);
 

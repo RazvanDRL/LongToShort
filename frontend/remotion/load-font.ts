@@ -29,6 +29,16 @@ let fonts: Font[] = [
         path: '/fonts/Bangers.woff2',
         weights: '100 900',
     },
+    {
+        name: 'Geist',
+        path: '/fonts/Geist.woff2',
+        weights: '100 900',
+    },
+    {
+        name: 'Helvetica',
+        path: '/fonts/Helvetica.woff2',
+        weights: '100 900',
+    }
 ];
 
 export const loadFonts = async (): Promise<void> => {
