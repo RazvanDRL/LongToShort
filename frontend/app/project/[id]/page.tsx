@@ -613,7 +613,8 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         </div>
                                                     </Button>
                                                 </div>
-                                                <div className="flex flex-col items-center">
+                                                {/* Helvetica - not variable */}
+                                                {/* <div className="flex flex-col items-center">
                                                     <Button
                                                         className={`cursor-pointer p-2 h-12 w-32 rounded-sm border border-[#E2E8F0] ${font.fontFamily === Helvetica.style.fontFamily ? 'bg-blue-400/50' : 'bg-white'}`}
                                                         onClick={() => {
@@ -639,7 +640,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                             Helvetica
                                                         </div>
                                                     </Button>
-                                                </div>
+                                                </div> */}
                                             </div>
                                             <h3 className="mb-4 mt-8">Font settings</h3>
                                             <div className="grid grid-cols-3 gap-3">
@@ -855,8 +856,9 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         }))
                                                     }} />
                                                 </div>
-                                                <div className="flex flex-col items-center mt-3">
-                                                    <Label className="mb-1.5 items-center" htmlFor="size">Letter spacing</Label>
+                                                {/* letter spacing */}
+                                                {/* <div className="flex col-span-2 flex-col items-left mt-3">
+                                                    <Label className="mb-1.5 text-left" htmlFor="size">Letter spacing</Label>
                                                     <Input
                                                         className="h-10 w-32"
                                                         id="size"
@@ -872,7 +874,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         }
                                                     />
                                                     <Slider className="w-32 mt-3" value={[font.letterSpacing]} step={1} id="size" min={-50} max={50} onValueChange={(e) => setFont((prevFont) => ({ ...prevFont, letterSpacing: e[0] }))} />
-                                                </div>
+                                                </div> */}
                                             </div>
                                         </div>
                                     </ScrollArea>

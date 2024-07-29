@@ -47,6 +47,7 @@ export const Font = z.object({
     strokeColor: z.string(),
   }),
   shadow: z.string(),
+  letterSpacing: z.number(),
 });
 
 export const Subtitle = z.object({
@@ -90,6 +91,7 @@ export const defaultMyCompProps: z.infer<typeof CompositionProps> = {
       strokeColor: "",
     },
     shadow: "",
+    letterSpacing: 0,
   },
   video: "",
   user_id: "",
