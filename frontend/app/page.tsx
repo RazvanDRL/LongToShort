@@ -1,10 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import localFont from 'next/font/local'
-import { motion } from 'framer-motion';
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 
@@ -126,7 +125,7 @@ export default function Home() {
                 </div> */}
                 {/* Hero */}
                 <div className="sticky z-0 top-0 flex flex-col gap-16 items-center">
-                    <h1 className={`text-left leading-none text-[60px] ${Satoshi.className} font-black`}>
+                    <h1 className={`text-left leading-none text-[36px] sm:text-[48px] md:text-[60px] ${Satoshi.className} font-black`}>
                         How Creators make&nbsp;
                         <br />
                         <span className="underline underline-offset-8 decoration-primary decoration-dashed">
@@ -190,8 +189,6 @@ export default function Home() {
                             </Button>
                         </div>
                     </div>
-
-
                 </section>
                 <section className="bg-background w-screen z-10">
                     <div className="max-w-6xl mx-auto pt-16 md:pt-32 items-center text-center">
@@ -307,7 +304,6 @@ export default function Home() {
                         </Button>
                     </div>
                 </section>
-
             </div>
         </div >
     );
