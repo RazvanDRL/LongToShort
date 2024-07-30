@@ -185,7 +185,7 @@ export default function Home() {
                             Unlock Viral Potential in Seconds 🚀
                         </h2>
                         <p className="mt-4 mb-10 text-black/50 text-[20px]">
-                            Transform your content from overlooked to overperforming. Here's how we skyrocket your success:
+                            Transform your content from overlooked to overperforming. Here&apos;s how we skyrocket your success:
                         </p>
                         <div className="grid grid-row-2 grid-cols-2 gap-8 text-black text-left">
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
