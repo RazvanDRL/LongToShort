@@ -81,7 +81,7 @@ export default function Login() {
         </div>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <Image src="/longtoshort.svg" alt="LongtoShort Logo" className="mx-auto mb-24" width={256} height={256} />
+            <Image src="/longtoshort.svg" alt="LongtoShort Logo" className="invert mx-auto mb-24" width={256} height={256} />
             <form action={loginGoogle}>
               <Button
                 variant="outline"

@@ -11,6 +11,7 @@ type Subtitle = {
   start: number;
   end: number;
   text: string;
+  filteredText?: string;
 };
 
 type Font = {

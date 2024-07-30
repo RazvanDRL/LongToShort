@@ -15,8 +15,6 @@ import {
 } from "@/components/ui/popover"
 import { Slider } from "@/components/ui/slider"
 import { Check, FileVideo, ListPlus, Save, Server, Trash2 } from "lucide-react";
-
-import { AspectRatio } from "@/components/ui/aspect-ratio"
 import {
     Menubar,
     MenubarMenu,
@@ -49,11 +47,13 @@ import { Loader2 } from "lucide-react";
 import type { Metadata, User } from "../../../types/constants";
 import { preloadVideo } from "@remotion/preload";
 import Link from "next/link";
+import { censor } from "@/app/utils/checkCensor";
 
 type Subtitle = {
     start: number;
     end: number;
     text: string;
+    filteredWord?: string;
 };
 
 const Komika = localFont({
@@ -140,7 +140,7 @@ export default function Project({ params }: { params: { id: string } }) {
             strokeColor: "#000",
         },
         shadow: shadowSizes.None,
-        letterSpacing: 10,
+        letterSpacing: 0,
     };
 
     const playerRef = useRef<PlayerRef>(null);
@@ -155,6 +155,7 @@ export default function Project({ params }: { params: { id: string } }) {
     const [endTimeSlider, setEndTimeSlider] = useState(0);
     const [focusedSubtitleIndex, setFocusedSubtitleIndex] = useState<number | null>(null);
     const [font, setFont] = useState<Font>(initialFont);
+    const [censorOption, setCensorOption] = useState<boolean>(true);
     const [words, setWords] = useState<number>(1);
     const inputProps: z.infer<typeof CompositionProps> = useMemo(() => {
         return {
@@ -296,7 +297,9 @@ export default function Project({ params }: { params: { id: string } }) {
                     const startTime = isNaN(wordObj.start) ? 0 : wordObj.start;
                     const endTime = isNaN(wordObj.end) ? 0 : wordObj.end;
                     const word = wordObj.word;
-                    newSubtitles.push({ start: startTime, end: endTime, text: word });
+                    // const censored = await censor(word);
+                    const censored = word;
+                    newSubtitles.push({ start: startTime, end: endTime, text: word, filteredWord: censored });
                 }
             }
             setSubtitles(newSubtitles);
@@ -856,6 +859,13 @@ export default function Project({ params }: { params: { id: string } }) {
                                                         }))
                                                     }} />
                                                 </div>
+                                                {/* censored option */}
+                                                {/* <div className="flex flex-col items-center mt-3">
+                                                    <Label className="mb-1.5 items-center" htmlFor="size">Censor</Label>
+                                                    <Switch onCheckedChange={(checked) => {
+                                                        setCensorOption(checked);
+                                                    }} />
+                                                </div> */}
                                                 {/* letter spacing */}
                                                 {/* <div className="flex col-span-2 flex-col items-left mt-3">
                                                     <Label className="mb-1.5 text-left" htmlFor="size">Letter spacing</Label>

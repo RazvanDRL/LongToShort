@@ -51,78 +51,6 @@ export default function Home() {
         <div className="container mx-auto bg-background">
             <Navbar />
             <div className="flex flex-col items-center justify-start min-h-screen pt-32 z-20">
-                {/* testimonials */}
-                {/* <div className="grid grid-cols-3 gap-12">
-                    <div className="col-span-1">
-                        <div className="text-center mt-4">
-                            <div className="flex justify-center">
-                                <div className="flex justify-center gap-1">
-                                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                </div>
-                            </div>
-                            <p className="mt-2 text-md font-medium text-neutral-700">
-                                {`"`}No annoying watermarks{`"`}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="col-span-1">
-                        <div className="text-center mt-4">
-                            <div className="flex justify-center gap-1">
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                            </div>
-                            <p className="mt-2 text-md font-medium text-neutral-700">
-                                {`"`}Lightning fast transcriptions{`"`}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="col-span-1">
-                        <div className="text-center mt-4">
-                            <div className="flex justify-center gap-1">
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                            </div>
-                            <p className="mt-2 text-md font-medium text-neutral-700">
-                                {`"`}Viral templates{`"`}
-                            </p>
-                        </div>
-                    </div>
-                </div> */}
-
-                {/* video demo */}
-
-                {/* <div className="">
-                    <Player
-                        className="rounded-xl"
-                        component={Landing}
-                        durationInFrames={1000}
-                        compositionWidth={1080 / 6}
-                        compositionHeight={1920 / 6}
-                        inputProps={{ video: `${staticFile('/videos/tristan_slovak.mp4')}`, showSubtitles }}
-                        autoPlay
-                        loop
-                        initiallyMuted
-                        clickToPlay
-                        fps={30}
-                    />
-                    <Button
-                        className="hover:cursor-pointer mt-6 rounded-lg relative"
-                        onClick={() => setShowSubtitles(true)}
-                    >
-                        <Image src="/cursors/hand_pointing.svg" alt="Pointing Hand" className="animate-bounce absolute -bottom-[7px] left-[90%] transform -translate-x-1/2 -mb-2.5" height={24} width={24} />
-                        ✨ Generate subtitles
-                    </Button>
-                </div> */}
                 {/* Hero */}
                 <div className="sticky z-0 top-0 flex flex-col gap-16 items-center">
                     <h1 className={`text-left leading-none text-[36px] sm:text-[48px] md:text-[60px] ${Satoshi.className} font-black`}>
@@ -138,7 +66,7 @@ export default function Home() {
                     </p>
                     <div>
                         <Button className="transition-transform duration-300 ease-in-out hover:scale-95 bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6">
-                            <Link href="/login">
+                            <Link href="/dashboard">
                                 Go Viral Today
                             </Link>
                             <ArrowRight className="w-5 h-5 ml-2" />
@@ -152,8 +80,7 @@ export default function Home() {
                             </div> */}
                     </div>
                 </div>
-
-                <section className="relative mt-96 w-screen bg-primary rounded-t-[60px] z-10">
+                <section className="relative mt-60 w-screen bg-primary rounded-t-[60px] z-50">
                     <div className="max-w-6xl mx-auto py-16 md:py-32 items-center text-center">
                         <div className="py-16">
                             <h2 className={`mb-32 text-center leading-none text-[48px] ${Satoshi.className} font-black text-white`}>
@@ -182,7 +109,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <Button className="bg-white text-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-28 transition-transform duration-300 ease-in-out hover:scale-95 hover:bg-background    ">
-                                <Link href="/login">
+                                <Link href="/dashboard">
                                     Gain 60% more views
                                 </Link>
                                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -190,13 +117,13 @@ export default function Home() {
                         </div>
                     </div>
                 </section>
-                <section className="bg-background w-screen z-10">
+                <section className="bg-background w-screen z-50">
                     <div className="max-w-6xl mx-auto pt-16 md:pt-32 items-center text-center">
                         <h2 className={`text-center leading-none text-[48px] ${Satoshi.className} font-black text-black`}>
-                            The #1 Views Booster 🚀
+                            Unlock Viral Potential in Seconds 🚀
                         </h2>
                         <p className="mt-4 mb-10 text-black/50 text-[20px]">
-                            Boost views, engagement, and retention of your videos with one magical click.
+                            Transform your content from overlooked to overperforming. Here's how we skyrocket your success:
                         </p>
                         <div className="grid grid-row-2 grid-cols-2 gap-8 text-black text-left">
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
@@ -253,14 +180,14 @@ export default function Home() {
                             </div>
                         </div>
                         <Button className="bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-16">
-                            <Link href="/login">
+                            <Link href="/dashboard">
                                 Boost views now
                             </Link>
                             <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
                     </div>
                 </section>
-                <section className="bg-background w-screen z-10">
+                <section className="bg-background w-screen z-50">
                     <div className="max-w-fit px-2 mx-auto md:py-32 items-center text-center">
                         <h3 className={`mb-4 text-center leading-none text-[48px] ${Satoshi.className} font-black text-black`}>
                             Post like the best influencers
@@ -297,7 +224,7 @@ export default function Home() {
                             ))}
                         </div>
                         <Button className="bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-16">
-                            <Link href="/login">
+                            <Link href="/dashboard">
                                 Post now
                             </Link>
                             <ArrowRight className="w-5 h-5 ml-2" />

@@ -54,6 +54,7 @@ export const Subtitle = z.object({
   start: z.number(),
   end: z.number(),
   text: z.string(),
+  filteredWord: z.string().optional(),
 });
 
 export const CompositionProps = z.object({
