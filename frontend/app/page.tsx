@@ -128,53 +128,52 @@ export default function Home() {
                         <div className="grid grid-row-2 grid-cols-2 gap-8 text-black text-left">
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
                                 <div className="text-6xl mr-6">
-                                    😉
+                                    🎯
                                 </div>
                                 <div>
                                     <h3 className="text-[24px] font-[800] mb-2">
-                                        Trendy Captions & Emojis
+                                        Spot-On Accuracy
                                     </h3>
                                     <p className="text-black/50 text-[16px]">
-                                        LongToShort&apos;s AI creates stylish video captions in 48 languages, making your content stand out.
+                                        Get subtitles you can trust. Our advanced system delivers precise transcriptions, so your message comes across clearly every time.                                    </p>
+                                </div>
+                            </div>
+                            <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
+                                <div className="text-6xl mr-6">
+                                    🚀
+                                </div>
+                                <div>
+                                    <h3 className="text-[24px] font-[800] mb-2">
+                                        Lightning-Fast Transcription
+                                    </h3>
+                                    <p className="text-black/50 text-[16px]">
+                                        We value your time. Get your subtitles in minutes, not hours. Keep your content flowing and your audience engaged.
                                     </p>
                                 </div>
                             </div>
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
                                 <div className="text-6xl mr-6">
-                                    ✍️
+                                    🎨
                                 </div>
                                 <div>
                                     <h3 className="text-[24px] font-[800] mb-2">
-                                        Trendy Captions & Emojis
+                                        Customization Options
                                     </h3>
                                     <p className="text-black/50 text-[16px]">
-                                        LongToShort&apos;s AI creates stylish video captions in 48 languages, making your content stand out.
+                                        Make your subtitles pop. Easily adjust font, color, size, and position to match your style and boost viewer engagement.
                                     </p>
                                 </div>
                             </div>
                             <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
                                 <div className="text-6xl mr-6">
-                                    ✨
+                                    🙂
                                 </div>
                                 <div>
                                     <h3 className="text-[24px] font-[800] mb-2">
-                                        Trendy Captions & Emojis
+                                        Clean Content Guarantee
                                     </h3>
                                     <p className="text-black/50 text-[16px]">
-                                        LongToShort&apos;s AI creates stylish video captions in 48 languages, making your content stand out.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-6xl mr-6">
-                                    🏆
-                                </div>
-                                <div>
-                                    <h3 className="text-[24px] font-[800] mb-2">
-                                        Trendy Captions & Emojis
-                                    </h3>
-                                    <p className="text-black/50 text-[16px]">
-                                        LongToShort&apos;s AI creates stylish video captions in 48 languages, making your content stand out.
+                                        Our smart filter catches bad words, avoid takedowns due to inappropriate language and keep your videos up and earning.
                                     </p>
                                 </div>
                             </div>
