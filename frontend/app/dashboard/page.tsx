@@ -21,6 +21,7 @@ import React, { useEffect, useState } from 'react';
 import Header from "@/components/header"
 import type { User } from "../../types/constants";
 import VideoList from "@/components/VideoList";
+import { FileUpload } from "@/components/ui/file-upload";
 
 type Video = {
     id: string;
@@ -114,63 +115,25 @@ export default function Dashboard() {
         return name;
     }
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files || !e.target.files[0] || !e.target.files[0].size || !e.target.files[0].type) return;
-        if (uploadState !== "idle") return;
-
-        if (e.target.files[0].size > 52428800 * 10) {
-            toast.error("File size is too big.");
-            e.target.value = "";
-            return;
-        }
-
-        if (e.target.files[0].type !== "video/mp4") {
-            toast.error("File type is not accepted. Contact support");
-            e.target.value = "";
-            return;
-        }
-
-        setFiles(e.target.files[0]);
-    };
-
-    const handleSubmitFile = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
+    const handleFileUpload = async (uploadedFiles: File[]) => {
         if (!user) return;
-        if (!files) return;
         if (uploadState !== "idle") return;
+        if (uploadedFiles.length === 0) return;
 
-        if (files) {
-            await uploadFile(files);
+        const file = uploadedFiles[0];
+
+        if (file.size > 52428800 * 10) {
+            toast.error("File size is too big.");
+            return;
         }
-    }
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-    };
-
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        if (!e.dataTransfer.files) return;
-        if (uploadState !== "idle") return;
-
-        const droppedFiles = e.dataTransfer.files;
-
-        if (droppedFiles.length > 0) {
-            const file = droppedFiles[0];
-
-            if (file.size > 52428800 * 10) {
-                toast.error("File size is too big.");
-                return;
-            }
-
-            if (file.type !== "video/mp4") {
-                toast.error("File type is not accepted. Contact support");
-                return;
-            }
-
-            setFiles(file);
+        if (!file.type.startsWith("video/")) {
+            toast.error("Only video files are accepted.");
+            return;
         }
+
+        setFiles(file);
+        await uploadFile(file);
     };
 
     function removeInvalidCharacters(input: string): string {
@@ -433,73 +396,34 @@ export default function Dashboard() {
             {user ? <Header user_email={user.email} /> : null}
             <main className="w-full h-screen flex justify-center items-center">
                 <div>
-                    <div className="flex flex-col items-center max-w-700px min-w-700px"
-                        onDragOver={handleDragOver}
-                        onDrop={handleDrop}
-                    >
-                        <form className="px-4" onSubmit={handleSubmitFile}>
-                            <label
-                                htmlFor="fileInput"
-                                className="relative flex justify-center items-center cursor-pointer font-medium text-muted-foreground border border-gray-400/50 border-dashed py-5 px-20 rounded-xl overflow-hidden"
+                    <div className="flex flex-col items-center max-w-700px min-w-700px">
+                        <FileUpload onChange={handleFileUpload} />
+                        {uploadState === "uploading" ? (
+                            <div>
+                                <Button
+                                    disabled
+                                    className='w-full mt-8'
+                                >
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Uploading...
+                                </Button>
+                            </div>
+                        ) : uploadState === "done" ? (
+                            <Button
+                                className="w-full mt-8"
+                                disabled
                             >
-                                {!files?.name ? "Choose a file (MP4), or drag it here" : shortenFileName(files?.name)}
-                                <div className="absolute right-8 text-gray-400">
-                                    {files?.name ?
-                                        <span
-                                            className="cursor-pointer"
-                                            onClick={() => {
-                                                if (uploadState === "uploading") return;
-                                                setFiles(undefined)
-                                            }}>
-                                            <XCircle />
-                                        </span>
-                                        :
-                                        ""}
-                                </div>
-                            </label>
-
-                            <input
-                                id="fileInput"
-                                className="hidden"
-                                type="file"
-                                onChange={handleFileChange}
-                                accept="video/mp4"
-                                disabled={uploadState === "uploading"}
-                            />
-                            {uploadState === "uploading" ? (
-                                <div>
-                                    <Button
-                                        disabled
-                                        className='w-full mt-8'
-                                    >
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Uploading...
-                                    </Button>
-                                </div>
-                            ) : uploadState === "done" ? (
-                                <Button
-                                    className="w-full mt-8"
-                                    disabled
-                                >
-                                    <Check className="mr-2 h-4 w-4" />
-                                    Done
-                                </Button>
-                            ) : uploadState === "error" ? (
-                                <Button
-                                    className="w-full mt-8"
-                                    disabled
-                                >
-                                    Error
-                                </Button>
-                            ) : (
-                                <Button
-                                    type="submit"
-                                    className="w-full mt-8"
-                                >
-                                    Upload
-                                </Button>
-                            )}
-                        </form>
+                                <Check className="mr-2 h-4 w-4" />
+                                Done
+                            </Button>
+                        ) : uploadState === "error" ? (
+                            <Button
+                                className="w-full mt-8"
+                                disabled
+                            >
+                                Error
+                            </Button>
+                        ) : null}
                     </div>
                     <div className="mt-20 md:mt-28 flex flex-col-1 justify-center items-center w-[70%] mx-auto">
                         <div>
