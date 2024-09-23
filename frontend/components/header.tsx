@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Avvvatars from "avvvatars-react";
 import {
+    BadgePlus,
     CirclePlus,
     Home,
     LogOut,
@@ -156,9 +157,10 @@ export default function Header({ user_email }: { user_email: string }) {
                             </Popover>
                         </div>
                         <div>
-                            <Button className="mr-6 md:mr-8" variant={"outline"} asChild>
+                            <Button className="mr-6 md:mr-8 border-2 border-blue-500 hover:bg-blue-50 transition-colors duration-300" variant={"outline"} asChild>
                                 <Link href="/pricing">
-                                    Add more videos
+                                    <BadgePlus className="mr-2 h-4 w-4 text-blue-500" />
+                                    <span className="font-semibold text-blue-600">Add more videos</span>
                                 </Link>
                             </Button>
                         </div>
@@ -188,10 +190,10 @@ export default function Header({ user_email }: { user_email: string }) {
                             </PopoverContent>
                         </Popover>
                         <div>
-                            <Button className="mr-3" variant={"outline"} asChild>
+                            <Button className="mr-3 border-2 border-blue-500 hover:bg-blue-50 transition-colors duration-300" variant={"outline"} asChild>
                                 <Link href="/pricing">
-                                    <CirclePlus className="w-4 h-4 mr-2" />
-                                    Videos
+                                    <BadgePlus className="w-4 h-4 mr-2 text-blue-500" />
+                                    <span className="font-semibold text-blue-600">Videos</span>
                                 </Link>
                             </Button>
                         </div>

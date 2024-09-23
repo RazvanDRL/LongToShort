@@ -127,8 +127,8 @@ export default function Dashboard() {
             return;
         }
 
-        if (!file.type.startsWith("video/")) {
-            toast.error("Only video files are accepted.");
+        if (file.type !== "video/mp4") {
+            toast.error("File type is not accepted. Contact support");
             return;
         }
 
