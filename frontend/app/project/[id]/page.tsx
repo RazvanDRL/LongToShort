@@ -136,10 +136,10 @@ export default function Project({ params }: { params: { id: string } }) {
         uppercase: true,
         punctuation: false,
         stroke: {
-            strokeWidth: strokeSizes.None,
+            strokeWidth: strokeSizes.M,
             strokeColor: "#000",
         },
-        shadow: shadowSizes.None,
+        shadow: shadowSizes.M,
         letterSpacing: 0,
     };
 
