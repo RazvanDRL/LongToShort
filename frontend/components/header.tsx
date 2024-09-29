@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import Link from "next/link";
 import Image from "next/image";
+import Logo from "@/public/autosubs.svg";
 
 export default function Header({ user_email }: { user_email: string }) {
     const router = useRouter();
@@ -115,7 +116,7 @@ export default function Header({ user_email }: { user_email: string }) {
         <nav className="fixed top-0 left-0 right-0 z-10 container bg-background">
             <div className="sticky flex justify-between items-center py-4 md:py-6 md:px-8">
                 <div className="flex justify-start items-center">
-                    {pathname !== '/dashboard' &&
+                    {pathname !== '/dashboard' ?
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
@@ -128,6 +129,8 @@ export default function Header({ user_email }: { user_email: string }) {
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
+                        :
+                        <Image src={Logo} alt="Logo" className="w-32 h-auto sm:w-40 md:w-48" />
                     }
 
                 </div>

@@ -894,7 +894,7 @@ export default function Project({ params }: { params: { id: string } }) {
                                         <ScrollArea style={{ height: '640px' }} className="rounded-xl shadow-xl">
                                             <div className="px-4 mt-6 mx-3 mb-3 flex shrink-0 flex-col justify-center text-sm md:text-base">
                                                 <h3 className="mb-1 flex gap-1 font-bold">
-                                                    <span>LongToShort AI</span>
+                                                    <span>AutoSubs AI</span>
                                                 </h3>
                                                 {/* Experimental feature */}
                                                 {/* <Label className="mb-4 mt-8 font-semibold">Words - {words}</Label>

@@ -399,18 +399,16 @@ export default function Dashboard() {
                     <div className="flex flex-col items-center max-w-700px min-w-700px">
                         <FileUpload onChange={handleFileUpload} />
                         {uploadState === "uploading" ? (
-                            <div>
-                                <Button
-                                    disabled
-                                    className='w-full mt-8'
-                                >
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Uploading...
-                                </Button>
-                            </div>
+                            <Button
+                                disabled
+                                className='w-[24rem] mt-8'
+                            >
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Uploading...
+                            </Button>
                         ) : uploadState === "done" ? (
                             <Button
-                                className="w-full mt-8"
+                                className="w-[24rem] mt-8"
                                 disabled
                             >
                                 <Check className="mr-2 h-4 w-4" />
@@ -418,7 +416,7 @@ export default function Dashboard() {
                             </Button>
                         ) : uploadState === "error" ? (
                             <Button
-                                className="w-full mt-8"
+                                className="w-[24rem] mt-8"
                                 disabled
                             >
                                 Error

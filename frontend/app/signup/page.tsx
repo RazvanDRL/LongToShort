@@ -82,7 +82,7 @@ export default function SignUp() {
         </div>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <Image src="/longtoshort.svg" alt="LongtoShort Logo" className="mx-auto mb-24" width={256} height={256} />
+            <Image src="/autosubs.svg" alt="LongtoShort Logo" className="mx-auto mb-24" width={256} height={256} />
             <form action={signupGoogle}>
               <Button
                 variant="outline"
@@ -120,7 +120,7 @@ export default function SignUp() {
               >
                 <div className="flex items-center justify-center mr-2.5">
                   <Image
-                    className="h-5 w-5 dark:invert"
+                    className="h-5 w-5"
                     src={Github}
                     alt="Github Logo"
                   />
