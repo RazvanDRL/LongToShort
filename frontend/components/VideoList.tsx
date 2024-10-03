@@ -5,7 +5,7 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
 import {
     Pagination,
     PaginationContent,
@@ -71,9 +71,13 @@ const VideoList: React.FC<VideoListProps> = ({ videos }) => {
                 <div className="flex items-center justify-between space-x-4 mb-0.5 pl-2">
                     <h4 className="text-sm font-semibold">Your Videos</h4>
                     <CollapsibleTrigger asChild className={videos.length > 1 ? "" : "hidden"}>
-                        <Button variant="ghost" size="sm" className="w-9 p-0">
-                            <ChevronsUpDown className="h-4 w-4" />
-                            <span className="sr-only">Toggle</span>
+                        <Button variant="ghost" size="sm" className="flex items-center">
+                            <span className="text-xs mr-1">{isOpen ? "Collapse" : "Expand"}</span>
+                            {isOpen ? (
+                                <ChevronUp className="h-4 w-4" />
+                            ) : (
+                                <ChevronDown className="h-4 w-4" />
+                            )}
                         </Button>
                     </CollapsibleTrigger>
                 </div>
@@ -94,7 +98,8 @@ const VideoList: React.FC<VideoListProps> = ({ videos }) => {
                     <div>
                         {formatSeconds(Math.round(videos[0].duration))}
                     </div>
-                </div> :
+                </div>
+                    :
                     pageVideos.map((video, index) => (
                         <a key={video.id} href={video.processed ? `/project/${video.id}` : `/video/${video.id}`} className="">
                             <div className="rounded-md border px-4 py-3 font-mono text-sm mt-2.5 flex justify-between">

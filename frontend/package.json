@@ -46,6 +46,8 @@
     "@tabler/icons-react": "^3.17.0",
     "@types/uuid": "^9.0.8",
     "@types/web": "^0.0.143",
+    "@upstash/ratelimit": "^2.0.3",
+    "@upstash/redis": "^1.34.1",
     "@vercel/speed-insights": "^1.0.12",
     "antd": "^5.20.6",
     "avvvatars-react": "^0.4.2",

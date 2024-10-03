@@ -1,12 +1,15 @@
-import S3 from 'aws-sdk/clients/s3.js';
-import { NextResponse } from 'next/server'
+import { S3Client, HeadObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
-const s3 = new S3({
+const s3Client = new S3Client({
+    region: 'auto',
     endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID!}.r2.cloudflarestorage.com`,
-    accessKeyId: process.env.CLOUDFLARE_AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.CLOUDFLARE_AWS_SECRET_ACCESS_KEY!,
-    signatureVersion: 'v4',
+    credentials: {
+        accessKeyId: process.env.CLOUDFLARE_AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.CLOUDFLARE_AWS_SECRET_ACCESS_KEY!,
+    },
 });
 
 export async function POST(req: Request) {
@@ -42,18 +45,15 @@ export async function POST(req: Request) {
 
     try {
         // Check if the file exists
-        await s3.headObject({ Bucket: bucket, Key: fullKey }).promise();
+        await s3Client.send(new HeadObjectCommand({ Bucket: bucket, Key: fullKey }));
 
         // If the file exists, generate the signed URL
-        const url = await s3.getSignedUrlPromise('getObject', {
-            Bucket: bucket,
-            Key: fullKey,
-            Expires: 3600
-        });
+        const command = new GetObjectCommand({ Bucket: bucket, Key: fullKey });
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
 
         return NextResponse.json({ url });
     } catch (error: any) {
-        if (error.code === 'NotFound') {
+        if (error.name === 'NotFound') {
             return NextResponse.json({ error: 'File not found' }, { status: 404 });
         }
         console.error('Error checking file existence:', error);

@@ -3,21 +3,11 @@ import { supabase } from "@/lib/supabaseClient";
 import { Toaster, toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation'
+import { useCallback, useState } from 'react';
 
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronsUpDown, Check, Link } from "lucide-react"
-
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-
-import {
-    XCircle
-} from "lucide-react"
-
-import React, { useEffect, useState } from 'react';
+import { Loader2, Check, Upload } from "lucide-react"
+import React, { useEffect } from 'react';
 import Header from "@/components/header"
 import type { User } from "../../types/constants";
 import VideoList from "@/components/VideoList";
@@ -34,13 +24,11 @@ type Video = {
 
 export default function Dashboard() {
     const router = useRouter();
-    const [isOpen, setIsOpen] = useState(true);
     const [user, setUser] = useState<User | null>(null);
     const [videos, setVideos] = useState<Video[] | null>(null);
     const [shouldRender, setShouldRender] = useState(false);
-    const [files, setFiles] = useState<File>();
     const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
-    const [page, setPage] = useState(1);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const fetchAllVideos = async () => {
         console.log("Fetching all videos...");
@@ -101,28 +89,14 @@ export default function Dashboard() {
         }
     }
 
-    function shortenFileNamePhone(name: string) {
-        if (name.length > 19) {
-            return name.substring(0, 12) + "..." + name.substring(name.length - 4, name.length);
-        }
-        return name;
-    }
-
-    function shortenFileName(name: string) {
-        if (name.length > 25) {
-            return name.substring(0, 18) + "..." + name.substring(name.length - 4, name.length);
-        }
-        return name;
-    }
-
-    const handleFileUpload = async (uploadedFiles: File[]) => {
+    const handleFileUpload = useCallback(async (uploadedFiles: File[]) => {
         if (!user) return;
         if (uploadState !== "idle") return;
         if (uploadedFiles.length === 0) return;
 
         const file = uploadedFiles[0];
 
-        if (file.size > 52428800 * 10) {
+        if (file.size > 1073741824) {
             toast.error("File size is too big.");
             return;
         }
@@ -132,9 +106,79 @@ export default function Dashboard() {
             return;
         }
 
-        setFiles(file);
         await uploadFile(file);
-    };
+    }, [user, uploadState]);
+
+    async function uploadFile(file: File) {
+        if (!user) return;
+        if (uploadState !== "idle") return;
+
+        setUploadState("uploading");
+        setUploadProgress(0);
+
+        let uuid: string = uuidv4();
+        let ext: string = getFileExtension(file.name);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('fileName', `${user.id}/${uuid}.mp4`);
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${user.access_token}` // Add this line
+                },
+            });
+
+            if (response.ok) {
+                const reader = response.body?.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader!.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const progress = parseInt(line.slice(6), 10);
+                            setUploadProgress(progress);
+                        }
+                    }
+                }
+
+                setUploadState("done");
+                const { duration, height, width } = await getDuration(file);
+
+                const { error } = await supabase
+                    .from('metadata')
+                    .insert({ id: uuid, user_id: user.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, height: height, width: width, ext: ext });
+                if (error) {
+                    toast.error(error.message);
+                    return;
+                }
+
+                toast.success('File uploaded successfully. Redirecting...');
+                setTimeout(() => {
+                    router.push(`/video/${uuid}`);
+                }, 2000);
+
+                await fetchAllVideos(); // Refresh the video list
+            } else {
+                const errorText = await response.text();
+                toast.error(`Upload failed: ${errorText}`);
+                setUploadState("error");
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            toast.error('An error occurred while uploading the file');
+            setUploadState("error");
+        }
+    }
 
     function removeInvalidCharacters(input: string): string {
         // Define the regular expression pattern for valid characters
@@ -173,197 +217,6 @@ export default function Dashboard() {
     function getFileExtension(filename: string): string {
         return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2).toLowerCase();
     }
-
-    async function uploadFile(file: File) {
-        if (!user) return;
-        if (uploadState !== "idle") return;
-
-        setUploadState("uploading");
-
-        let uuid: string = uuidv4();
-        let ext: string = getFileExtension(file.name);
-        // let contentType: string = file.type;
-
-        // try {
-        //     const thumbnailBlob = await generateThumbnail(file);
-        //     const thumbnailUrl = URL.createObjectURL(thumbnailBlob);
-        //     setThumbnailUrl(thumbnailUrl);
-        // } catch (error) {
-        //     console.error('Failed to generate thumbnail:', error);
-        //     toast.error('Failed to generate thumbnail');
-        // }
-
-        const response = await fetch(`/api/upload?key=${user?.id}/${uuid}.mp4`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'video/mp4',
-            },
-            body: file,
-        });
-
-        if (response.status == 200) {
-            setUploadState("done");
-            const { duration, height, width } = await getDuration(file);
-
-            const { error } = await supabase
-                .from('metadata')
-                .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, height: height, width: width, ext: ext });
-            if (error) {
-                toast.error(error.message);
-                return;
-            }
-
-            const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-                router.push(`/video/${uuid}`);
-            });
-
-            toast.promise(promise, {
-                loading: 'File uploaded successfully. Redirecting...',
-            })
-        }
-
-        if (response.status != 200) {
-            toast.error(await response.text());
-            setUploadState("error");
-        }
-    }
-
-    async function generateThumbnail(file: File): Promise<Blob> {
-        return new Promise((resolve, reject) => {
-            const video = document.createElement('video');
-            video.preload = 'metadata';
-            video.onloadedmetadata = function () {
-                video.currentTime = 0; // Seek to 1 second
-            };
-            video.onseeked = function () {
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob(blob => {
-                    if (blob) {
-                        resolve(blob);
-                    } else {
-                        reject(new Error('Failed to generate thumbnail'));
-                    }
-                }, 'image/jpeg', 0.7); // JPEG at 70% quality
-            };
-            video.onerror = function () {
-                reject(new Error('Error occurred while loading video'));
-            };
-            video.src = URL.createObjectURL(file);
-        });
-    }
-
-    async function handleRemoveVideo(video_id: string) {
-        if (!user) return;
-
-        const { error } = await supabase
-            .from('metadata')
-            .delete()
-            .eq('id', video_id);
-
-        if (error) {
-            console.log(error);
-            return;
-        }
-        const { data: delete_storage } = await supabase.storage
-            .from("processed_videos")
-            .remove([`${user.id}/${video_id}.mp4`]);
-
-        const { data, error: error2 } = await supabase
-            .from('metadata')
-            .select("*")
-            .eq('user_id', user.id);
-
-        if (error2) {
-            console.log(error2);
-            return;
-        }
-
-        if (!data) {
-            console.log("no data");
-            return;
-        }
-
-        const fetchedVideos: Video[] = [];
-
-        for (let i = 0; i < data.length; i++) {
-            const file = data[i];
-            fetchedVideos.push({
-                id: file.id,
-                name: file.name || '',
-                created_at: file.created_at,
-                duration: file.duration,
-                processed: file.processed,
-                ext: file.ext,
-            });
-        }
-
-        setVideos(fetchedVideos);
-    }
-
-    function formatSeconds(seconds: number) {
-        let date = new Date(0);
-        date.setSeconds(seconds);
-        return date.toISOString().substr(14, 5);
-    }
-
-    // async function downloadFromUrl(url: string) {
-    //     let body = {
-    //         video_url: url,
-    //     }
-
-    //     const options = {
-    //         method: 'POST',
-    //         body: JSON.stringify(body),
-    //     };
-
-    //     try {
-    //         const response = await fetch("/api/download", options);
-    //         if (!response.ok) {
-    //             toast.error("Error downloading video");
-    //             return;
-    //         }
-    //         const result = await response.json();
-
-    //         console.log(result);
-
-    //         if (result.error) {
-    //             toast.error("Error downloading video");
-    //             return;
-    //         }
-
-    //         let uuid: string = uuidv4();
-    //         let ext: string = "mp4";
-
-    //         const { error } = await supabase
-    //             .from('metadata')
-    //             .insert({ id: uuid, user_id: user?.id, name: `${removeInvalidCharacters(result.title)}`, video_src: result.url, thumbnail: result.thumbnail, duration: result.duration, ext: ext });
-
-    //         if (error) {
-    //             toast.error(error.message);
-    //             return;
-    //         }
-
-    //         const promise = () => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
-    //             router.push(`/video/${uuid}`);
-    //         });
-
-    //         toast.promise(promise, {
-    //             loading: 'File uploaded successfully. Redirecting...',
-    //         })
-
-
-
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
-
-    // function handleVideoUrlChange(e: React.ChangeEvent<HTMLInputElement>) {
-    //     setVideoUrl(e.target.value);
-    // }
 
     useEffect(() => {
         const runPrecheck = async () => {
@@ -404,7 +257,7 @@ export default function Dashboard() {
                                 className='w-[24rem] mt-8'
                             >
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Uploading...
+                                Uploading... {uploadProgress}%
                             </Button>
                         ) : uploadState === "done" ? (
                             <Button
@@ -419,6 +272,7 @@ export default function Dashboard() {
                                 className="w-[24rem] mt-8"
                                 disabled
                             >
+                                <Upload className="mr-2 h-4 w-4" />
                                 Error
                             </Button>
                         ) : null}
@@ -431,7 +285,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
-            </main >
-        </div >
+            </main>
+        </div>
     );
 }
