@@ -232,7 +232,7 @@ export default function Project({ params }: { params: { id: string } }) {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${user?.access_token}`,
                 },
-                body: JSON.stringify({ key: `${params.id}-compressed.${metadata!.ext}`, bucket: 'upload-bucket' }),
+                body: JSON.stringify({ key: `${params.id}-compressed.mp4`, bucket: 'upload-bucket' }),
             });
 
             if (!responseCompressed.ok) {
