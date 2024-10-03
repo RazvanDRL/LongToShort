@@ -70,7 +70,7 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		keyframes: {
-  			'shimmer': {
+  			shimmer: {
   				from: {
   					backgroundPosition: '0 0'
   				},
@@ -78,7 +78,7 @@ module.exports = {
   					backgroundPosition: '-200% 0'
   				}
   			},
-  			'shine': {
+  			shine: {
   				from: {
   					backgroundPosition: '200% 0'
   				},
@@ -113,8 +113,8 @@ module.exports = {
   		},
   		animation: {
   			'spin-slow': 'spin 2s linear infinite',
-  			'shine': 'shine 8s ease-in-out infinite',
-  			'shimmer': 'shimmer 2s linear infinite',
+  			shine: 'shine 8s ease-in-out infinite',
+  			shimmer: 'shimmer 2s linear infinite',
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
   			rainbow: 'rainbow var(--speed, 2s) infinite linear'

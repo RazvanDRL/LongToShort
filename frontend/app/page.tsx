@@ -16,6 +16,12 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const Satoshi = localFont({
     src: '../public/fonts/Satoshi.woff2',
@@ -344,6 +350,39 @@ export default function Home() {
                                 </Card>
                             ))}
                         </div>
+                    </div>
+                </section>
+                <section className="bg-background w-screen z-50">
+                    <div className="max-w-6xl mx-auto py-16 md:py-32">
+                        <h2 className={`mb-12 text-center text-[36px] ${Satoshi.className} font-black`}>
+                            Frequently Asked Questions
+                        </h2>
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="item-1">
+                                <AccordionTrigger>How does the AI subtitle generation work?</AccordionTrigger>
+                                <AccordionContent>
+                                    Our AI uses advanced speech recognition and natural language processing to automatically generate accurate subtitles for your videos. Simply upload your video, and our system will process it to create subtitles in minutes.
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-2">
+                                <AccordionTrigger>Can I edit the generated subtitles?</AccordionTrigger>
+                                <AccordionContent>
+                                    Yes, you can easily edit the generated subtitles through our user-friendly interface. This allows you to make any necessary adjustments or corrections to ensure perfect accuracy.
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-3">
+                                <AccordionTrigger>What video formats are supported?</AccordionTrigger>
+                                <AccordionContent>
+                                    We support a wide range of video formats including MP4, AVI, MOV, and more. If you have a specific format not listed, please contact our support team for assistance.
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-4">
+                                <AccordionTrigger>How long does it take to process a video?</AccordionTrigger>
+                                <AccordionContent>
+                                    Processing time depends on the length and complexity of your video. Most videos are processed within minutes, but longer videos may take up to an hour. You'll be notified as soon as your subtitles are ready.
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     </div>
                 </section>
             </div>
