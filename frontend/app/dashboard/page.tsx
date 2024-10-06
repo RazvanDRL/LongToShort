@@ -246,7 +246,7 @@ export default function Dashboard() {
         <div className="container mx-auto">
             <Toaster richColors />
 
-            {user ? <Header user_email={user.email} /> : null}
+            {user ? <Header /> : null}
             <main className="w-full h-screen flex justify-center items-center">
                 <div>
                     <div className="flex flex-col items-center max-w-700px min-w-700px">

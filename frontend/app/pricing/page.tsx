@@ -117,7 +117,7 @@ export default function Pricing() {
 
     return (
         <div className="container mx-auto">
-            {user ? <Header user_email={user.email} /> : null}
+            {user ? <Header /> : null}
             <div className="flex flex-col items-center justify-center min-h-screen">
                 <h1 className="text-[32px] md:text-[36px] lg:text-[48px] font-bold text-center mb-4 mt-24    lg:mt-0 leading-tight">
                     Start making <span className="text-primary underline underline-offset-8 decoration-primary decoration-dashed">amazing videos, today.</span>

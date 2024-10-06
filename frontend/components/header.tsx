@@ -41,11 +41,17 @@ import Link from "next/link";
 import Image from "next/image";
 import Logo from "@/public/autosubs.svg";
 
-export default function Header({ user_email }: { user_email: string }) {
+export default function Header() {
     const router = useRouter();
     const [feedbackText, setFeedbackText] = useState("");
     const [credits, setCredits] = useState(0);
-    const [avatar, setAvatar] = useState(localStorage.getItem(`avatar_${user_email}`) || "");
+    const [email, setEmail] = useState("");
+    const [avatar, setAvatar] = useState("");
+
+    useEffect(() => {
+        setAvatar(localStorage.getItem(`avatar_${email}`) || "");
+    }, [email]);
+
     const pathname = usePathname();
 
     const handleSignOut = async () => {
@@ -73,7 +79,7 @@ export default function Header({ user_email }: { user_email: string }) {
                     user_id: user_id,
                     feedback: feedbackText,
                     page: pathname,
-                    email: user_email
+                    email: email
                 }
             ]);
 
@@ -91,7 +97,7 @@ export default function Header({ user_email }: { user_email: string }) {
         const id = (await supabase.auth.getUser()).data?.user?.id;
         const { data, error } = await supabase
             .from('profiles')
-            .select('credits,avatar')
+            .select('credits,avatar,email')
             .eq('id', id);
 
         if (error) {
@@ -101,10 +107,14 @@ export default function Header({ user_email }: { user_email: string }) {
         if (data && data.length > 0) {
             if (data[0].avatar) {
                 setAvatar(data[0].avatar);
-                localStorage.setItem(`avatar_${user_email}`, data[0].avatar);
+                localStorage.setItem(`avatar_${email}`, data[0].avatar);
             }
             if (data[0].credits)
                 setCredits(Number(data[0].credits));
+            if (data[0].email) {
+                setEmail(data[0].email);
+                localStorage.setItem(`email_${email}`, data[0].email);
+            }
         }
     }
 
@@ -130,7 +140,9 @@ export default function Header({ user_email }: { user_email: string }) {
                             </BreadcrumbList>
                         </Breadcrumb>
                         :
-                        <Image src={Logo} alt="Logo" className="w-32 h-auto sm:w-40 md:w-48" />
+                        <Link href="/">
+                            <Image src={Logo} alt="Logo" className="w-32 h-auto sm:w-40 md:w-48" />
+                        </Link>
                     }
 
                 </div>
@@ -208,12 +220,12 @@ export default function Header({ user_email }: { user_email: string }) {
                                     {avatar !== "" ?
                                         <Image src={avatar} alt="avatar" width={40} height={40} className="rounded-full w-[40px] h-[40px]" priority />
                                         :
-                                        <Avvvatars value={user_email} shadow={true} size={40} />
+                                        <Avvvatars value={email} shadow={true} size={40} />
                                     }
                                 </a>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56 mr-8 mt-2">
-                                <DropdownMenuLabel>{user_email}</DropdownMenuLabel>
+                                <DropdownMenuLabel>{email}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem>

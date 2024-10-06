@@ -454,7 +454,7 @@ export default function Project({ params }: { params: { id: string } }) {
     return (
         <div className="container">
             <Toaster />
-            {user ? <Header user_email={user.email} /> : null}
+            {user ? <Header /> : null}
             <main className="w-full h-screen flex justify-center items-center">
                 {metadata && (
                     <div className="flex justify-center items-center flex-col-reverse md:flex-row">
