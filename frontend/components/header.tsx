@@ -173,7 +173,7 @@ export default function Header() {
                         </div>
                         <div>
                             <Button className="mr-6 md:mr-8 border-2 border-blue-500 hover:bg-blue-50 transition-colors duration-300" variant={"outline"} asChild>
-                                <Link href="/pricing">
+                                <Link href="/add-credits">
                                     <BadgePlus className="mr-2 h-4 w-4 text-blue-500" />
                                     <span className="font-semibold text-blue-600">Add more videos</span>
                                 </Link>
@@ -206,7 +206,7 @@ export default function Header() {
                         </Popover>
                         <div>
                             <Button className="mr-3 border-2 border-blue-500 hover:bg-blue-50 transition-colors duration-300" variant={"outline"} asChild>
-                                <Link href="/pricing">
+                                <Link href="/add-credits">
                                     <BadgePlus className="w-4 h-4 mr-2 text-blue-500" />
                                     <span className="font-semibold text-blue-600">Videos</span>
                                 </Link>

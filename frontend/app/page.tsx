@@ -23,6 +23,8 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Footer } from "@/components/footer";
+import { FAQ } from "@/components/faq";
+import { Pricing } from "@/components/pricing";
 
 const Satoshi = localFont({
     src: '../public/fonts/Satoshi.woff2',
@@ -294,91 +296,10 @@ export default function Home() {
                     </div>
                 </section>
                 <section className="bg-background w-full z-50">
-                    <div className="flex flex-col items-center justify-center min-h-screen px-4">
-                        <h1 className="text-[28px] sm:text-[32px] md:text-[36px] lg:text-[48px] font-bold text-center mb-4 mt-24 lg:mt-0 leading-tight">
-                            Start making <span className="text-primary underline underline-offset-8 decoration-primary decoration-dashed">amazing videos, today.</span>
-                        </h1>
-                        <p className="text-[16px] sm:text-[18px] text-black/50 text-center mb-8">
-                            No hidden fees. Videos never expire.
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-                            {plans.map((plan, index) => (
-                                <Card key={index} className={`w-full ${plan.popular ? "border-primary/80 border-2 relative" : ""}`}>
-                                    {plan.popular && (
-                                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
-                                            Most Popular
-                                        </div>
-                                    )}
-                                    <CardHeader>
-                                        <CardTitle className="mb-1 text-xl">{plan.title}</CardTitle>
-                                        <CardDescription className="mb-4">{plan.description}</CardDescription>
-                                        <span className="text-4xl font-bold">${plan.price}</span>
-                                        <CardDescription className="mb-4">{plan.priceDescription}</CardDescription>
-                                        <Button className="w-full rounded-xl transition-transform duration-300 ease-in-out hover:scale-95" asChild>
-                                            <Link href={`https://buy.stripe.com/${plan.paymentLink}`}>
-                                                {plan.cta}
-                                            </Link>
-                                        </Button>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid w-full items-center gap-2 text-sm">
-                                            {plan.features.map((feature, index) => (
-                                                <span key={index} className="flex items-center">
-                                                    <CircleCheck className="mr-2 w-4 h-4 text-green-400 flex-shrink-0" />
-                                                    <span>{feature}</span>
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                    <Separator className="w-[90%] mx-auto mb-4" />
-                                    <CardFooter className="flex flex-col items-start">
-                                        <Label className="text-lg mb-4">Features</Label>
-                                        <div className="grid w-full items-start gap-2 text-sm">
-                                            {features.map((feature, index) => (
-                                                <span key={index} className="flex items-center">
-                                                    <CircleCheck className="mr-2 w-4 h-4 text-green-400 flex-shrink-0" />
-                                                    <span>{feature}</span>
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </CardFooter>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
+                    <Pricing className="max-w-6xl mx-auto py-16 md:py-32 px-4" />
                 </section>
                 <section className="bg-background w-full z-50">
-                    <div className="max-w-6xl mx-auto py-16 md:py-32 px-4">
-                        <h2 className={`mb-12 text-center text-[28px] sm:text-[36px] ${Satoshi.className} font-black`}>
-                            Frequently Asked Questions
-                        </h2>
-                        <Accordion type="single" collapsible className="w-full">
-                            <AccordionItem value="item-1">
-                                <AccordionTrigger>How does the AI subtitle generation work?</AccordionTrigger>
-                                <AccordionContent>
-                                    Our AI uses advanced speech recognition and natural language processing to automatically generate accurate subtitles for your videos. Simply upload your video, and our system will process it to create subtitles in minutes.
-                                </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="item-2">
-                                <AccordionTrigger>Can I edit the generated subtitles?</AccordionTrigger>
-                                <AccordionContent>
-                                    Yes, you can easily edit the generated subtitles through our user-friendly interface. This allows you to make any necessary adjustments or corrections to ensure perfect accuracy.
-                                </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="item-3">
-                                <AccordionTrigger>What video formats are supported?</AccordionTrigger>
-                                <AccordionContent>
-                                    We support a wide range of video formats including MP4, AVI, MOV, and more. If you have a specific format not listed, please contact our support team for assistance.
-                                </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="item-4">
-                                <AccordionTrigger>How long does it take to process a video?</AccordionTrigger>
-                                <AccordionContent>
-                                    Processing time depends on the length and complexity of your video. Most videos are processed within minutes, but longer videos may take up to an hour. You'll be notified as soon as your subtitles are ready.
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    </div>
+                    <FAQ className="max-w-6xl mx-auto py-16 md:py-32 px-4" />
                 </section>
             </div>
             <Footer />
