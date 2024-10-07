@@ -22,6 +22,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
+import { Footer } from "@/components/footer";
 
 const Satoshi = localFont({
     src: '../public/fonts/Satoshi.woff2',
@@ -118,12 +119,12 @@ export default function Home() {
     return (
         <div className="container mx-auto bg-background">
             <Navbar />
-            <div className="flex flex-col items-center justify-start min-h-screen pt-32 z-20">
+            <div className="flex flex-col items-center justify-start min-h-screen pt-16 md:pt-32 z-20">
                 {/* Hero */}
-                <div className="sticky z-0 top-0 flex flex-col gap-16 items-center">
-                    <h1 className={`text-left leading-none text-[36px] sm:text-[48px] md:text-[60px] ${Satoshi.className} font-black`}>
+                <div className="sticky z-0 top-0 flex flex-col gap-8 md:gap-16 items-center px-4 md:px-0">
+                    <h1 className={`text-center md:text-left leading-tight text-[32px] sm:text-[48px] md:text-[60px] ${Satoshi.className} font-black`}>
                         How Creators make&nbsp;
-                        <br />
+                        <br className="hidden md:inline" />
                         <span className="underline underline-offset-8 decoration-primary decoration-dashed">
                             viral shorts
                         </span>
@@ -133,25 +134,18 @@ export default function Home() {
                         Easily generate <span className="font-bold">subtitles</span> for your videos in seconds. Just upload your video and we&apos;ll do the rest.
                     </p>
                     <div>
-                        <Button className="transition-transform duration-300 ease-in-out hover:scale-95 bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6">
+                        <Button className="transition-transform duration-300 ease-in-out hover:scale-95 bg-primary rounded-xl w-full sm:w-auto font-semibold text-lg px-5 py-6">
                             <Link href="/dashboard">
                                 Go Viral Today
                             </Link>
                             <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
-                        {/* <div className="mt-6 flex justify-left gap-1">
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                            </div> */}
                     </div>
                 </div>
-                <section className="relative mt-60 w-screen bg-primary rounded-t-[60px] z-50">
-                    <div className="max-w-6xl mx-auto py-16 md:py-32 items-center text-center">
-                        <div className="py-16">
-                            <h2 className={`mb-32 text-center leading-none text-[48px] ${Satoshi.className} font-black text-white`}>
+                <section className="relative mt-32 md:mt-60 w-screen h-screen bg-primary rounded-t-[30px] md:rounded-t-[60px] z-50 overflow-hidden">
+                    <div className="max-w-6xl mx-auto py-16 md:py-32 px-4 md:px-0 items-center text-center">
+                        <div className="py-8 md:py-16">
+                            <h2 className={`mb-16 md:mb-32 text-center leading-tight text-[36px] md:text-[48px] ${Satoshi.className} font-black text-white`}>
                                 60% of potential views
                                 <br />
                                 are lost&nbsp;🤬&nbsp;
@@ -176,7 +170,7 @@ export default function Home() {
                                     <h3 className="font-bold">Inconsistency</h3>
                                 </div>
                             </div>
-                            <Button className="bg-white text-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-28 transition-transform duration-300 ease-in-out hover:scale-95 hover:bg-background    ">
+                            <Button className="bg-white text-primary rounded-xl w-full sm:w-auto font-semibold text-lg px-5 py-6 mt-16 md:mt-28 transition-transform duration-300 ease-in-out hover:scale-95 hover:bg-background">
                                 <Link href="/dashboard">
                                     Gain 60% more views
                                 </Link>
@@ -185,68 +179,69 @@ export default function Home() {
                         </div>
                     </div>
                 </section>
-                <section className="bg-background w-screen z-50">
-                    <div className="max-w-6xl mx-auto pt-16 md:pt-32 items-center text-center">
-                        <h2 className={`text-center leading-none text-[48px] ${Satoshi.className} font-black text-black`}>
+                <section className="bg-background w-full z-50">
+                    <div className="max-w-6xl mx-auto pt-16 md:pt-32 px-4 md:px-0 items-center text-center">
+                        <h2 className={`text-center leading-tight text-[36px] md:text-[48px] ${Satoshi.className} font-black text-black`}>
                             Unlock Viral Potential in Seconds 🚀
                         </h2>
-                        <p className="mt-4 mb-10 text-black/50 text-[20px]">
+                        <p className="mt-4 mb-10 text-black/50 text-[18px] md:text-[20px]">
                             Transform your content from overlooked to overperforming. Here&apos;s how we skyrocket your success:
                         </p>
-                        <div className="grid grid-row-2 grid-cols-2 gap-8 text-black text-left">
-                            <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-6xl mr-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-black text-left">
+                            <div className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
+                                <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
                                     🎯
                                 </div>
                                 <div>
-                                    <h3 className="text-[24px] font-[800] mb-2">
+                                    <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
                                         Spot-On Accuracy
                                     </h3>
-                                    <p className="text-black/50 text-[16px]">
-                                        Get subtitles you can trust. Our advanced system delivers precise transcriptions, so your message comes across clearly every time.                                    </p>
+                                    <p className="text-black/50 text-[14px] md:text-[16px]">
+                                        Get subtitles you can trust. Our advanced system delivers precise transcriptions, so your message comes across clearly every time.
+                                    </p>
                                 </div>
                             </div>
-                            <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-6xl mr-6">
+                            <div className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
+                                <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
                                     🚀
                                 </div>
                                 <div>
-                                    <h3 className="text-[24px] font-[800] mb-2">
+                                    <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
                                         Lightning-Fast Transcription
                                     </h3>
-                                    <p className="text-black/50 text-[16px]">
+                                    <p className="text-black/50 text-[14px] md:text-[16px]">
                                         We value your time. Get your subtitles in minutes, not hours. Keep your content flowing and your audience engaged.
                                     </p>
                                 </div>
                             </div>
-                            <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-6xl mr-6">
+                            <div className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
+                                <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
                                     🎨
                                 </div>
                                 <div>
-                                    <h3 className="text-[24px] font-[800] mb-2">
+                                    <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
                                         Customization Options
                                     </h3>
-                                    <p className="text-black/50 text-[16px]">
+                                    <p className="text-black/50 text-[14px] md:text-[16px]">
                                         Make your subtitles pop. Easily adjust font, color, size, and position to match your style and boost viewer engagement.
                                     </p>
                                 </div>
                             </div>
-                            <div className="border border-neutral-100 p-8 col-span-1 row-span-1 bg-background rounded-xl flex items-center drop-shadow-xl">
-                                <div className="text-6xl mr-6">
+                            <div className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
+                                <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
                                     🙂
                                 </div>
                                 <div>
-                                    <h3 className="text-[24px] font-[800] mb-2">
+                                    <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
                                         Clean Content Guarantee
                                     </h3>
-                                    <p className="text-black/50 text-[16px]">
+                                    <p className="text-black/50 text-[14px] md:text-[16px]">
                                         Our smart filter catches bad words, avoid takedowns due to inappropriate language and keep your videos up and earning.
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <Button className="bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-16">
+                        <Button className="bg-primary rounded-xl w-full sm:w-auto font-semibold text-lg px-5 py-6 mt-16">
                             <Link href="/dashboard">
                                 Boost views now
                             </Link>
@@ -254,15 +249,15 @@ export default function Home() {
                         </Button>
                     </div>
                 </section>
-                <section className="bg-background w-screen z-50">
-                    <div className="max-w-fit px-2 mx-auto md:py-32 items-center text-center">
-                        <h3 className={`mb-4 text-center leading-none text-[48px] ${Satoshi.className} font-black text-black`}>
+                <section className="bg-background w-full z-50">
+                    <div className="max-w-6xl px-4 mx-auto py-16 md:py-32 items-center text-center">
+                        <h3 className={`mb-4 text-center leading-tight text-[36px] md:text-[48px] ${Satoshi.className} font-black text-black`}>
                             Post like the <span className="underline underline-offset-8 decoration-primary decoration-dashed text-primary">best influencers</span>
                         </h3>
-                        <p className="mt-4 mb-10 text-black/50 text-[20px]">
+                        <p className="mt-4 mb-10 text-black/50 text-[18px] md:text-[20px]">
                             Dominate your niche with AI-crafted shorts, crush it with influencer-level impact.
                         </p>
-                        <div className="grid grid-cols-4 gap-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                             {videos.map((video, index) => (
                                 <div key={index} className="flex flex-col items-center">
                                     <div className="flex items-center mb-4">
@@ -290,7 +285,7 @@ export default function Home() {
                                 </div>
                             ))}
                         </div>
-                        <Button className="bg-primary rounded-xl w-min font-semibold text-lg px-5 py-6 mt-16">
+                        <Button className="bg-primary rounded-xl w-full sm:w-auto font-semibold text-lg px-5 py-6 mt-16">
                             <Link href="/dashboard">
                                 Post now
                             </Link>
@@ -298,12 +293,12 @@ export default function Home() {
                         </Button>
                     </div>
                 </section>
-                <section className="bg-background w-screen z-50">
-                    <div className="flex flex-col items-center justify-center min-h-screen">
-                        <h1 className="text-[32px] md:text-[36px] lg:text-[48px] font-bold text-center mb-4 mt-24    lg:mt-0 leading-tight">
+                <section className="bg-background w-full z-50">
+                    <div className="flex flex-col items-center justify-center min-h-screen px-4">
+                        <h1 className="text-[28px] sm:text-[32px] md:text-[36px] lg:text-[48px] font-bold text-center mb-4 mt-24 lg:mt-0 leading-tight">
                             Start making <span className="text-primary underline underline-offset-8 decoration-primary decoration-dashed">amazing videos, today.</span>
                         </h1>
-                        <p className="text-[18px] text-black/50 text-center mb-8">
+                        <p className="text-[16px] sm:text-[18px] text-black/50 text-center mb-8">
                             No hidden fees. Videos never expire.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
@@ -352,9 +347,9 @@ export default function Home() {
                         </div>
                     </div>
                 </section>
-                <section className="bg-background w-screen z-50">
-                    <div className="max-w-6xl mx-auto py-16 md:py-32">
-                        <h2 className={`mb-12 text-center text-[36px] ${Satoshi.className} font-black`}>
+                <section className="bg-background w-full z-50">
+                    <div className="max-w-6xl mx-auto py-16 md:py-32 px-4">
+                        <h2 className={`mb-12 text-center text-[28px] sm:text-[36px] ${Satoshi.className} font-black`}>
                             Frequently Asked Questions
                         </h2>
                         <Accordion type="single" collapsible className="w-full">
@@ -386,6 +381,7 @@ export default function Home() {
                     </div>
                 </section>
             </div>
-        </div >
+            <Footer />
+        </div>
     );
 }
