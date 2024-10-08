@@ -64,57 +64,28 @@ const videos = [
 ]
 
 const features = [
-    "AI Video Subtitles",
-    "No Watermark",
-    "Custom Branding",
-    "Custom Templates",
-    "Custom Fonts",
-    "Custom Colors",
-    "Custom Music",
+    {
+        emoji: "🎯",
+        title: "Spot-On Accuracy",
+        description: "Get subtitles you can trust. Our advanced system delivers precise transcriptions, so your message comes across clearly every time.",
+    },
+    {
+        emoji: "🚀",
+        title: "Lightning-Fast Transcription",
+        description: "We value your time. Get your subtitles in minutes, not hours. Keep your content flowing and your audience engaged.",
+    },
+    {
+        emoji: "🎨",
+        title: "Customization Options",
+        description: "Make your subtitles pop. Easily adjust font, color, size, and position to match your style and boost viewer engagement.",
+    },
+    {
+        emoji: "🙂",
+        title: "Clean Content Guarantee",
+        description: "Our smart filter catches bad words, avoid takedowns due to inappropriate language and keep your videos up and earning.",
+    },
 ]
 
-const plans = [
-    {
-        title: "Solo 🙂",
-        description: "Starting in content creation",
-        paymentLink: "test_6oE5lkfHz0ZGes0000",
-        price: 20,
-        priceDescription: "One time",
-        features: [
-            "20 videos per month",
-            "5GB of storage",
-            "3 minutes / video",
-        ],
-        cta: "Seems good"
-    },
-    {
-        title: "Creator 🤩",
-        description: "For growing businesses",
-        paymentLink: "test_6oE5lkfHz0ZGes0000",
-        price: 50,
-        priceDescription: "One time",
-        features: [
-            "50 videos per month",
-            "10GB of storage",
-            "5 minutes / video",
-        ],
-        cta: "That's better",
-        popular: true
-    },
-    {
-        title: "Teams 🚀",
-        description: "For large businesses",
-        paymentLink: "test_6oE5lkfHz0ZGes0000",
-        price: 100,
-        priceDescription: "One time",
-        features: [
-            "100 videos per month",
-            "20GB of storage",
-            "10 minutes / video",
-        ],
-        cta: "Best value"
-    },
-]
 
 export default function Home() {
 
@@ -190,58 +161,21 @@ export default function Home() {
                             Transform your content from overlooked to overperforming. Here&apos;s how we skyrocket your success:
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-black text-left">
-                            <div className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
-                                <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
-                                    🎯
+                            {features.map((feature, index) => (
+                                <div key={index} className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
+                                    <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
+                                        {feature.emoji}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
+                                            {feature.title}
+                                        </h3>
+                                        <p className="text-black/50 text-[14px] md:text-[16px]">
+                                            {feature.description}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
-                                        Spot-On Accuracy
-                                    </h3>
-                                    <p className="text-black/50 text-[14px] md:text-[16px]">
-                                        Get subtitles you can trust. Our advanced system delivers precise transcriptions, so your message comes across clearly every time.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
-                                <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
-                                    🚀
-                                </div>
-                                <div>
-                                    <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
-                                        Lightning-Fast Transcription
-                                    </h3>
-                                    <p className="text-black/50 text-[14px] md:text-[16px]">
-                                        We value your time. Get your subtitles in minutes, not hours. Keep your content flowing and your audience engaged.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
-                                <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
-                                    🎨
-                                </div>
-                                <div>
-                                    <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
-                                        Customization Options
-                                    </h3>
-                                    <p className="text-black/50 text-[14px] md:text-[16px]">
-                                        Make your subtitles pop. Easily adjust font, color, size, and position to match your style and boost viewer engagement.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="border border-neutral-100 p-6 md:p-8 bg-background rounded-xl flex flex-col md:flex-row items-start md:items-center drop-shadow-xl">
-                                <div className="text-5xl md:text-6xl mb-4 md:mb-0 md:mr-6">
-                                    🙂
-                                </div>
-                                <div>
-                                    <h3 className="text-[20px] md:text-[24px] font-[800] mb-2">
-                                        Clean Content Guarantee
-                                    </h3>
-                                    <p className="text-black/50 text-[14px] md:text-[16px]">
-                                        Our smart filter catches bad words, avoid takedowns due to inappropriate language and keep your videos up and earning.
-                                    </p>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                         <Button className="bg-primary rounded-xl w-full sm:w-auto font-semibold text-lg px-5 py-6 mt-16">
                             <Link href="/dashboard">
