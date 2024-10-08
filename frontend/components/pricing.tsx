@@ -80,7 +80,7 @@ export function Pricing({ className, user }: { className?: string; user?: User |
                     Start making <span className="text-primary">amazing videos</span>, today.
                 </h1>
                 <p className="text-xl text-muted-foreground text-center mb-12">
-                    No hidden fees. <span className="decoration underline decoration-dashed underline-offset-4">One-time</span> payment. Choose the plan that's right for you.
+                    No hidden fees. <span className="decoration underline decoration-dashed underline-offset-4">One-time</span> payment. Choose the plan that&apos;s right for you.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
