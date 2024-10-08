@@ -46,6 +46,7 @@
     "@supabase/supabase-js": "^2.45.4",
     "@tabler/icons-react": "^3.19.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@types/lodash": "^4.17.10",
     "@types/uuid": "^9.0.8",
     "@types/web": "^0.0.143",
     "@upstash/ratelimit": "^2.0.3",

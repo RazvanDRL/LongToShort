@@ -1,25 +1,23 @@
 "use client"
 import { supabase } from "@/lib/supabaseClient";
 import { Toaster, toast } from 'sonner';
-
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-
 import Badge from "@/components/badge";
 import Header from "@/components/header";
 import Link from "next/link";
-
 import {
     ExternalLink,
     Loader,
     Loader2,
     Sparkles,
     VideoIcon,
+    Clock,
+    CheckCircle
 } from "lucide-react"
-
 import React, { useEffect, useState } from 'react';
-
 import type { Metadata, User } from "../../../types/constants";
+import { Progress } from "@/components/ui/progress";
 
 type QueuePos = {
     position: number;
@@ -41,7 +39,7 @@ export default function Video({ params }: { params: { id: string } }) {
     const [startTime, setStartTime] = useState<number | null>(0);
     const [shouldRender, setShouldRender] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
-
+    const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
 
     async function handleSignedIn() {
         const { data: { user } } = await supabase.auth.getUser();
@@ -71,25 +69,22 @@ export default function Video({ params }: { params: { id: string } }) {
                     const s = payload.new.status;
                     setStatus(s);
                 }
-                await queuePosition().then(async (pos) => {
-                    await fetchEstimatedTime(pos!, metadata!).then((data) => {
-                        setQueuePos({
-                            position: pos!,
-                            estimated_time: data.waitingTime,
-                            processing_time: data.processingTime,
-                        });
-                    });
-                });
+                await updateQueuePosition();
             }
         )
         .subscribe();
 
-    function formatTime(seconds: number) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${hours ? hours + "h" : ""} ${minutes ? minutes + "m" : ""} ${secs ? secs + "s" : ""}`;
-    };
+    async function updateQueuePosition() {
+        const pos = await queuePosition();
+        if (pos && metadata) {
+            const data = await fetchEstimatedTime(pos, metadata);
+            setQueuePos({
+                position: pos,
+                estimated_time: data.waitingTime,
+                processing_time: data.processingTime,
+            });
+        }
+    }
 
     async function queuePosition() {
         let { data, error } = await supabase
@@ -123,7 +118,7 @@ export default function Video({ params }: { params: { id: string } }) {
         if (dur > 300 && dur <= 600) dur /= 13;
 
         return {
-            waitingTime: 90 + Math.floor(dur + ((pos - 1) * 7)),
+            waitingTime: 120 + Math.floor(dur + ((pos - 1) * 10)),
             processingTime: dur,
         };
     }
@@ -209,15 +204,7 @@ export default function Video({ params }: { params: { id: string } }) {
                     return;
                 }
                 if (!update_created_at_error) {
-                    await queuePosition().then(async (pos) => {
-                        await fetchEstimatedTime(pos!, metadata!).then((data) => {
-                            setQueuePos({
-                                position: pos!,
-                                estimated_time: data.waitingTime,
-                                processing_time: data.processingTime,
-                            });
-                        });
-                    });
+                    await updateQueuePosition();
                     setStartTime(new Date().getTime());
                     setStatus("in queue");
                 }
@@ -244,14 +231,6 @@ export default function Video({ params }: { params: { id: string } }) {
             setStatus(data[0].status);
             setStartTime(new Date(data[0].created_at).getTime());
         }
-
-    }
-
-    function shortenFileName(name: string) {
-        if (name.length > 20) {
-            return name.substring(0, 20) + "..." + name.substring(name.length - 4, name.length);
-        }
-        return name;
     }
 
     function translateStatus(status: Status) {
@@ -279,7 +258,6 @@ export default function Video({ params }: { params: { id: string } }) {
             }
 
             const data = await response.json();
-            console.log(data.url);
             setVideo(data.url);
         } catch (error) {
             console.error('Error fetching video:', error);
@@ -297,26 +275,8 @@ export default function Video({ params }: { params: { id: string } }) {
                         if (metadata.video_src === null) {
                             await fetchVideo();
                         }
-                        else {
-                            // decide if platform is tiktok or instagram based on the video_src hostname
-                            const hostname = new URL(metadata.video_src).hostname;
-                            if (hostname.includes("tiktokcdn"))
-                                setVideo(metadata.video_src);
-                            else {
-                                const video_path = metadata.video_src.replace(/^(?:\/\/|[^\/]+)*\//, "/");
-                                setVideo("/instagram-dw" + video_path);
-                            }
-                        }
                         await fetchProcessingData();
-                        await queuePosition().then(async (pos) => {
-                            await fetchEstimatedTime(pos!, metadata!).then((data) => {
-                                setQueuePos({
-                                    position: pos!,
-                                    estimated_time: data.waitingTime,
-                                    processing_time: data.processingTime,
-                                });
-                            });
-                        });
+                        await updateQueuePosition();
                         setShouldRender(true);
                     }
                     else if (metadata.processed === true) {
@@ -337,30 +297,29 @@ export default function Video({ params }: { params: { id: string } }) {
             const interval = setInterval(() => {
                 const currentTime = Date.now();
                 const diffInSeconds = Math.floor((currentTime - startTime!) / 1000);
-                setProgress(Math.min((diffInSeconds * 100) / queuePos?.estimated_time!, 100));
+                const newProgress = Math.min((diffInSeconds * 100) / queuePos?.estimated_time!, 100);
+                setProgress(newProgress);
+
+                const remainingTime = Math.max(queuePos?.estimated_time! - diffInSeconds, 0);
+                setTimeRemaining(remainingTime);
             }, 1000);
             return () => clearInterval(interval);
-
         }
-    }, [processing, startTime, status]);
+    }, [processing, startTime, status, queuePos?.estimated_time]);
 
     useEffect(() => {
         const handleVisibilityChange = async () => {
             if (!document.hidden) {
-                // When the tab becomes visible, trigger a fetch request
                 await fetchProcessingData();
             }
         };
 
-        // Add event listener for visibility change
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
-        // Initial check when component mounts
         (async () => {
             await fetchProcessingData();
         })();
 
-        // Cleanup function to remove event listener
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
@@ -401,73 +360,88 @@ export default function Video({ params }: { params: { id: string } }) {
     }
 
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <Toaster richColors />
 
             {user ? <Header /> : null}
-            <main className="w-full h-screen flex justify-center items-center">
-                {status !== "" ?
-                    <div>
-                        <div className="flex justify-between items-center w-full">
-                            <div>                                {
-                                status ? (
-                                    <Badge className="mb-3 text-sm px-4 py-2 md:px-5 md:py-3 md:mb-6" text={`${translateStatus(status)}`} color={statusData(status!)} />
-                                ) : null
-                            }
+            <main className="w-full min-h-screen flex justify-center items-center">
+                <div className="w-full max-w-3xl p-6 bg-white rounded-xl shadow-lg">
+                    {status !== "" ? (
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center w-full">
+                                <Badge className="text-sm px-4 py-2" text={`${translateStatus(status)}`} color={statusData(status!)} />
+                                {status === "done" && (
+                                    <Button asChild variant="outline" className="font-medium">
+                                        <Link href={`/project/${params.id}`}>
+                                            <ExternalLink className="mr-2 h-4 w-4" />
+                                            Go to project
+                                        </Link>
+                                    </Button>
+                                )}
                             </div>
-                            <div>
-                                {
-                                    status === "done" ? (
-                                        <Button asChild variant="outline" className="mb-3 font-medium md:mb-6 md:text-base md:px-8 md:py-6">
-                                            <Link href={`/project/${params.id}`}>
-                                                <ExternalLink className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                                                Go to project
-                                            </Link>
-                                        </Button>
-                                    ) : null
-                                }
+                            {queuePos && (
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-xl z-10">
+                                        <Loader className="animate-spin w-12 h-12 text-white" />
+                                    </div>
+                                    <video
+                                        src={video!}
+                                        crossOrigin="anonymous"
+                                        className="rounded-xl aspect-video w-full"
+                                        disablePictureInPicture
+                                    />
+                                </div>
+                            )}
+                            <div className="space-y-4">
+                                <Progress value={progress} className="w-full" />
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <span>Queue Position: {queuePos?.position}</span>
+                                    <span>Estimated Time: {timeRemaining ? `${Math.floor(timeRemaining / 60)}m ${timeRemaining % 60}s` : 'Calculating...'}</span>
+                                </div>
+                            </div>
+                            <div className="text-center text-sm text-gray-500">
+                                {status === "processing" ? "Your video is being processed. This may take a few minutes." : "Your video is in the queue. We'll start processing it soon."}
                             </div>
                         </div>
-                        {queuePos &&
-                            <div className="relative">
-                                <div className="font-bold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white z-50">
-                                    <Loader className="relative animate-spin w-12 h-12 text-secondary" />
-                                </div>
-                                <div className="w-full h-full bg-slate-800 opacity-70 rounded-xl z-30 absolute" />
-                                <video
-                                    src={video!}
-                                    crossOrigin="anonymous"
-                                    className="rounded-xl aspect-auto max-h-[60vh]"
-                                    disablePictureInPicture
-                                />
-                            </div>
-                        }
-
-                    </div>
-                    :
-                    <div className="flex justify-center items-center w-full h-full">
-                        {metadata &&
-                            <div className="flex flex-col justify-center items-center">
-                                <div className="mr-auto mb-2 font-medium flex items-center justify-center">
-                                    <VideoIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                                    {shortenFileName(metadata?.name)}.{metadata?.ext}
-                                </div>
-                                <video
-                                    src={video!}
-                                    crossOrigin="anonymous"
-                                    className="rounded-xl aspect-auto max-h-[60vh]"
-                                    controls
-                                    disablePictureInPicture
-                                />
-                                <Button variant="ringHover" className="mt-3 font-medium md:mt-6 md:text-base md:px-8 md:py-6" onClick={() => processVideo()} disabled={processing}>
-                                    <Sparkles className="mr-2 h-5 w-5" />
-                                    Generate subtitles
-                                </Button>
-                            </div>
-                        }
-                    </div>
-                }
-            </main >
-        </div >
+                    ) : (
+                        <div className="space-y-6">
+                            {metadata && (
+                                <>
+                                    <div className="flex items-center space-x-2 text-gray-700">
+                                        <VideoIcon className="h-5 w-5" />
+                                        <span className="font-medium text-lg">{metadata?.name}.mp4</span>
+                                    </div>
+                                    <video
+                                        src={video!}
+                                        crossOrigin="anonymous"
+                                        className="rounded-xl aspect-video w-full"
+                                        controls
+                                        disablePictureInPicture
+                                    />
+                                    <Button
+                                        variant="default"
+                                        className="w-full py-6 text-lg font-semibold"
+                                        onClick={() => processVideo()}
+                                        disabled={processing}
+                                    >
+                                        {processing ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                                Processing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Sparkles className="mr-2 h-5 w-5" />
+                                                Generate subtitles
+                                            </>
+                                        )}
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </main>
+        </div>
     );
 }
