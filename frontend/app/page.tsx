@@ -106,14 +106,12 @@ export default function Home() {
                     <p className={`text-center text-[16px] ${Poppins.className} font-[400] leading-relaxed max-w-[450px]`}>
                         Easily generate <span className="font-bold">subtitles</span> for your videos in seconds. Just upload your video and we&apos;ll do the rest.
                     </p>
-                    <div>
+                    <Link href="/dashboard">
                         <Button className="transition-transform duration-300 ease-in-out hover:scale-95 bg-primary rounded-xl w-full sm:w-auto font-semibold text-lg px-5 py-6">
-                            <Link href="/dashboard">
-                                Go Viral Today
-                            </Link>
+                            Go Viral Today
                             <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
-                    </div>
+                    </Link>
                 </div>
                 <section className="relative mt-32 md:mt-60 w-screen h-screen bg-primary rounded-t-[30px] md:rounded-t-[60px] z-50 overflow-hidden">
                     <div className="max-w-6xl mx-auto py-16 md:py-32 px-4 md:px-0 items-center text-center">

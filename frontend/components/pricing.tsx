@@ -75,8 +75,8 @@ export function Pricing({ className, user }: { className?: string; user?: User |
 
     return (
         <div className={`${className} py-16 px-4 sm:px-6 lg:px-8`}>
-            <div className="max-w-7xl mx-auto">
-                <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-8">
+            <div className="max-w-7xl mx-auto mt-16">
+                <h1 className="text-4xl sm:text-5xl font-extrabold mb-8">
                     Start making <span className="text-primary">amazing videos</span>, today.
                 </h1>
                 <p className="text-xl text-muted-foreground text-center mb-12">

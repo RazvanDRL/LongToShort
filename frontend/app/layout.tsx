@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google';
 import './globals.css'
 import PlausibleProvider from 'next-plausible'
-import Script from "next/script";
+// import Script from "next/script";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,12 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <Script
+        {/* <Script
           id="usercentrics-cmp"
           src="https://web.cmp.usercentrics.eu/ui/loader.js"
           data-settings-id="iFQ6TgX4bDPgrf"
           strategy="afterInteractive"
-        />
+        /> */}
       </head>
       <body className={inter.className}>
         <ThemeProvider

@@ -39,12 +39,12 @@ export function FAQ({ className }: { className?: string }) {
             <h2 className={`mb-12 text-center text-[28px] sm:text-[36px] font-black`}>
                 Frequently Asked Questions
             </h2>
-            <div className="w-full max-w-3xl mx-auto">
+            <div className="w-full max-w-3xl mx-auto text-left">
                 <Accordion type="single" collapsible className="w-full">
                     {faqData.map((item, index) => (
                         <AccordionItem key={index} value={`item-${index + 1}`}>
-                            <AccordionTrigger>{item.question}</AccordionTrigger>
-                            <AccordionContent>{item.answer}</AccordionContent>
+                            <AccordionTrigger className="text-left text-lg font-medium">{item.question}</AccordionTrigger>
+                            <AccordionContent className="text-left text-base text-muted-foreground">{item.answer}</AccordionContent>
                         </AccordionItem>
                     ))}
                 </Accordion>
