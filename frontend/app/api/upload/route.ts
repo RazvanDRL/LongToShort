@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { S3Client, CreateMultipartUploadCommand, UploadPartCommand, CompleteMultipartUploadCommand } from '@aws-sdk/client-s3';
 import { createClient } from '@supabase/supabase-js';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -9,17 +8,8 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_KEY!
 );
 
-const s3Client = new S3Client({
-    region: 'auto',
-    endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-    credentials: {
-        accessKeyId: process.env.CLOUDFLARE_AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.CLOUDFLARE_AWS_SECRET_ACCESS_KEY!,
-    },
-});
-
-const BUCKET_NAME = 'upload-bucket';
-const PART_SIZE = 5 * 1024 * 1024; // 5MB part size
+const BUNNY_STREAM_LIBRARY_ID = process.env.BUNNY_STREAM_LIBRARY_ID!;
+const BUNNY_API_KEY = process.env.BUNNY_API_KEY!;
 
 // Rate limiting for 2 requests per 15 seconds
 const ratelimit = new Ratelimit({
@@ -62,56 +52,59 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid file name' }, { status: 400 });
     }
 
-    const fileSize = file.size;
-    let uploadedSize = 0;
-
     const stream = new ReadableStream({
         async start(controller) {
             try {
-                // Step 1: Initiate multipart upload
-                const createMultipartUpload = await s3Client.send(new CreateMultipartUploadCommand({
-                    Bucket: BUCKET_NAME,
-                    Key: fileName,
-                }));
+                // Step 1: Create the video object
+                const createResponse = await fetch(`https://video.bunnycdn.com/library/${BUNNY_STREAM_LIBRARY_ID}/videos`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/*+json',
+                        'AccessKey': BUNNY_API_KEY
+                    },
+                    body: JSON.stringify({ title: fileName })
+                });
 
-                const uploadId = createMultipartUpload.UploadId;
-
-                // Step 2: Upload parts
-                const fileBuffer = await file.arrayBuffer();
-                const parts = [];
-
-                for (let i = 0; i < fileBuffer.byteLength; i += PART_SIZE) {
-                    const end = Math.min(i + PART_SIZE, fileBuffer.byteLength);
-                    const partNumber = Math.floor(i / PART_SIZE) + 1;
-
-                    const uploadPartResult = await s3Client.send(new UploadPartCommand({
-                        Bucket: BUCKET_NAME,
-                        Key: fileName,
-                        UploadId: uploadId,
-                        PartNumber: partNumber,
-                        Body: Buffer.from(fileBuffer.slice(i, end)),
-                    }));
-
-                    parts.push({
-                        ETag: uploadPartResult.ETag,
-                        PartNumber: partNumber,
-                    });
-
-                    uploadedSize += end - i;
-                    const progress = Math.round((uploadedSize / fileSize) * 100);
-                    controller.enqueue(`data: ${progress}\n\n`);
+                if (!createResponse.ok) {
+                    throw new Error('Failed to create video object');
                 }
 
-                // Step 3: Complete multipart upload
-                await s3Client.send(new CompleteMultipartUploadCommand({
-                    Bucket: BUCKET_NAME,
-                    Key: fileName,
-                    UploadId: uploadId,
-                    MultipartUpload: { Parts: parts },
-                }));
+                const { guid } = await createResponse.json();
+
+                // Step 2: Upload the video
+                const fileBuffer = await file.arrayBuffer();
+                const uploadResponse = await fetch(`https://video.bunnycdn.com/library/${BUNNY_STREAM_LIBRARY_ID}/videos/${guid}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': file.type,
+                        'AccessKey': BUNNY_API_KEY
+                    },
+                    body: fileBuffer
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Upload failed');
+                }
 
                 controller.enqueue(`data: 100\n\n`);
                 controller.close();
+
+                // Update Supabase with the video information
+                // const { error: supabaseError } = await supabase
+                //     .from('metadata')
+                //     .insert({
+                //         id: guid,
+                //         user_id: user.id,
+                //         name: fileName,
+                //         bunny_id: guid
+                //     });
+
+                // if (supabaseError) {
+                //     console.error('Error updating Supabase:', supabaseError);
+                // }
+
             } catch (error) {
                 console.error('Error uploading file:', error);
                 controller.error(error);
