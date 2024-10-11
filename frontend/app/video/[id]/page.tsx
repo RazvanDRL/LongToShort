@@ -40,6 +40,7 @@ export default function Video({ params }: { params: { id: string } }) {
     const [shouldRender, setShouldRender] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
     const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+    const [loadingVideo, setLoadingVideo] = useState<boolean>(true);
 
     async function handleSignedIn() {
         const { data: { user } } = await supabase.auth.getUser();
@@ -259,6 +260,7 @@ export default function Video({ params }: { params: { id: string } }) {
 
             const data = await response.json();
             setVideo(data.url);
+            setLoadingVideo(false);
         } catch (error) {
             console.error('Error fetching video:', error);
         }
@@ -272,12 +274,12 @@ export default function Video({ params }: { params: { id: string } }) {
                 try {
                     let metadata = await fetchMetadata();
                     if (metadata.processed === false) {
+                        setShouldRender(true);
                         if (metadata.video_src === null) {
                             await fetchVideo();
                         }
                         await fetchProcessingData();
                         await updateQueuePosition();
-                        setShouldRender(true);
                     }
                     else if (metadata.processed === true) {
                         router.replace(`/project/${params.id}`);
@@ -411,13 +413,20 @@ export default function Video({ params }: { params: { id: string } }) {
                                         <VideoIcon className="h-5 w-5" />
                                         <span className="font-medium text-lg">{metadata?.name}.mp4</span>
                                     </div>
-                                    <video
-                                        src={video!}
-                                        crossOrigin="anonymous"
-                                        className="rounded-xl aspect-video w-full"
-                                        controls
-                                        disablePictureInPicture
-                                    />
+                                    <div className="relative">
+                                        {loadingVideo ? (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl">
+                                                <Loader2 className="w-12 h-12 text-gray-500 animate-spin" />
+                                            </div>
+                                        ) : null}
+                                        <video
+                                            src={video!}
+                                            crossOrigin="anonymous"
+                                            className="rounded-xl aspect-video w-full"
+                                            controls
+                                            disablePictureInPicture
+                                        />
+                                    </div>
                                     <Button
                                         variant="default"
                                         className="w-full py-6 text-lg font-semibold"
