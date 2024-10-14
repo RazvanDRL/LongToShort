@@ -89,17 +89,9 @@ export default function Dashboard() {
         }
     }
 
-    const handleFileUpload = useCallback(async (uploadedFiles: File[]) => {
+    async function uploadFile(file: File) {
         if (!user) return;
         if (uploadState !== "idle") return;
-        if (uploadedFiles.length === 0) return;
-
-        const file = uploadedFiles[0];
-
-        if (file.type !== "video/mp4") {
-            toast.error("File type is not accepted. Only MP4 files are allowed.");
-            return;
-        }
 
         setUploadState("uploading");
         setUploadProgress(0);
@@ -108,17 +100,37 @@ export default function Dashboard() {
         let ext: string = getFileExtension(file.name);
 
         try {
-            const key = `${user.id}/${uuid}.mp4`;
-            const response = await fetch(`/api/upload`, {
-                method: 'PUT',
-                body: file,
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('fileName', `${user.id}/${uuid}.mp4`);
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
                 headers: {
-                    'Authorization': `Bearer ${user.access_token}`,
-                    'X-File-Key': key,
+                    'Authorization': `Bearer ${user.access_token}`
                 },
             });
 
             if (response.ok) {
+                const reader = response.body?.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader!.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const progress = parseInt(line.slice(6), 10);
+                            setUploadProgress(progress);
+                        }
+                    }
+                }
+
                 setUploadState("done");
                 const { duration, height, width } = await getDuration(file);
 
@@ -146,7 +158,7 @@ export default function Dashboard() {
             toast.error('An error occurred while uploading the file');
             setUploadState("error");
         }
-    }, [user, uploadState]);
+    }
 
     function removeInvalidCharacters(input: string): string {
         // Define the regular expression pattern for valid characters
@@ -199,6 +211,26 @@ export default function Dashboard() {
         };
         runPrecheck();
     }, [user?.id]);
+
+    const handleFileUpload = useCallback(async (uploadedFiles: File[]) => {
+        if (!user) return;
+        if (uploadState !== "idle") return;
+        if (uploadedFiles.length === 0) return;
+
+        const file = uploadedFiles[0];
+
+        if (file.size > 1073741824000000) {
+            toast.error("File size is too big.");
+            return;
+        }
+
+        if (file.type !== "video/mp4") {
+            toast.error("File type is not accepted. Contact support");
+            return;
+        }
+
+        await uploadFile(file);
+    }, [user, uploadState]);
 
     if (!shouldRender) {
         return (

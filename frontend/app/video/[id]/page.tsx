@@ -1,46 +1,41 @@
 "use client"
-import { supabase } from "@/lib/supabaseClient";
-import { Toaster, toast } from 'sonner';
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import Badge from "@/components/badge";
-import Header from "@/components/header";
-import Link from "next/link";
-import {
-    ExternalLink,
-    Loader,
-    Loader2,
-    Sparkles,
-    VideoIcon,
-    Clock,
-    CheckCircle
-} from "lucide-react"
-import React, { useEffect, useState } from 'react';
-import type { Metadata, User } from "../../../types/constants";
-import { Progress } from "@/components/ui/progress";
 
-type QueuePos = {
+import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Toaster, toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { ExternalLink, Loader2, Sparkles, Video as VideoIcon, Clock, CheckCircle } from 'lucide-react'
+import { supabase } from "@/lib/supabaseClient";
+import Header from "@/components/header";
+import type { Metadata, User } from "../../../types/constants";
+
+type Status = 'queued' | 'processing' | 'done' | 'starting' | 'in queue' | 'succeeded' | ''
+
+interface QueuePosition {
     position: number;
     estimated_time: number;
     processing_time: number;
 }
 
-type Status = "starting" | "in queue" | "processing" | "succeeded" | "done" | "";
-
 export default function Video({ params }: { params: { id: string } }) {
-    const router = useRouter();
-
     const [user, setUser] = useState<User | null>(null);
-    const [video, setVideo] = useState<string | null>(null);
-    const [metadata, setMetadata] = useState<Metadata | null>(null);
-    const [queuePos, setQueuePos] = useState<QueuePos | null>(null);
-    const [processing, setProcessing] = useState(false);
-    const [status, setStatus] = useState<Status>("");
+    const [status, setStatus] = useState<Status>('')
+    const [queuePos, setQueuePos] = useState<QueuePosition | null>(null)
+    const [progress, setProgress] = useState(0)
+    const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
+    const [metadata, setMetadata] = useState<Metadata | null>(null)
+    const [video, setVideo] = useState<string | null>(null)
+    const [processing, setProcessing] = useState(false)
+    const [loadingVideo, setLoadingVideo] = useState(true)
+    const [isPortrait, setIsPortrait] = useState(false)
     const [startTime, setStartTime] = useState<number | null>(0);
     const [shouldRender, setShouldRender] = useState<boolean>(false);
-    const [progress, setProgress] = useState<number>(0);
-    const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-    const [loadingVideo, setLoadingVideo] = useState<boolean>(true);
+    const videoRef = useRef<HTMLVideoElement>(null)
+    const router = useRouter()
 
     async function handleSignedIn() {
         const { data: { user } } = await supabase.auth.getUser();
@@ -68,7 +63,7 @@ export default function Video({ params }: { params: { id: string } }) {
             async (payload: any) => {
                 if (payload.new.video_id == params.id) {
                     const s = payload.new.status;
-                    setStatus(s);
+                    setStatus(s as Status);
                 }
                 await updateQueuePosition();
             }
@@ -153,19 +148,6 @@ export default function Video({ params }: { params: { id: string } }) {
         return data;
     }
 
-    function statusData(status: string) {
-        if (status === "starting" || status === "loading") {
-            return "yellow";
-        }
-        if (status === "processing") {
-            return "blue";
-        }
-        if (status === "succeeded" || status === "done") {
-            return "green";
-        }
-        return "gray";
-    }
-
     async function processVideo() {
         const credits = await supabase.from("profiles").select("credits").eq("id", user?.id);
         if (credits.data && credits.data.length > 0 && credits.data[0].credits < 1) {
@@ -229,18 +211,9 @@ export default function Video({ params }: { params: { id: string } }) {
         }
 
         if (data !== null && data.length > 0) {
-            setStatus(data[0].status);
+            setStatus(data[0].status as Status);
             setStartTime(new Date(data[0].created_at).getTime());
         }
-    }
-
-    function translateStatus(status: Status) {
-        if (status === "in queue") return "Queueing for processing";
-        if (status === "starting") return "AI model is starting";
-        if (status === "processing") return "The AI does its magic";
-        if (status === "succeeded") return "Succeeded";
-        if (status === "done") return "Done";
-        return "";
     }
 
     async function fetchVideo() {
@@ -351,6 +324,47 @@ export default function Video({ params }: { params: { id: string } }) {
         };
     }, [params.id]);
 
+    useEffect(() => {
+        const checkAspectRatio = () => {
+            if (videoRef.current) {
+                const { videoWidth, videoHeight } = videoRef.current
+                setIsPortrait(videoHeight > videoWidth)
+            }
+        }
+
+        const video = videoRef.current
+        if (video) {
+            video.addEventListener('loadedmetadata', checkAspectRatio)
+            return () => video.removeEventListener('loadedmetadata', checkAspectRatio)
+        }
+    }, [video])
+
+    const translateStatus = (status: Status) => {
+        const statusMap: Record<Status, string> = {
+            queued: 'In Queue',
+            processing: 'Processing',
+            done: 'Completed',
+            starting: 'Starting',
+            'in queue': 'In Queue',
+            succeeded: 'Succeeded',
+            '': 'Not Started'
+        }
+        return statusMap[status]
+    }
+
+    const statusData = (status: Status) => {
+        const statusMap: Record<Status, { color: string; icon: JSX.Element }> = {
+            queued: { color: 'bg-yellow-500', icon: <Loader2 className="animate-spin" /> },
+            processing: { color: 'bg-blue-500', icon: <Loader2 className="animate-spin" /> },
+            done: { color: 'bg-green-500', icon: <CheckCircle /> },
+            starting: { color: 'bg-yellow-500', icon: <Loader2 className="animate-spin" /> },
+            'in queue': { color: 'bg-yellow-500', icon: <Clock /> },
+            succeeded: { color: 'bg-green-500', icon: <CheckCircle /> },
+            '': { color: 'bg-gray-500', icon: <VideoIcon /> }
+        }
+        return statusMap[status]
+    }
+
     if (!shouldRender) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -362,95 +376,115 @@ export default function Video({ params }: { params: { id: string } }) {
     }
 
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <Toaster richColors />
-
+        <>
             {user ? <Header /> : null}
-            <main className="w-full min-h-screen flex justify-center items-center">
-                <div className="w-full max-w-3xl p-6 bg-white rounded-xl shadow-lg">
-                    {status !== "" ? (
-                        <div className="space-y-6">
-                            <div className="flex justify-between items-center w-full">
-                                <Badge className="text-sm px-4 py-2" text={`${translateStatus(status)}`} color={statusData(status!)} />
-                                {status === "done" && (
-                                    <Button asChild variant="outline" className="font-medium">
-                                        <Link href={`/project/${params.id}`}>
-                                            <ExternalLink className="mr-2 h-4 w-4" />
-                                            Go to project
-                                        </Link>
-                                    </Button>
-                                )}
-                            </div>
-                            {queuePos && (
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-xl z-10">
-                                        <Loader className="animate-spin w-12 h-12 text-white" />
-                                    </div>
+            <div className="container mx-auto min-h-screen px-4 sm:px-6 lg:px-8 pt-16"> {/* Added pt-16 for top padding */}
+                <Toaster richColors />
+                <Card className="max-w-3xl mx-auto mt-8"> {/* Added mt-8 for top margin */}
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-bold text-center">Video Subtitle Generator</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {status !== "" ? (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-center">
+                                    <Badge variant="secondary" className="text-sm px-3 py-1">
+                                        <span className={`mr-2 inline-block h-2 w-2 rounded-full ${statusData(status)?.color || 'bg-gray-500'}`}></span>
+                                        {translateStatus(status)}
+                                    </Badge>
+                                    {status === "done" && (
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link href={`/project/${params.id}`}>
+                                                <ExternalLink className="mr-2 h-4 w-4" />
+                                                View Project
+                                            </Link>
+                                        </Button>
+                                    )}
+                                </div>
+                                <div className={`relative rounded-lg overflow-hidden ${isPortrait ? 'max-w-[360px] mx-auto' : 'w-full'}`}>
+                                    {(status === 'queued' || status === 'processing' || status === 'in queue' || status === 'starting') && (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+                                            <Loader2 className="animate-spin w-12 h-12 text-white" />
+                                        </div>
+                                    )}
                                     <video
+                                        ref={videoRef}
                                         src={video!}
                                         crossOrigin="anonymous"
-                                        className="rounded-xl aspect-video w-full"
+                                        className={`w-full ${isPortrait ? 'aspect-[9/16]' : 'aspect-video'} object-contain bg-black`}
+                                        controls={status === 'done' || status === 'succeeded'}
                                         disablePictureInPicture
                                     />
                                 </div>
-                            )}
-                            <div className="space-y-4">
-                                <Progress value={progress} className="w-full" />
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Queue Position: {queuePos?.position}</span>
-                                    <span>Estimated Time: {timeRemaining ? `${Math.floor(timeRemaining / 60)}m ${timeRemaining % 60}s` : 'Calculating...'}</span>
-                                </div>
-                            </div>
-                            <div className="text-center text-sm text-gray-500">
-                                {status === "processing" ? "Your video is being processed. This may take a few minutes." : "Your video is in the queue. We'll start processing it soon."}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="space-y-6">
-                            {metadata && (
-                                <>
-                                    <div className="flex items-center space-x-2 text-gray-700">
-                                        <VideoIcon className="h-5 w-5" />
-                                        <span className="font-medium text-lg">{metadata?.name}.mp4</span>
+                                {status !== 'done' && status !== 'succeeded' && (
+                                    <div className="space-y-2">
+                                        <Progress value={progress} className="w-full" />
+                                        <div className="flex justify-between text-sm text-gray-600">
+                                            <span>Queue Position: {queuePos?.position}</span>
+                                            <span>
+                                                Estimated Time: {timeRemaining ? `${Math.floor(timeRemaining / 60)}m ${timeRemaining % 60}s` : 'Calculating...'}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="relative">
-                                        {loadingVideo ? (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl">
-                                                <Loader2 className="w-12 h-12 text-gray-500 animate-spin" />
-                                            </div>
-                                        ) : null}
-                                        <video
-                                            src={video!}
-                                            crossOrigin="anonymous"
-                                            className="rounded-xl aspect-video w-full"
-                                            controls
-                                            disablePictureInPicture
-                                        />
-                                    </div>
-                                    <Button
-                                        variant="default"
-                                        className="w-full py-6 text-lg font-semibold"
-                                        onClick={() => processVideo()}
-                                        disabled={processing}
-                                    >
-                                        {processing ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                Processing...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Sparkles className="mr-2 h-5 w-5" />
-                                                Generate subtitles
-                                            </>
-                                        )}
-                                    </Button>
-                                </>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </main>
-        </div>
+                                )}
+                                <p className="text-center text-sm text-gray-500">
+                                    {status === "processing"
+                                        ? "Your video is being processed. This may take a few minutes."
+                                        : "Your video is in the queue. We'll start processing it soon."}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                {metadata && (
+                                    <>
+                                        <div className="flex items-center space-x-2 text-gray-700">
+                                            <VideoIcon className="h-5 w-5" />
+                                            <span className="font-medium text-lg">{metadata.name}.mp4</span>
+                                        </div>
+                                        <div className={`relative rounded-lg overflow-hidden ${isPortrait ? 'max-w-[360px] mx-auto' : 'w-full'}`}>
+                                            {loadingVideo && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                                                    <Loader2 className="w-12 h-12 text-gray-500 animate-spin" />
+                                                </div>
+                                            )}
+                                            <video
+                                                ref={videoRef}
+                                                src={video!}
+                                                crossOrigin="anonymous"
+                                                className={`w-full ${isPortrait ? 'aspect-[9/16]' : 'aspect-video'} object-contain bg-black`}
+                                                controls
+                                                disablePictureInPicture
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </CardContent>
+                    <CardFooter>
+                        {status === '' && (
+                            <Button
+                                variant="default"
+                                className="w-full py-6 text-lg font-semibold"
+                                onClick={processVideo}
+                                disabled={processing}
+                            >
+                                {processing ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sparkles className="mr-2 h-5 w-5" />
+                                        Generate Subtitles
+                                    </>
+                                )}
+                            </Button>
+                        )}
+                    </CardFooter>
+                </Card>
+            </div>
+        </>
     );
 }

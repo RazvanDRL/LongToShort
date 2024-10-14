@@ -1,87 +1,129 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { S3Client, CreateMultipartUploadCommand, UploadPartCommand, CompleteMultipartUploadCommand } from '@aws-sdk/client-s3';
 import { createClient } from '@supabase/supabase-js';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
-const secretAccessKey = process.env.CLOUDFLARE_AWS_SECRET_ACCESS_KEY!;
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+);
 
-const MAX_UPLOAD_SIZE = 52428800 * 10; // 500MB
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
-
-// Create a new ratelimiter, that allows 5 requests per 5 minutes
-const ratelimit = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(5, "5 m"),
+const s3Client = new S3Client({
+    region: 'auto',
+    endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+        accessKeyId: process.env.CLOUDFLARE_AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.CLOUDFLARE_AWS_SECRET_ACCESS_KEY!,
+    },
 });
 
-async function executePutRequest(url: string, data: ArrayBuffer, authToken?: string): Promise<Response> {
-    const headers = {
-        'Content-Type': 'video/mp4',
-        'Authorization': `Bearer ${authToken}`,
-        'X-Content-Type-Options': 'nosniff',
-        'X-XSS-Protection': '1; mode=block',
-    };
+const BUCKET_NAME = 'upload-bucket';
+const PART_SIZE = 5 * 1024 * 1024; // 5MB part size
 
-    try {
-        const response = await fetch(url, {
-            method: 'PUT',
-            headers,
-            body: data,
-        });
+// Rate limiting for 2 requests per 15 seconds
+const ratelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(2, '15 s'),
+    analytics: true,
+});
 
-        return response;
-    } catch (error) {
-        console.error('Error executing PUT request:', error);
-        throw error;
-    }
-}
-
-export async function PUT(req: Request): Promise<Response> {
-    const authHeader = req.headers.get('Authorization');
+export async function POST(request: NextRequest) {
+    // Authenticate user
+    const authHeader = request.headers.get('Authorization');
     if (!authHeader) {
-        return new Response('Unauthorized', { status: 401 });
+        return NextResponse.json({ error: 'No authorization header' }, { status: 401 });
     }
 
     const token = authHeader.split(' ')[1];
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-        return new Response('Unauthorized', { status: 401 });
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Rate limiting
-    const { success } = await ratelimit.limit(user.id);
-    if (!success) {
-        return new Response('Too many requests', { status: 429 });
+    // Apply rate limiting
+    const identifier = user.id;
+    const result = await ratelimit.limit(identifier);
+    if (!result.success) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
-    const key = req.headers.get('X-File-Key');
-    if (!key) {
-        return new Response('Missing file key', { status: 400 });
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    const fileName = formData.get('fileName') as string;
+
+    if (!file || !fileName) {
+        return NextResponse.json({ error: 'File or fileName is missing' }, { status: 400 });
     }
 
-    const data = await req.arrayBuffer();
-    const dataSize = data.byteLength;
-
-    if (dataSize > MAX_UPLOAD_SIZE) {
-        return new Response('File size exceeds the maximum upload limit of 500MB.', {
-            status: 413,
-            headers: {
-                'Content-Security-Policy': "default-src 'self'",
-            },
-        });
+    // Check if the fileName starts with the user's ID
+    if (!fileName.startsWith(`${user.id}/`)) {
+        return NextResponse.json({ error: 'Invalid file name' }, { status: 400 });
     }
 
-    const uploadUrl = process.env.CLOUDFLARE_WORKER_URL!;
-    try {
-        const response = await executePutRequest(`${uploadUrl}/${key}`, data, secretAccessKey);
-        if (response.status !== 200) {
-            const errorMessage = await response.text();
-            return new Response(`Error uploading file: ${errorMessage}`, { status: response.status });
+    const fileSize = file.size;
+    let uploadedSize = 0;
+
+    const stream = new ReadableStream({
+        async start(controller) {
+            try {
+                // Step 1: Initiate multipart upload
+                const createMultipartUpload = await s3Client.send(new CreateMultipartUploadCommand({
+                    Bucket: BUCKET_NAME,
+                    Key: fileName,
+                }));
+
+                const uploadId = createMultipartUpload.UploadId;
+
+                // Step 2: Upload parts
+                const fileBuffer = await file.arrayBuffer();
+                const parts = [];
+
+                for (let i = 0; i < fileBuffer.byteLength; i += PART_SIZE) {
+                    const end = Math.min(i + PART_SIZE, fileBuffer.byteLength);
+                    const partNumber = Math.floor(i / PART_SIZE) + 1;
+
+                    const uploadPartResult = await s3Client.send(new UploadPartCommand({
+                        Bucket: BUCKET_NAME,
+                        Key: fileName,
+                        UploadId: uploadId,
+                        PartNumber: partNumber,
+                        Body: Buffer.from(fileBuffer.slice(i, end)),
+                    }));
+
+                    parts.push({
+                        ETag: uploadPartResult.ETag,
+                        PartNumber: partNumber,
+                    });
+
+                    uploadedSize += end - i;
+                    const progress = Math.round((uploadedSize / fileSize) * 100);
+                    controller.enqueue(`data: ${progress}\n\n`);
+                }
+
+                // Step 3: Complete multipart upload
+                await s3Client.send(new CompleteMultipartUploadCommand({
+                    Bucket: BUCKET_NAME,
+                    Key: fileName,
+                    UploadId: uploadId,
+                    MultipartUpload: { Parts: parts },
+                }));
+
+                controller.enqueue(`data: 100\n\n`);
+                controller.close();
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                controller.error(error);
+            }
         }
-        return response;
-    } catch (error) {
-        console.error('Error uploading file:', error);
-        return new Response('Internal Server Error', { status: 500 });
-    }
+    });
+
+    return new Response(stream, {
+        headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+        },
+    });
 }
