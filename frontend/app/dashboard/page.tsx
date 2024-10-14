@@ -12,6 +12,8 @@ import Header from "@/components/header"
 import type { User } from "../../types/constants";
 import VideoList from "@/components/VideoList";
 import { FileUpload } from "@/components/ui/file-upload";
+import axios from "axios";
+import sanitize from 'sanitize-filename';
 
 type Video = {
     id: string;
@@ -96,84 +98,70 @@ export default function Dashboard() {
         setUploadState("uploading");
         setUploadProgress(0);
 
-        let uuid: string = uuidv4();
-        let ext: string = getFileExtension(file.name);
+        let uuid: string = uuidv4() as string;
+        let ext: string = getFileExtension(file.name) as string;
 
         try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('fileName', `${user.id}/${uuid}.mp4`);
-
-            const response = await fetch('/api/upload', {
+            // Step 1: Get a signed URL for uploading
+            const getUrlResponse = await fetch('/api/upload', {
                 method: 'POST',
-                body: formData,
                 headers: {
-                    'Authorization': `Bearer ${user.access_token}`
+                    'Authorization': `Bearer ${user.access_token}`,
+                    'Content-Type': 'application/json'
                 },
+                body: JSON.stringify({
+                    filename: `${uuid}.mp4`,
+                    fileSize: file.size,
+                    fileType: file.type
+                })
             });
 
-            if (response.ok) {
-                const reader = response.body?.getReader();
-                const decoder = new TextDecoder();
-
-                while (true) {
-                    const { done, value } = await reader!.read();
-                    if (done) break;
-
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
-
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const progress = parseInt(line.slice(6), 10);
-                            setUploadProgress(progress);
-                        }
-                    }
-                }
-
-                setUploadState("done");
-                const { duration, height, width } = await getDuration(file);
-
-                const { error } = await supabase
-                    .from('metadata')
-                    .insert({ id: uuid, user_id: user.id, name: `${removeInvalidCharacters(file.name)}`, duration: duration, height: height, width: width, ext: ext });
-                if (error) {
-                    toast.error(error.message);
-                    return;
-                }
-
-                toast.success('File uploaded successfully. Redirecting...');
-                setTimeout(() => {
-                    router.push(`/video/${uuid}`);
-                }, 2000);
-
-                await fetchAllVideos(); // Refresh the video list
-            } else {
-                const errorText = await response.text();
-                toast.error(`Upload failed: ${errorText}`);
-                setUploadState("error");
+            if (!getUrlResponse.ok) {
+                throw new Error('Failed to get upload URL');
             }
-        } catch (error) {
+
+            const { url } = await getUrlResponse.json();
+
+            // Step 2: Upload the file to the signed URL
+            const uploadResponse = await axios.put(url, file, {
+                headers: {
+                    'Content-Type': file.type,
+                },
+                onUploadProgress: (progressEvent) => {
+                    const progress = Math.round((progressEvent.loaded * 100) / file.size);
+                    setUploadProgress(progress);
+                }
+            });
+
+            if (uploadResponse.status !== 200) {
+                throw new Error('Failed to upload file');
+            }
+
+            setUploadState("done");
+            const { duration, height, width } = await getDuration(file);
+
+            const sanitizedName = sanitize(file.name);
+            const nameWithoutExtension = sanitizedName.replace(/\.[^.]+$/, '');
+
+            const { error } = await supabase
+                .from('metadata')
+                .insert({ id: uuid, user_id: user.id, name: nameWithoutExtension, duration, height, width, ext });
+            if (error) {
+                toast.error(error.message);
+                return;
+            }
+
+            toast.success('File uploaded successfully. Redirecting...');
+            setTimeout(() => {
+                router.push(`/video/${uuid}`);
+            }, 2000);
+
+            await fetchAllVideos(); // Refresh the video list
+        } catch (error: any) {
             console.error('Error uploading file:', error);
             toast.error('An error occurred while uploading the file');
             setUploadState("error");
         }
-    }
-
-    function removeInvalidCharacters(input: string): string {
-        // Define the regular expression pattern for valid characters
-        const validCharsRegex = /^(\w|\/|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/;
-
-        // Remove the file extension
-        const fileNameWithoutExtension = input.replace(/\.[^.]+$/, '');
-
-        // Use the RegExp test method to filter out invalid characters
-        const validCharacters = Array.from(fileNameWithoutExtension).filter(char => validCharsRegex.test(char));
-
-        // Join the valid characters back into a string
-        const sanitizedString = validCharacters.join('');
-
-        return sanitizedString;
     }
 
     async function getDuration(file: File): Promise<{ duration: number, width: number, height: number }> {
@@ -219,13 +207,13 @@ export default function Dashboard() {
 
         const file = uploadedFiles[0];
 
-        if (file.size > 1073741824000000) {
-            toast.error("File size is too big.");
+        if (file.size > 1 * 1024 ** 3) {
+            toast.error("File size is too big. Max size is 1GB.");
             return;
         }
 
         if (file.type !== "video/mp4") {
-            toast.error("File type is not accepted. Contact support");
+            toast.error("File type is not accepted. Only .mp4 files are accepted. Contact support if you need to upload other file types.");
             return;
         }
 
